@@ -1,4 +1,4 @@
-<div>
+<div class="p-4">
     <div class="card-controls sm:flex">
         <div class="w-full sm:w-1/2">
             Per page:

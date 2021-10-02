@@ -49,6 +49,11 @@ class Course extends Model implements HasMedia
         'deleted_at',
     ];
 
+    public function variations()
+    {
+        return $this->hasMany(CourseVariation::class);
+    }
+
     public function registerMediaConversions(Media $media = null): void
     {
         $thumbnailWidth  = 50;

@@ -1,5 +1,6 @@
 <div wire:ignore>
-    <div class="dropzone" {{ $attributes }}></div>
+    <div class="dropzone bg-white rounded-md my-4 flex items-center justify-center  p-4 w-full h-48 text-center" {{
+    $attributes }}></div>
 </div>
 
 @push('scripts')

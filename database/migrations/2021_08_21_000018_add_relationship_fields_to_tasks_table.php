@@ -9,7 +9,7 @@ class AddRelationshipFieldsToTasksTable extends Migration
     public function up()
     {
         Schema::table('tasks', function (Blueprint $table) {
-            $table->unsignedBigInteger('status_id');
+            $table->unsignedBigInteger('status_id')->nullable();
             $table->foreign('status_id', 'status_fk_4617134')->references('id')->on('task_statuses');
             $table->unsignedBigInteger('assigned_to_id')->nullable();
             $table->foreign('assigned_to_id', 'assigned_to_fk_4617138')->references('id')->on('users');

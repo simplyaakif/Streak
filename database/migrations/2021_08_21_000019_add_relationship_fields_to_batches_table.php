@@ -9,7 +9,7 @@ class AddRelationshipFieldsToBatchesTable extends Migration
     public function up()
     {
         Schema::table('batches', function (Blueprint $table) {
-            $table->unsignedBigInteger('course_id');
+            $table->unsignedBigInteger('course_id')->nullable();
             $table->foreign('course_id', 'course_fk_4617210')->references('id')->on('courses');
         });
     }

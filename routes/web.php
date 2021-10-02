@@ -17,12 +17,23 @@ use App\Http\Controllers\Admin\TaskStatusController;
 use App\Http\Controllers\Admin\TaskTagController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\UserProfileController;
-use Illuminate\Support\Facades\Auth;
+    use App\Http\Controllers\Controller;
+    use App\Http\Controllers\DiscussionsController;
+    use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\Student\StudentController as SC;
 
 Route::redirect('/', '/login');
 
 Auth::routes(['register' => false]);
+
+
+Route::group(['prefix' => 'student'],function(){
+    Route::get('/',[SC::class,'index'])->name('student.dashboard');
+    Route::get('/courses',[SC::class,'courses'])->name('student.courses');
+    Route::get('/discussions',[DiscussionsController::class,'index'])->name('student.discussions');
+});
 
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
