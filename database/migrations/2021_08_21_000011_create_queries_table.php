@@ -14,6 +14,14 @@ class CreateQueriesTable extends Migration
             $table->string('mobile');
             $table->string('email')->nullable();
             $table->longText('address')->nullable();
+
+            $table->bigInteger('staff_user_id')->nullable();
+            $table->text('remarks')->nullable();
+
+            $table->string('telephone')->nullable();
+            $table->string('p_timings')->nullable();
+            $table->string('reference')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
         });

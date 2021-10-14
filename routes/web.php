@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\Admin\AuditLogController;
+    use App\Http\Controllers\AccountsController;
+    use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\BatchController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\DepartmentController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\UserProfileController;
     use App\Http\Controllers\Controller;
     use App\Http\Controllers\DiscussionsController;
+    use App\Http\Controllers\ExpensesController;
     use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -49,6 +51,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
 
     // Query
     Route::post('queries/media', [QueryController::class, 'storeMedia'])->name('queries.storeMedia');
+    Route::get('queries/dashboard`',[QueryController::class,'dashboard'])->name('queries.dashboard');
     Route::resource('queries', QueryController::class, ['except' => ['store', 'update', 'destroy']]);
 
     // Course
@@ -88,6 +91,13 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
     // Student
     Route::post('students/media', [StudentController::class, 'storeMedia'])->name('students.storeMedia');
     Route::resource('students', StudentController::class, ['except' => ['store', 'update', 'destroy']]);
+
+//    Expense
+    Route::resource('finance/expenses',ExpensesController::class);
+
+    //    Account
+//    Route::get('finance/accounts/',[AccountsController::class,'index'])->name('accounts.dashboard');
+    Route::resource('finance/accounts',AccountsController::class);
 });
 
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'middleware' => ['auth']], function () {

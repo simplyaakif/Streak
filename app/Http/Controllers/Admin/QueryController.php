@@ -17,6 +17,12 @@ class QueryController extends Controller
         return view('admin.query.index');
     }
 
+    public function dashboard()
+    {
+//        abort_if(Gate::denies('query_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        return view('admin.query.dashboard');
+    }
+
     public function create()
     {
         abort_if(Gate::denies('query_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');

@@ -1,14 +1,18 @@
 <div wire:ignore>
     <div class="flatpickr flatpickr-{{ $attributes['id'] }} relative">
         @if(!isset($attributes['required']))
-            <div class="absolute inset-y-0 left-0 flex items-center">
-                <button id="clear-{{ $attributes['id'] }}" type="button" class="text-rose-600 w-10 h-full" data-clear>
+            <div class="absolute inset-y-0 right-0 flex items-center">
+                <button id="clear-{{ $attributes['id'] }}" type="button" class="text-rose-600 w-10" data-clear>
                     <i class="far fa-times-circle"></i>
                 </button>
             </div>
         @endif
 
-        <input type="text" class="form-control" {{ $attributes }} data-input>
+        <div class="">
+
+        <x-common.data-input-text {{ $attributes }} data-input/>
+        </div>
+{{--        <input type="text" class="form-input" {{ $attributes }} data-input>--}}
     </div>
 </div>
 

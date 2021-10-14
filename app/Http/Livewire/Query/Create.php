@@ -2,13 +2,18 @@
 
 namespace App\Http\Livewire\Query;
 
+use App\Models\Course;
 use App\Models\Query;
+use App\Models\User;
 use Livewire\Component;
+use phpDocumentor\Reflection\Types\Collection;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Create extends Component
 {
     public Query $query;
+    public  $courses;
+    public $users;
 
     public array $mediaToRemove = [];
 
@@ -17,6 +22,8 @@ class Create extends Component
     public function mount(Query $query)
     {
         $this->query = $query;
+        $this->courses= Course::all();
+        $this->users= User::all();
     }
 
     public function render()
@@ -75,6 +82,31 @@ class Create extends Component
                 'string',
                 'nullable',
             ],
+            'query.p_timings' => [
+                'string',
+                'nullable',
+            ],
+            'query.remarks' => [
+                'string',
+                'nullable',
+            ],
+            'query.telephone' => [
+                'string',
+                'nullable',
+            ],
+            'query.reference' => [
+                'string',
+                'nullable',
+            ],
+            'query.staff_user_id' => [
+                'numeric',
+                'required',
+            ],
+            'query.created_at'=>[
+                'string','nullable'
+            ]
+
+
         ];
     }
 
