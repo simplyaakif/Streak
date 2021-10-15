@@ -1,21 +1,22 @@
 <?php
 
-namespace Database\Seeders;
+    namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
+    use Illuminate\Database\Seeder;
 
-class DatabaseSeeder extends Seeder
-{
-    public function run()
-    {
-        $this->call([
-            PermissionsTableSeeder::class,
-            RolesTableSeeder::class,
-            PermissionRoleTableSeeder::class,
-            UsersTableSeeder::class,
-            RoleUserTableSeeder::class,
-            CoursesTableSeeder::class,
-//            TaskStatusTableSeeder::class,
-        ]);
+    class DatabaseSeeder extends Seeder {
+
+        public function run()
+        {
+            $this->call([
+                            PermissionsTableSeeder::class,
+                            RolesTableSeeder::class,
+                            PermissionRoleTableSeeder::class,
+                            UsersTableSeeder::class,
+                            RoleUserTableSeeder::class,
+                            CoursesTableSeeder::class,
+                            TimelineTableSeeder::class,
+                            //            TaskStatusTableSeeder::class,
+                        ]);
+        }
     }
-}

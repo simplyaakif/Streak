@@ -250,17 +250,12 @@
                 </div>
             </fieldset>
 
-        </div>
-
-        <div class="form-group pt-6">
-            <button class="btn btn-indigo mr-2" type="submit">
-                {{ trans('global.save') }}
-            </button>
-            <a href="{{ route('admin.students.index') }}" class="btn btn-secondary">
-                {{ trans('global.cancel') }}
-            </a>
-        </div>
-    </form>
-</div>
-
-
+    <div class="form-group">
+        <button class="btn btn-indigo mr-2" type="submit">
+            {{ trans('global.save') }}
+        </button>
+        <a href="{{ route('admin.students.index') }}" class="btn btn-secondary">
+            {{ trans('global.cancel') }}
+        </a>
+    </div>
+</form>

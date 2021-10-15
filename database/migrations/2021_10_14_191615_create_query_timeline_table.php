@@ -4,17 +4,17 @@
     use Illuminate\Database\Schema\Blueprint;
     use Illuminate\Support\Facades\Schema;
 
-    class CreateCourseQueryTable extends Migration {
+    class CreateQueryTimelineTable extends Migration {
 
         public function up()
         {
-            Schema::create('course_query', function (Blueprint $table) {
+            Schema::create('query_timeline', function (Blueprint $table) {
                 $table->bigIncrements('id');
-                $table->bigInteger('course_id');
-                $table->bigInteger('course_variation_id')->nullable();
                 $table->bigInteger('query_id');
-                $table->string('learning_type');
-                $table->string('remarks')->nullable();
+                $table->bigInteger('timeline_id');
+                $table->string('remarks');
+                $table->dateTime('fw_date_time')->nullable();
+
                 //
 
                 $table->timestamps();
@@ -23,6 +23,6 @@
 
         public function down()
         {
-            Schema::dropIfExists('course_query');
+            Schema::dropIfExists('query_timeline');
         }
     }

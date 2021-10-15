@@ -55,6 +55,14 @@ class Query extends Model implements HasMedia
         'address',
     ];
 
+    public function timelines()
+    {
+        return $this->belongsToMany(Timeline::class);
+    }
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class);
+    }
     public function registerMediaConversions(Media $media = null): void
     {
         $thumbnailWidth  = 50;

@@ -8,10 +8,8 @@
             </div>
         @endif
 
-        <div class="">
 
         <x-common.data-input-text {{ $attributes }} data-input/>
-        </div>
 {{--        <input type="text" class="form-input" {{ $attributes }} data-input>--}}
     </div>
 </div>

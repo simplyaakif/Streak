@@ -71,15 +71,24 @@
             </div>
             <div class="sm:col-span-3">
                 <x-common.data-label class="form-label required" label="Course" for=""/>
-                <x-common.data-input-select >
+                <x-common.data-input-select name="" wire:model.defer="qCourses.course_id" >
                     @foreach($courses as $course)
-                        <option value="">{{$course->title}}</option>
+                        <option value="{{$course->id}}">{{$course->title}}</option>
                     @endforeach
                 </x-common.data-input-select>
             </div>
             <div class="sm:col-span-3">
                 <x-common.data-label class="form-label required" label="Session Learning Type" for=""/>
-                <x-common.data-input-text />
+                <x-common.data-input-select name="" wire:model.defer="qCourses.learning_type">
+                    <option value="regular">Regular - On Campus</option>
+                    <option value="online">Online</option>
+                    <option value="weekend">Weekend</option>
+                </x-common.data-input-select>
+            </div>
+
+            <div class="sm:col-span-6">
+                <x-common.data-label class="form-label required" label="Remarks" for=""/>
+                <x-common.data-input-text name="" wire:model.defer="qCourses.remarks"/>
             </div>
 
 
@@ -130,22 +139,26 @@
 
             <div class="sm:col-span-3">
                 <x-common.data-label class="form-label required" label="Status" for=""/>
-                <x-common.data-input-text value="Entry in System" disabled/>
+                <x-common.data-input-select :is_skip_select="true" wire:model="timeline.timeline_id" disabled >
+{{--                    @foreach($timelines as $timeline)--}}
+                        <option selected value="{{$timelines[0]->id}}">{{$timelines[0]->title}}</option>
+{{--                    @endforeach--}}
+                </x-common.data-input-select>
             </div>
 
             <div class="sm:col-span-3">
                 <x-common.data-label class="form-label required" label="Comments on Status" for=""/>
-                <x-common.data-input-text value=""/>
+                <x-common.data-input-text value="" wire:model.defer="timeline.remarks"/>
             </div>
 
             <div class="sm:col-span-3">
                 <x-common.data-label class="form-label required" label="Status Date & Time" for=""/>
-                <x-common.data-input-text value="{{now()->toDateTimeString()}}"/>
+                <x-common.data-input-text disabled value="{{now()->toDateTimeString()}}"/>
             </div>
 
             <div class="sm:col-span-3">
                 <x-common.data-label class="form-label required" label="Follow Up Date & Time" for=""/>
-                <x-date-picker picker="" id="follow-up" name="followUp" wire:model="query.created_at" />
+                <x-date-picker picker="" id="follow_up" name="follow_up" wire:model="timeline.fw_date_time" />
             </div>
 
         </div>
