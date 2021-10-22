@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\UserProfileController;
     use App\Http\Controllers\Controller;
     use App\Http\Controllers\DiscussionsController;
+    use App\Http\Controllers\EmployeesController;
     use App\Http\Controllers\ExpensesController;
     use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Student\StudentController as SC;
 
 Route::redirect('/', '/login');
+
+Route::get('/wip',[HomeController::class,'wip']);
 
 Auth::routes(['register' => false]);
 
@@ -96,8 +99,12 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
     Route::resource('finance/expenses',ExpensesController::class);
 
     //    Account
-//    Route::get('finance/accounts/',[AccountsController::class,'index'])->name('accounts.dashboard');
     Route::resource('finance/accounts',AccountsController::class);
+
+//    Employee
+    Route::resource('employees',EmployeesController::class,['except' => ['store','update','destroy']]);
+
+
 });
 
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'middleware' => ['auth']], function () {

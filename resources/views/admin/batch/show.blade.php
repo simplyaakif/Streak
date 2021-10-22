@@ -67,10 +67,10 @@
                         </tr>
                         <tr>
                             <th>
-                                {{ trans('cruds.batch.fields.time') }}
+                                Session Duration
                             </th>
                             <td>
-                                {{ $batch->time }}
+                                {{ $batch->session_duration }}
                             </td>
                         </tr>
                         <tr>

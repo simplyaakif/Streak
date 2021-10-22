@@ -18,6 +18,7 @@ class CreateStudentsTable extends Migration
             $table->string('cnic_passport')->nullable();
             $table->string('mobile')->nullable();
             $table->string('email')->nullable();
+            $table->bigInteger('guardian_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

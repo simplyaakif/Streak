@@ -76,8 +76,22 @@ class Student extends Model implements HasMedia
         'cnic_passport',
         'mobile',
         'email',
+        'guardian_id'
     ];
 
+    public function guardian()
+    {
+        return $this->belongsTo(Guardian::class);
+    }
+    public function batches()
+    {
+        return $this->belongsToMany(Batch::class);
+    }
+
+    public function recoveries()
+    {
+        return $this->hasMany(Recovery::class);
+    }
     public function registerMediaConversions(Media $media = null): void
     {
         $thumbnailWidth  = 50;

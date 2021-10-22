@@ -13,14 +13,9 @@
             </button>
         </div>
     </div>
-    <div class="card bg-blueGray-100">
-        <!-- This example requires Tailwind CSS v2.0+ -->
 
-
-
-        <div class="card-body">
+    <x-common.page-body>
             @livewire('query.create')
-        </div>
-    </div>
+    </x-common.page-body>
 </div>
 @endsection

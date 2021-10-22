@@ -55,6 +55,11 @@ class Query extends Model implements HasMedia
         'address',
     ];
 
+    public function getHumanDateAttribute()
+    {
+        return $this->created_at->format('d-M-Y');
+    }
+
     public function timelines()
     {
         return $this->belongsToMany(Timeline::class);

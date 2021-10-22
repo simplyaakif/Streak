@@ -13,7 +13,7 @@
                 $table->bigInteger('course_id');
                 $table->bigInteger('course_variation_id')->nullable();
                 $table->bigInteger('query_id');
-                $table->string('learning_type');
+                $table->string('learning_type')->nullable();
                 $table->string('remarks')->nullable();
                 //
 

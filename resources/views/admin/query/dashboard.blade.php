@@ -4,10 +4,7 @@
     <x-common.page-header>
         <div class="">
 
-            <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
-                Queries Dashboard
-            </h1>
-            <p class="text-sm text-gray-500">Queries Reports and Sub Reports</p>
+            <x-common.ph-section-header title="Queries Dashboard" subtitle="Queries Reports and Sub Reports"/>
         </div>
     </x-common.page-header>
 
@@ -17,7 +14,7 @@
             <div>
                 <h2 class="text-lg leading-6 font-medium text-gray-900">Overview</h2>
                 <div class="mt-2 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
-                    <x-common.stat-card label="Daily Queries" stat="37">
+                    <x-common.stat-card label="Daily Queries" stat="{{$dQuery}}">
                         <x-slot name="icon">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                  xmlns="http://www.w3.org/2000/svg">
@@ -35,7 +32,7 @@
 
                         </x-slot>
                     </x-common.stat-card>
-                    <x-common.stat-card label="Weekly Queries" stat="37">
+                    <x-common.stat-card label="Weekly Queries" stat="{{$wQuery}}">
                         <x-slot name="icon">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                  xmlns="http://www.w3.org/2000/svg">
@@ -53,7 +50,7 @@
 
                         </x-slot>
                     </x-common.stat-card>
-                    <x-common.stat-card label="Montly Queries" stat="37">
+                    <x-common.stat-card label="Montly Queries" stat="{{$mQuery}}">
                         <x-slot name="icon">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                  xmlns="http://www.w3.org/2000/svg">
@@ -71,7 +68,7 @@
 
                         </x-slot>
                     </x-common.stat-card>
-                    <x-common.stat-card label="Last Month Queries" stat="37">
+                    <x-common.stat-card label="Last Month Queries" stat="{{$pMquery}}">
                         <x-slot name="icon">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                  xmlns="http://www.w3.org/2000/svg">

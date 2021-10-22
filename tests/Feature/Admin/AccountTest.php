@@ -17,6 +17,7 @@
         {
             $this->seed();
             $user = User::findOrFail(1)->first();
+
             $this->actingAs($user);
         }
 

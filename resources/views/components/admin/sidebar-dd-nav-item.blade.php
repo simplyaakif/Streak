@@ -28,7 +28,6 @@
          x-transition:leave-start="transform opacity-100 scale-100"
          x-transition:leave-end="transform opacity-0 scale-95"
     >
-
         {{$slot}}
     </div>
 </div>

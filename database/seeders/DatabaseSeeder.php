@@ -16,6 +16,8 @@
                             RoleUserTableSeeder::class,
                             CoursesTableSeeder::class,
                             TimelineTableSeeder::class,
+                            AccountsTableSeeder::class,
+                            EmployeeSeeder::class,
                             //            TaskStatusTableSeeder::class,
                         ]);
         }

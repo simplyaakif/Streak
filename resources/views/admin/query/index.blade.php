@@ -1,23 +1,19 @@
 @extends('layouts.admin')
 @section('content')
 <div class="row">
-    <div class="card bg-white">
-        <div class="card-header border-b border-blueGray-200">
-            <div class="card-header-container">
-                <h6 class="card-title">
-                    {{ trans('cruds.query.title_singular') }}
-                    {{ trans('global.list') }}
-                </h6>
-
+    <x-common.page-header>
+        <x-common.ph-section-header title="Query Search" subtitle="All the queries in the system"/>
                 @can('query_create')
                     <a class="btn btn-indigo" href="{{ route('admin.queries.create') }}">
                         {{ trans('global.add') }} {{ trans('cruds.query.title_singular') }}
                     </a>
                 @endcan
-            </div>
-        </div>
-        @livewire('query.index')
+    </x-common.page-header>
 
-    </div>
+    <x-common.page-body>
+        <livewire:datatable/>
+{{--        @livewire('query.index')--}}
+    </x-common.page-body>
+
 </div>
 @endsection

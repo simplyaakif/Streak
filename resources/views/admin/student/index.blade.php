@@ -1,23 +1,19 @@
 @extends('layouts.admin')
 @section('content')
 <div class="row">
-    <div class="card bg-white">
-        <div class="card-header border-b border-blueGray-200">
-            <div class="card-header-container">
-                <h6 class="card-title">
-                    {{ trans('cruds.student.title_singular') }}
-                    {{ trans('global.list') }}
-                </h6>
+    <x-common.page-header>
+        <x-common.ph-section-header title="Students List" subtitle="All the active students list"/>
+        @can('student_create')
+            <a class="btn btn-indigo" href="{{ route('admin.students.create') }}">
+                {{ trans('global.add') }} {{ trans('cruds.student.title_singular') }}
+            </a>
+        @endcan
+    </x-common.page-header>
 
-                @can('student_create')
-                    <a class="btn btn-indigo" href="{{ route('admin.students.create') }}">
-                        {{ trans('global.add') }} {{ trans('cruds.student.title_singular') }}
-                    </a>
-                @endcan
-            </div>
-        </div>
+
+    <x-common.page-body>
+
         @livewire('student.index')
-
-    </div>
+    </x-common.page-body>
 </div>
 @endsection

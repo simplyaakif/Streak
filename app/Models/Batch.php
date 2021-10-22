@@ -28,7 +28,6 @@ class Batch extends Model implements HasMedia
         'title',
         'limit',
         'course.title',
-        'time',
         'description',
     ];
 
@@ -37,7 +36,6 @@ class Batch extends Model implements HasMedia
         'title',
         'limit',
         'course.title',
-        'time',
         'description',
     ];
 
@@ -47,7 +45,6 @@ class Batch extends Model implements HasMedia
     ];
 
     protected $dates = [
-        'time',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -57,7 +54,7 @@ class Batch extends Model implements HasMedia
         'title',
         'limit',
         'course_id',
-        'time',
+        'session_duration',
         'description',
     ];
 

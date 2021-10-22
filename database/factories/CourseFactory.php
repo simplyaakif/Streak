@@ -13,8 +13,8 @@
         public function definition(): array
         {
             return [
-                'title'       => $this->faker->word,
-                'description' => $this->faker->text,
+                'title'       => $this->faker->word(),
+                'description' => $this->faker->text(),
                 'created_at'  => Carbon::now(),
                 'updated_at'  => Carbon::now(),
             ];

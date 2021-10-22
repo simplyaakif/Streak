@@ -36,6 +36,7 @@ class StudentController extends Controller
         abort_if(Gate::denies('student_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $student->load('user');
+        $student->load('batches');
 
         return view('admin.student.show', compact('student'));
     }

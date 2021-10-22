@@ -58,9 +58,10 @@
 
             $this->timeline['created_at']=now();
 
-            if(!$this->timeline['fw_date_time']){
-            $this->timeline['fw_date_time']=Carbon::createFromFormat('Y-m-d H:i:s', $this->timeline['created_at']);
+            if($this->timeline['fw_date_time']){
+            $this->timeline['fw_date_time']=Carbon::parse( $this->timeline['fw_date_time']);
             }
+//            dd($this->timeline);
 
 
             $this->query->timelines()->attach($this->timeline['timeline_id'], $this->timeline);

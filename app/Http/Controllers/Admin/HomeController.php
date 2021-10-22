@@ -25,4 +25,9 @@
                                                   'mQuery','mStudent'
                                               ]));
         }
+
+        public function wip()
+        {
+            return view('wip');
+        }
     }
