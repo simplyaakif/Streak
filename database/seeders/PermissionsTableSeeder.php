@@ -321,6 +321,45 @@ class PermissionsTableSeeder extends Seeder
             [
                 'id'    => 78,
                 'title' => 'employee_access',
+            ], [
+                'id'    => 79,
+                'title' => 'expense_create',
+            ],
+            [
+                'id'    => 80,
+                'title' => 'expense_edit',
+            ],
+            [
+                'id'    => 81,
+                'title' => 'expense_show',
+            ],
+            [
+                'id'    => 82,
+                'title' => 'expense_delete',
+            ],
+            [
+                'id'    => 83,
+                'title' => 'expense_access',
+            ],
+            [
+                'id'    => 84,
+                'title' => 'income_create',
+            ],
+            [
+                'id'    => 85,
+                'title' => 'income_edit',
+            ],
+            [
+                'id'    => 86,
+                'title' => 'income_show',
+            ],
+            [
+                'id'    => 87,
+                'title' => 'income_delete',
+            ],
+            [
+                'id'    => 88,
+                'title' => 'income_access',
             ],
         ];
 

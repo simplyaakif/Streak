@@ -17,14 +17,16 @@
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/dusk": "^6.11",
         "laravel/framework": "^8.12",
+        "laravel/sanctum": "^2.8",
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.2",
         "livewire/livewire": "^2.3",
         "maatwebsite/excel": "^3.1",
-        "laravel/sanctum": "^2.8",
-        "spatie/laravel-medialibrary": "^9.4"
+        "spatie/laravel-medialibrary": "^9.4",
+        "staudenmeir/eloquent-has-many-deep": "^1.7"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.6",
         "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
         "laravel/sail": "^1.0.1",

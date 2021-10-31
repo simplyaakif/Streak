@@ -14,6 +14,7 @@
     class Create extends Component {
 
         public Query $query;
+        public $validationAlert = false;
         public $timelines;
         public $qCourses
             = [
@@ -21,9 +22,10 @@
                 'learning_type' => '',
                 'remarks'       => '',
             ];
-        public $timeline = [
-                'timeline_id' => 1,
-                'remarks'          => '',
+        public $timeline
+            = [
+                'timeline_id'  => 1,
+                'remarks'      => '',
                 'fw_date_time' => null,
             ];
         public $courses;
@@ -33,12 +35,13 @@
 
         public array $mediaCollections = [];
 
+
         public function mount(Query $query)
         {
-            $this->query   = $query;
-            $this->courses = Course::all();
-            $this->users   = User::all();
-            $this->timelines   = Timeline::all();
+            $this->query     = $query;
+            $this->courses   = Course::all();
+            $this->users     = User::all();
+            $this->timelines = Timeline::all();
         }
 
         public function render()
@@ -50,16 +53,24 @@
         {
 
 //            dd($this->timeline);
+            $this->validationAlert = true;
+            $errors                = $this->getErrorBag();
+            if(count($errors) > 0) {
+                $this->validationAlert = true;
+            }else{
+
+                $this->validationAlert = false;
+            }
             $this->validate();
 
             $this->query->save();
-            $this->qCourses['created_at']=now();
+            $this->qCourses['created_at'] = now();
             $this->query->courses()->attach($this->qCourses['course_id'], $this->qCourses);
 
-            $this->timeline['created_at']=now();
+            $this->timeline['created_at'] = now();
 
-            if($this->timeline['fw_date_time']){
-            $this->timeline['fw_date_time']=Carbon::parse( $this->timeline['fw_date_time']);
+            if($this->timeline['fw_date_time']) {
+                $this->timeline['fw_date_time'] = Carbon::parse($this->timeline['fw_date_time']);
             }
 //            dd($this->timeline);
 
@@ -100,6 +111,7 @@
                 'query.name'                     => [
                     'string',
                     'required',
+                    'min:3',
                 ],
                 'query.mobile'                   => [
                     'string',
@@ -132,6 +144,17 @@
                 'query.staff_user_id'            => [
                     'numeric',
                     'required',
+                ],
+                'qCourses.course_id'             => [
+                    'numeric',
+                    'required'
+                ],
+                'qCourses.learning_type'         => [
+                    'required'
+                ],
+                'qCourses.remarks'               => [
+                    'nullable',
+                    'string'
                 ],
 
             ];

@@ -22,6 +22,7 @@ use App\Http\Controllers\Auth\UserProfileController;
     use App\Http\Controllers\DiscussionsController;
     use App\Http\Controllers\EmployeesController;
     use App\Http\Controllers\ExpensesController;
+    use App\Http\Controllers\IncomesController;
     use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -95,15 +96,17 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
     Route::post('students/media', [StudentController::class, 'storeMedia'])->name('students.storeMedia');
     Route::resource('students', StudentController::class, ['except' => ['store', 'update', 'destroy']]);
 
-//    Expense
+    //    Expense
     Route::resource('finance/expenses',ExpensesController::class);
 
     //    Account
     Route::resource('finance/accounts',AccountsController::class);
 
-//    Employee
+    //    Employee
     Route::resource('employees',EmployeesController::class,['except' => ['store','update','destroy']]);
 
+    //    Income
+    Route::resource('incomes',IncomesController::class,['except' => ['store','update','destroy']]);
 
 });
 

@@ -7,10 +7,13 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <link rel="stylesheet" href="{{asset('css/student.css')}}">
+
     @livewireStyles
-    @livewireScripts
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.2/dist/alpine.min.js" defer></script>
     <script src="{{asset('js/components.js')}}"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 </head>
 <body class="bg-gray-200">
@@ -22,6 +25,19 @@
          :col="$searchCol" :actions="['show','edit','delete']">
     </livewire:admin.global-table>
     {{--<livewire:datatable/>--}}
+
+
+    @livewireScripts
+    @yield('scripts')
+    @stack('scripts')
+    <script>
+        function closeAlert(event) {
+            let element = event.target;
+            while (element.nodeName !== "BUTTON") {
+                element = element.parentNode;
+            }
+            element.parentNode.parentNode.removeChild(element.parentNode);
+        }
 </div>
 
 </body>

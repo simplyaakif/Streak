@@ -28,16 +28,16 @@
                     {{ trans('cruds.student.fields.name_helper') }}
                 </div>
             </div>
-            {{--        <div class="sm:col-span-3 form-group {{ $errors->has('student.user_id') ? 'invalid' : '' }}">--}}
-            {{--            <label class="form-label" for="user">{{ trans('cruds.student.fields.user') }}</label>--}}
-            {{--            <x-select-list class="form-control" id="user" name="user" :options="$this->listsForFields['user']" wire:model="student.user_id" />--}}
-            {{--            <div class="validation-message">--}}
-            {{--                {{ $errors->first('student.user_id') }}--}}
-            {{--            </div>--}}
-            {{--            <div class="help-block">--}}
-            {{--                {{ trans('cruds.student.fields.user_helper') }}--}}
-            {{--            </div>--}}
-            {{--        </div>--}}
+                    <div class="sm:col-span-3 form-group {{ $errors->has('student.user_id') ? 'invalid' : '' }}">
+                        <label class="form-label" for="user">{{ trans('cruds.student.fields.user') }}</label>
+                        <x-select-list class="form-control" id="user" name="user" :options="$this->listsForFields['user']" wire:model="student.user_id" />
+                        <div class="validation-message">
+                            {{ $errors->first('student.user_id') }}
+                        </div>
+                        <div class="help-block">
+                            {{ trans('cruds.student.fields.user_helper') }}
+                        </div>
+                    </div>
             <div class="sm:col-span-3 form-group {{ $errors->has('student.father_name') ? 'invalid' : '' }}">
                 <label class="form-label" for="father_name">{{ trans('cruds.student.fields.father_name') }}</label>
                 <input class="form-control" type="text" name="father_name" id="father_name"

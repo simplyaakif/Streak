@@ -118,6 +118,7 @@ class Student extends Model implements HasMedia
             $media['thumbnail'] = $item->getUrl('thumbnail');
             $media['preview_thumbnail'] = $item->getUrl('preview_thumbnail');
 
+
             return $media;
         });
     }

@@ -1,7 +1,6 @@
 <div>
     {{--    Filters --}}
     <div class="mb-4 flex justify-between items-center">
-
         @if($searchColumn)
             <div class="w-1/4">
                 <x-common.data-input-text
@@ -13,6 +12,19 @@
                 <x-icons.filter  wire:click="resetFilters" bold  class="w-8 h-8 text-cyan-600"/>
             </div>
         @endif
+    </div>
+    <div class="grid grid-cols-3 gap-2 mb-4">
+        <div>
+
+        <x-common.filter-select  label="Select Filter">
+            <x-select-list id="course" class="w-full shadow-inner  rounded border-gray-200 text-sm"  :options="['1'=>'Spoken English','2'=>'Fluency English']"
+                           wire:model="filters.course" />
+        </x-common.filter-select>
+        </div>
+        <div>
+
+        <x-common.filter-date-interval label="Date Filter"/>
+        </div>
     </div>
     {{--    Table--}}
     <x-common.table>

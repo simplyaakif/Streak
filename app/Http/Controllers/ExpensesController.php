@@ -9,6 +9,7 @@
 
         public function index()
         {
+            return view('admin.finance.expenses.index');
             //
         }
 

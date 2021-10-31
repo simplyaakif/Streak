@@ -10,7 +10,12 @@
         {
             Schema::create('expenses', function (Blueprint $table) {
                 $table->bigIncrements('id');
-
+                    $table->string('type');
+                    $table->string('amount');
+                    $table->boolean('is_paid');
+                    $table->dateTime('paid_on');
+                    $table->bigInteger('paid_by');
+                    $table->string('paid_to');
                 //
 
                 $table->timestamps();
