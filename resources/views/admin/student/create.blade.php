@@ -1,19 +1,9 @@
 @extends('layouts.admin')
 @section('content')
-<div class="row">
-    <div class="card bg-blueGray-100">
-        <div class="card-header">
-            <div class="card-header-container">
-                <h6 class="card-title">
-                    {{ trans('global.create') }}
-                    {{ trans('cruds.student.title_singular') }}
-                </h6>
-            </div>
-        </div>
-
-        <div class="card-body">
-            @livewire('student.create')
-        </div>
-    </div>
-</div>
+    <x-common.page-header>
+        <x-common.ph-section-header title="Create Admission" subtitle="Enter details for a new Student"/>
+    </x-common.page-header>
+    <x-common.page-body>
+        @livewire('student.create')
+    </x-common.page-body>
 @endsection

@@ -10,13 +10,16 @@ html {
 }
 ::-webkit-scrollbar {
     width: 5px;  /* Remove scrollbar space */
+    height: 5px;
     /*background: transparent;  !* Optional: just make scrollbar invisible *!*/
     @apply bg-transparent
 }
 /* Optional: show position indicator in red */
 ::-webkit-scrollbar-thumb {
+    height: 8px;
     @apply bg-cyan-900 rounded-full
 }
+
 
 .form-group {
     @apply my-2 block

@@ -268,7 +268,7 @@ class PermissionsTableSeeder extends Seeder
             ],
             [
                 'id'    => 65,
-                'title' => 'employee_access',
+                'title' => 'employee_management_access',
             ],
             [
                 'id'    => 66,
@@ -276,7 +276,7 @@ class PermissionsTableSeeder extends Seeder
             ],
             [
                 'id'    => 67,
-                'title' => 'finance_managment_access',
+                'title' => 'finance_management_access',
             ],
             [
                 'id'    => 68,
@@ -360,6 +360,9 @@ class PermissionsTableSeeder extends Seeder
             [
                 'id'    => 88,
                 'title' => 'income_access',
+            ],[
+                'id'    => 89,
+                'title' => 'dashboard_access',
             ],
         ];
 

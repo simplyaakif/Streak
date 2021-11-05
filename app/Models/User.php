@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Lab404\Impersonate\Models\Impersonate;
 
 class User extends Authenticatable
 {
@@ -19,6 +20,7 @@ class User extends Authenticatable
     use HasAdvancedFilter;
     use SoftDeletes;
     use Notifiable;
+    use Impersonate;
 
     public $table = 'users';
 
@@ -60,6 +62,15 @@ class User extends Authenticatable
         return $this->roles()->where('title', 'Admin')->exists();
     }
 
+    /**
+     * @return bool
+     */
+    public function canImpersonate()
+    {
+        // For example
+        return $this->is_admin == 1;
+    }
+
     public function scopeAdmins()
     {
         return $this->whereHas('roles', fn ($q) => $q->where('title', 'Admin'));
@@ -85,5 +96,9 @@ class User extends Authenticatable
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public function student(){
+        return $this->hasOne(Student::class);
     }
 }

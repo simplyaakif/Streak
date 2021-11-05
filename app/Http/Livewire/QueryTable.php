@@ -3,7 +3,9 @@
     namespace App\Http\Livewire;
 
     use App\Models\Course;
+    use App\Models\Income;
     use App\Models\Query;
+    use App\Models\Timeline;
     use Carbon\Carbon;
     use Livewire\Component;
     use Livewire\WithPagination;
@@ -11,6 +13,21 @@
     class QueryTable extends Component {
 
         use withPagination;
+
+        public $showEditModal = false;
+        public $showDeleteModal = false;
+
+        public $delete_id;
+        public $is_editing = false;
+
+        public Query $editing;
+        public $addTimelineData=[
+            'timeline_id'=>2,
+            'fw_date_time'=>null,
+            'remarks'=>null,
+        ];
+
+        public $timelines;
 
         public $courses = [];
         public $sortField = 'created_at';
@@ -32,6 +49,16 @@
                 'sortDirection'
             ];
 
+        public function rules()
+        {
+            return [
+                'editing.name'=>'required|string',
+                'editing.mobile'=>'required|string',
+                'editing.email'=>'string',
+
+            ];
+        }
+
         public function deleteQuery($query)
         {
             $model = Query::findOrFail($query);
@@ -42,10 +69,30 @@
             $this->showQueryDetails = $query;
             $this->showQuery = true;
         }
+
+        public function addTimeline()
+        {
+            $this->validate([
+                                'addTimelineData.timeline_id'=>'required',
+                                'addTimelineData.fw_date_time'=>'date',
+                                'addTimelineData.remarks'=>'string'
+                            ]);
+            $query = $this->showQueryDetails;
+            $query->timelines()->attach($this->addTimelineData['timeline_id'],$this->addTimelineData);
+        }
         public function mount()
         {
-            $this->showQueryDetails = Query::first();
+            $this->timelines = Timeline::all();
+            $this->editing = Query::first();
+            $this->showQueryDetails = Query::make(['created_at' => now()]);
             $this->courses = Course::all('id','title');
+        }
+
+        public function edit(Query $query)
+        {
+            $this->is_editing = true;
+            $this->showEditModal = true;
+            $this->editing = $query;
         }
 
         public function sortBy($field)

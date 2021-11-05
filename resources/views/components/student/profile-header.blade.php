@@ -12,8 +12,9 @@
           but preserve the same layout if the text wraps without making the image jump around.
         -->
         <div class="pt-1.5">
-            <h1 class="text-2xl font-bold text-gray-900">Ricardo Cooper</h1>
-            <p class="text-sm font-medium text-gray-500">Applied for <a href="#" class="text-gray-900">Front End Developer</a> on <time datetime="2020-08-25">August 25, 2020</time></p>
+            <h1 class="text-2xl font-bold text-gray-900">{{Auth::user()->name}}</h1>
+            <p class="text-sm font-medium text-gray-500">Admitted on <time>{{Auth::user()
+            ->created_at->format('d F Y')}}</time></p>
         </div>
     </div>
     <div class="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">

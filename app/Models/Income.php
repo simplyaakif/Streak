@@ -5,9 +5,9 @@
     use Carbon\Carbon;
     use Illuminate\Database\Eloquent\Factories\HasFactory;
     use Illuminate\Database\Eloquent\Model;
-    use phpDocumentor\Reflection\Types\Self_;
 
     class Income extends Model {
+        use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
         use HasFactory;
 
@@ -42,9 +42,17 @@
             return $this->belongsTo(User::class);
         }
 
-        public function acccount()
+        public function account()
         {
-            return $this->hasOneThrough(Transaction::class,Account::class);
+            return $this->hasOneDeep(
+                Account::class,
+                    [Transaction::class],
+//                    [null, 'id', 'account_id'],
+                    ['account_id', 'id'],
+                    ['id','transactionable_id']
+//                    [null, ['transactionable_type', 'transactionable_id'], 'id']
+            );
+//            return $this->hasOneDeepFromRelations($this->transaction(),(new Transaction)->account());
         }
 
     }

@@ -21,9 +21,7 @@
                 'created_at'  => Carbon::now(),
                 'updated_at'  => Carbon::now(),
 
-                'course_id' => function () {
-                    return Course::factory()->create()->id;
-                },
+                'course_id' => $this->faker->randomElement([1,2,3])
             ];
         }
     }

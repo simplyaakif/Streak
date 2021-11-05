@@ -2,6 +2,7 @@
 
     namespace App\Models;
 
+    use Carbon\Carbon;
     use \DateTimeInterface;
     use App\Support\HasAdvancedFilter;
     use App\Traits\Auditable;
@@ -99,23 +100,62 @@
 
         public function getHumanDateAttribute()
         {
-            return $this->created_at->format('d-M-Y');
+            return $this->created_at ? $this->created_at->format('d-M-Y') : null;
+        }
+
+        public function avatarUrl()
+        {
+
+            return 'https://avatars.dicebear.com/api/initials/' . $this->name . '.svg';
         }
 
         public function timelines()
         {
-            return $this->belongsToMany(Timeline::class)->withPivot(['created_at','remarks','fw_date_time']);
+            return $this->belongsToMany(Timeline::class)->withPivot([
+                                                                        'created_at',
+                                                                        'remarks',
+                                                                        'fw_date_time'
+                                                                    ])->withTimestamps();
         }
 
         public function courses()
         {
-            return $this->belongsToMany(Course::class);
+            return $this->belongsToMany(Course::class)->withTimestamps();
         }
-        public function getPTimingsAttribute($value){
+
+        public function getCourseAttribute()
+        {
+            return $this->courses()->first();
+        }
+
+        public function getRecentTimelineTitleAttribute($value)
+        {
+            return $this->timelines->last() ? $this->timelines->last()->title : null;
+
+        }
+
+        public function getRecentTimelineDateAttribute($value)
+        {
+            if($this->timelines->last()) {
+                return $this->timelines->last()->pivot->fw_date_time ? Carbon::parse($this->timelines->last()
+                      ->pivot->fw_date_time)->format('h:i a d-m-Y') : null;
+            }
+
+            return null;
+        }
+
+        public function getEntryByAttribute()
+        {
+            return User::find($this->attributes['staff_user_id'])->name;
+        }
+
+        public function getPTimingsAttribute($value)
+        {
             return static::preferred_timings[$value] ?? null;
         }
 
-        public function getReferenceAttribute($value){
+        public function getReferenceAttribute($value)
+        {
             return static::marketing[$value] ?? null;
         }
 

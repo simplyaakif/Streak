@@ -29,8 +29,10 @@
                 ->whereYear('created_at',now()->subMonth()->year)
                 ->get()->count();
 
+            $queries = Query::latest()->take(10)->get();
+
             return view('admin.query.dashboard', compact([
-                                                             'dQuery','mQuery','wQuery','pMquery'
+                                                             'dQuery','mQuery','wQuery','pMquery','queries'
                                                          ]));
         }
 

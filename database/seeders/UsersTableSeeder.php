@@ -16,12 +16,14 @@ class UsersTableSeeder extends Seeder
                 'email'          => 'admin@admin.com',
                 'password'       => bcrypt('password'),
                 'remember_token' => null,
+                'is_staff' => 1,
             ], [
                 'id'             => 2,
                 'name'           => 'FDO',
                 'email'          => 'aceinstitute.fdo1@gmail.com',
                 'password'       => bcrypt('password'),
                 'remember_token' => null,
+                'is_staff' => 1,
             ],
         ];
 

@@ -6,4 +6,5 @@
 
     class Timeline extends Model {
         protected $guarded=[];
+
     }

@@ -8,16 +8,18 @@
                 <p class="mt-1 text-sm text-blue-gray-500">This information will be displayed publicly so be careful
                     what you share.</p>
             </div>
-            {{--        <div class="form-group {{ $errors->has('mediaCollections.student_dp') ? 'invalid' : '' }}">--}}
-            {{--            <label class="form-label" for="dp">{{ trans('cruds.student.fields.dp') }}</label>--}}
-            {{--            <x-dropzone id="dp" name="dp" action="{{ route('admin.students.storeMedia') }}" collection-name="student_dp" max-file-size="2" max-width="4096" max-height="4096" max-files="1" />--}}
-            {{--            <div class="validation-message">--}}
-            {{--                {{ $errors->first('mediaCollections.student_dp') }}--}}
-            {{--            </div>--}}
-            {{--            <div class="help-block">--}}
-            {{--                {{ trans('cruds.student.fields.dp_helper') }}--}}
-            {{--            </div>--}}
-            {{--        </div>--}}
+            <div class="form-group {{ $errors->has('mediaCollections.student_dp') ? 'invalid' : '' }}">
+                <label class="form-label" for="dp">{{ trans('cruds.student.fields.dp') }}</label>
+                <x-dropzone id="dp" name="dp" action="{{ route('admin.students.storeMedia') }}"
+                            collection-name="student_dp" max-file-size="2" max-width="4096" max-height="4096"
+                            max-files="1"/>
+                <div class="validation-message">
+                    {{ $errors->first('mediaCollections.student_dp') }}
+                </div>
+                <div class="help-block">
+                    {{ trans('cruds.student.fields.dp_helper') }}
+                </div>
+            </div>
             <div class="sm:col-span-3 form-group {{ $errors->has('student.name') ? 'invalid' : '' }}">
                 <label class="form-label" for="name">{{ trans('cruds.student.fields.name') }}</label>
                 <input class="form-control" type="text" name="name" id="name" wire:model.defer="student.name">
@@ -28,16 +30,17 @@
                     {{ trans('cruds.student.fields.name_helper') }}
                 </div>
             </div>
-                    <div class="sm:col-span-3 form-group {{ $errors->has('student.user_id') ? 'invalid' : '' }}">
-                        <label class="form-label" for="user">{{ trans('cruds.student.fields.user') }}</label>
-                        <x-select-list class="form-control" id="user" name="user" :options="$this->listsForFields['user']" wire:model="student.user_id" />
-                        <div class="validation-message">
-                            {{ $errors->first('student.user_id') }}
-                        </div>
-                        <div class="help-block">
-                            {{ trans('cruds.student.fields.user_helper') }}
-                        </div>
-                    </div>
+            <div class="sm:col-span-3 form-group {{ $errors->has('student.user_id') ? 'invalid' : '' }}">
+                <label class="form-label" for="user">{{ trans('cruds.student.fields.user') }}</label>
+                <x-select-list class="form-control" id="user" name="user" :options="$this->listsForFields['user']"
+                               wire:model="student.user_id"/>
+                <div class="validation-message">
+                    {{ $errors->first('student.user_id') }}
+                </div>
+                <div class="help-block">
+                    {{ trans('cruds.student.fields.user_helper') }}
+                </div>
+            </div>
             <div class="sm:col-span-3 form-group {{ $errors->has('student.father_name') ? 'invalid' : '' }}">
                 <label class="form-label" for="father_name">{{ trans('cruds.student.fields.father_name') }}</label>
                 <input class="form-control" type="text" name="father_name" id="father_name"
@@ -158,7 +161,7 @@
                 <div class="p-4 bg-gray-50 flex items-center justify-between">
                     <div class="w-3/4">
                         <x-common.data-label class="form-label required" label="Select Batch" for=""/>
-                        <x-common.data-input-text />
+                        <x-common.data-input-text/>
                     </div>
                     <button class="btn btn-indigo">Add Batch</button>
                 </div>
@@ -166,38 +169,38 @@
                     <div class="grid grid-cols-3 gap-6 my-4">
                         <div>
                             <x-common.data-label class="form-label required" label="Course Fee" for=""/>
-                            <x-common.data-input-text />
+                            <x-common.data-input-text/>
                         </div>
                         <div>
                             <x-common.data-label class="form-label required" label="Course Start Date" for=""/>
-                            <x-common.data-input-text />
+                            <x-common.data-input-text/>
                         </div>
                         <div>
                             <x-common.data-label class="form-label required" label="Course End Date" for=""/>
-                            <x-common.data-input-text />
+                            <x-common.data-input-text/>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-3 gap-6 my-4">
                         <div>
                             <x-common.data-label class="form-label required" label="Installment Amount" for=""/>
-                            <x-common.data-input-text />
+                            <x-common.data-input-text/>
                         </div>
                         <div>
                             <x-common.data-label class="form-label required" label="Due Date" for=""/>
-                            <x-common.data-input-text />
+                            <x-common.data-input-text/>
                         </div>
                         <div>
                             <x-common.data-label class="form-label required" label="Status" for=""/>
-                            <x-common.data-input-text />
+                            <x-common.data-input-text/>
                         </div>
                         <div>
                             <x-common.data-label class="form-label required" label="Slip #" for=""/>
-                            <x-common.data-input-text />
+                            <x-common.data-input-text/>
                         </div>
                         <div>
                             <x-common.data-label class="form-label required" label="Slip #" for=""/>
-                            <x-common.data-input-text />
+                            <x-common.data-input-text/>
                         </div>
                     </div>
 
@@ -250,12 +253,14 @@
                 </div>
             </fieldset>
 
-    <div class="form-group">
-        <button class="btn btn-indigo mr-2" type="submit">
-            {{ trans('global.save') }}
-        </button>
-        <a href="{{ route('admin.students.index') }}" class="btn btn-secondary">
-            {{ trans('global.cancel') }}
-        </a>
-    </div>
-</form>
+            <div class="form-group">
+                <button class="btn btn-indigo mr-2" type="submit">
+                    {{ trans('global.save') }}
+                </button>
+                <a href="{{ route('admin.students.index') }}" class="btn btn-secondary">
+                    {{ trans('global.cancel') }}
+                </a>
+            </div>
+        </div>
+    </form>
+</div>

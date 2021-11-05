@@ -1,6 +1,47 @@
-
 <div x-data="{ open: @entangle('showQuery') }" class="align-middle min-w-full overflow-x-auto space-y-4 overflow-hidden
 sm:rounded-lg">
+
+    <x-modal.dialog wire:model="showEditModal">
+        <x-slot name="title">Edit Query</x-slot>
+        <x-slot name="content">
+            <div>
+                {{--                <x-common.form-header title="Personal Information"/>--}}
+                <div class="grid grid-cols-2 gap-1">
+                    <x-shared.form.input-wrapper label="Name">
+                        <x-common.data-input-text
+                            error="editing.name"
+                            placeholder="Enter Query Name"
+                            wire:model.lazy="editing.name"/>
+                    </x-shared.form.input-wrapper>
+                    <x-shared.form.input-wrapper
+                        label="Mobile Number">
+                        <x-common.data-input-text
+                            error="editing.mobile"
+                            placeholder="Enter Mobile Number 03335335792"
+                            wire:model.lazy="editing.mobile"/>
+                    </x-shared.form.input-wrapper>
+                    <x-shared.form.input-wrapper label="Email">
+                        <x-common.data-input-text error="editing.email" type="email"
+                                                  wire:model.lazy="editing.email" placeholder="Enter Email Address"/>
+                    </x-shared.form.input-wrapper>
+                    <x-shared.form.input-wrapper label="Mobile Number">
+                        <x-common.data-input-text
+                            error="editing.mobile"
+                            placeholder="Enter Mobile Number 03335335792"
+                            wire:model.lazy="editing.mobile"/>
+                    </x-shared.form.input-wrapper>
+
+                </div>
+                {{--                <x-common.form-header title="Course Information"/>--}}
+                {{--                <x-common.form-header title="Status Information"/>--}}
+
+            </div>
+        </x-slot>
+        <x-slot name="footer">
+            <x-button.secondary wire:click="$toggle('showEditModal')">Cancel</x-button.secondary>
+            <x-button.primary>Save</x-button.primary>
+        </x-slot>
+    </x-modal.dialog>
 
     <div class="grid grid-cols-3 gap-2">
         <x-common.filter-wrapper label="Search by Name">
@@ -8,86 +49,123 @@ sm:rounded-lg">
         </x-common.filter-wrapper>
         <div>
 
-        <x-common.filter-select label="Select Course"  >
-            <x-common.data-input-text/>
-        </x-common.filter-select>
+            <x-common.filter-select label="Select Course">
+                <x-common.data-input-select wire:model="filters.course">
+                    <option value="">All</option>
+                    @foreach($courses as $course)
+                        <option value="{{$course->id}}">{{$course->title}}</option>
+                    @endforeach
+                </x-common.data-input-select>
+            </x-common.filter-select>
         </div>
         <div>
-        <x-common.filter-date-interval label="Added Dates"/>
+            <x-common.filter-wrapper label="Created Between">
+                <div class="mb-2">
+                    <div class="mb-2 flex space-x-1">
+                        <x-common.data-input-text wire:model="filters.date_min" type="date"
+                                                  placeholder="Search Query by Name"/>
+                        <x-common.data-input-text wire:model="filters.date_max" type="date"
+                                                  placeholder="Search Query by Name"/>
+                    </div>
+                </div>
+            </x-common.filter-wrapper>
         </div>
 
     </div>
 
     <x-common.table>
         <x-slot name="head">
+            <x-common.table.heading>
+                #
+            </x-common.table.heading>
             <x-common.table.heading sortable wire:click="sortBy('name')"
                                     :direction="$sortDirection  === 'name' ?
-                                    $sortDirection:null">Name
+                                    $sortDirection:null">Query Name
             </x-common.table.heading>
-            <x-common.table.heading sortable wire:click="sortBy('mobile')"
-                                    :direction="$sortDirection  === 'mobile' ?
-                                    $sortDirection:null">Mobile
-            </x-common.table.heading>
-            <x-common.table.heading>
-                Course
-            </x-common.table.heading>
+            <x-common.table.heading> Course</x-common.table.heading>
+            <x-common.table.heading>Entry By</x-common.table.heading>
+            <x-common.table.heading>Recent Status</x-common.table.heading>
             <x-common.table.heading sortable wire:click="sortBy('created_at')"
                                     :direction="$sortDirection  === 'created_at' ?
                                     $sortDirection:null">Entry Date
             </x-common.table.heading>
-            <x-common.table.heading>
-                Actions
-            </x-common.table.heading>
+            <x-common.table.heading> Actions</x-common.table.heading>
         </x-slot>
         <x-slot name="body">
             @forelse($queries as $query)
                 <x-common.table.row wire:loading.class.delay="opacity-50">
+                    <x-common.table.cell class="w-2">
+                        {{$queries->firstItem() + $loop->iteration - 1}}
+                    </x-common.table.cell>
                     <x-common.table.cell class="">
-                        <div>
-                            <div>
-                                {{$query->name}}
+                        <div class="flex space-x-2 items-center">
+                            <div class="w-12">
+                                <img class="h-10 w-10 rounded-full" src="{{$query->avatarUrl()}}" alt="">
                             </div>
-                            <div class="text-xs text-gray-500">{{$query->email}}</div>
+                            <div>
+                                <div>
+                                    {{$query->name}}
+                                    <div class="text-xs text-gray-500">{{$query->mobile}}</div>
+                                    <div class="text-xs text-gray-500">{{$query->email}}</div>
+                                </div>
+                            </div>
                         </div>
 
                     </x-common.table.cell>
-                    <x-common.table.cell>{{$query->mobile}}</x-common.table.cell>
                     <x-common.table.cell>
-                        <div class="flex space-x-2">
+                        <div class="flex text-center space-x-2 max-w-xs">
                             @foreach($query->courses as $course)
-                                <span class="px-2 py-1 flex rounded-full  bg-gray-100 text-xs">
-                            {{$course->title}}
-                            </span>
-                                <br>
+                                <div>
+                                <span class="px-2 py-1 truncate rounded-full bg-gray-100 text-xs">
+                                    {{$course->title}}
+                                </span>
+                                </div>
                             @endforeach
                         </div>
                     </x-common.table.cell>
-                    <x-common.table.cell>{{$query->human_date}}</x-common.table.cell>
+                    <x-common.table.cell>
+                        <span class="text-sm">
+
+                        {{$query->entry_by}}
+                        </span>
+                    </x-common.table.cell>
+                    <x-common.table.cell>
+                        <div class="flex flex-col text-center space-y-1">
+                            <span class="bg-gray-50 text-xs rounded-full">
+                        {{$query->recent_timeline_title }}
+                            </span>
+                            <span class="text-red-600 text-xs">
+                                {{$query->recent_timeline_date }}
+                            </span>
+                        </div>
+                    </x-common.table.cell>
+                    <x-common.table.cell><span class="text-xs">{{$query->human_date}}</span></x-common.table.cell>
                     <x-common.table.cell>
                         <div class="flex space-x-2 items-center">
                             @can('query_show')
-                            <a href="{{route('admin.queries.show',$query->id)}}" >
-                                <x-icons.eye class="w-6 h-6  text-cyan-700"/>
-                            </a>
+                                <a href="#" wire:click.prevent="showQuery({{$query->id}})">
+                                    <x-icons.eye class="w-6 h-6  text-cyan-700"/>
+                                </a>
+                                <a href="{{route('admin.queries.show',$query->id)}}">
+                                    <x-icons.export-square class="w-5 h-5  text-orange-700"/>
+                                </a>
                             @endcan
-
                             @can('query_edit')
-                            <a href="#" wire:click.prevent="showQuery({{$query->id}})">
-                                <x-icons.edit  class="w-5 h-5  text-blue-700"/>
-                            </a>
+                                <a href="#" wire:click.prevent="edit({{$query->id}})">
+                                    <x-icons.edit class="w-5 h-5  text-blue-700"/>
+                                </a>
                             @endcan
-
                             @can('query_delete')
-                            <a href="#" wire:click.prevent="deleteQuery({{$query->id}})">
-                                <x-icons.trash class="w-5 h-5  text-red-700"/>
-                            </a>
+                                <a href="#" wire:click.prevent="deleteQuery({{$query->id}})">
+                                    <x-icons.trash class="w-5 h-5  text-red-700"/>
+                                </a>
                             @endcan
                         </div>
                     </x-common.table.cell>
                 </x-common.table.row>
             @empty
                 <x-common.table.row wire:loading.class.delay="opacity-50">
-                    <x-common.table.cell colspan="5">
+                    <x-common.table.cell colspan="8">
                         <div class="py-10 flex justify-center items-center text-gray-300 text-xl">
                             No Query Found...
                         </div>
@@ -141,9 +219,9 @@ sm:rounded-lg">
                                 </div>
                                 <!-- Main -->
                                 <div>
-                                    <div class="pb-1 sm:pb-6">
+                                    <div class="pb-1 sm:pb-3">
                                         <div>
-                                            <div class="mt-6 px-4 sm:mt-8 sm:flex sm:items-end sm:px-6">
+                                            <div class="mt-6 px-4 sm:mt-4 sm:flex sm:items-end sm:px-6">
                                                 <div class="sm:flex-1">
                                                     <div>
                                                         <div class="flex items-center">
@@ -198,14 +276,14 @@ sm:rounded-lg">
                                                     {{$showQueryDetails->mobile}}
                                                 </dd>
                                             </div>
-                                            <div>
-                                                <dt class="text-sm font-medium text-gray-500 sm:w-40 sm:flex-shrink-0">
-                                                    Telephone
-                                                </dt>
-                                                <dd class="mt-1 text-sm text-gray-900 sm:col-span-2">
-                                                    {{$showQueryDetails->telephone}}
-                                                </dd>
-                                            </div>
+{{--                                            <div>--}}
+{{--                                                <dt class="text-sm font-medium text-gray-500 sm:w-40 sm:flex-shrink-0">--}}
+{{--                                                    Telephone--}}
+{{--                                                </dt>--}}
+{{--                                                <dd class="mt-1 text-sm text-gray-900 sm:col-span-2">--}}
+{{--                                                    {{$showQueryDetails->telephone}}--}}
+{{--                                                </dd>--}}
+{{--                                            </div>--}}
                                             <div>
                                                 <dt class="text-sm font-medium text-gray-500 sm:w-40 sm:flex-shrink-0">
                                                     Location
@@ -225,6 +303,77 @@ sm:rounded-lg">
                                                 </dd>
                                             </div>
                                         </dl>
+                                        <!-- This example requires Tailwind CSS v2.0+ -->
+                                        <div class="bg-gray-50">
+
+                                            <div class="py-4 border-b border-gray-200">
+                                                <h3 class=" px-4  text-lg leading-6 font-medium text-gray-900">
+                                                    Query Statuses
+                                                </h3>
+                                            </div>
+
+                                            <div class="px-4 py-2 text-xs">
+                                                <div class="bg-white py-2 px-2">
+                                                    <table>
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Status </th>
+                                                            <th>Follow Up Date</th>
+                                                            <th>Remarks</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody class="divide-y">
+                                                        @forelse($showQueryDetails->timelines as $timeline)
+                                                        <tr>
+                                                            <td class="px-2">
+                                                                {{$timeline->title}}
+                                                            </td>
+                                                            <td class="px-2">
+                                                                {{$timeline->pivot->fw_date_time}}
+                                                            </td>
+                                                            <td class="px-2">
+                                                                {{$timeline->pivot->remarks}}
+                                                            </td>
+                                                        </tr>
+                                                        @empty
+                                                        @endforelse
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="mt-4">
+                                                    <form wire:submit.prevent="addTimeline">
+
+                                                    <div class="grid grid-cols-2 gap-2">
+                                                        <div>
+                                                            <label for="">Status </label>
+                                                            <x-common.data-input-select
+                                                                wire:model="addTimelineData.timeline_id">
+                                                                @foreach($timelines as $timeline)
+                                                                    <option
+                                                                        value="{{$timeline->id}}">{{$timeline->title}}</option>
+                                                                @endforeach
+                                                            </x-common.data-input-select>
+                                                        </div>
+                                                        <div>
+                                                            <label for="">Follow Up date </label>
+                                                            <x-common.data-input-text label="Follow Up Date"
+                                                          wire:model="addTimelineData.fw_date_time"
+                                                                                      type="datetime-local"/>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <label for="">Remarks</label>
+                                                        <x-common.data-input-text wire:model="addTimelineData.remarks"/>
+                                                    </div>
+                                                    <div>
+                                                        <x-button.primary type="submit">Add Status</x-button.primary>
+                                                    </div>
+                                                    </form>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>

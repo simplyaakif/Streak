@@ -15,6 +15,7 @@
                             UsersTableSeeder::class,
                             RoleUserTableSeeder::class,
                             CoursesTableSeeder::class,
+                            BatchesTableSeeder::class,
                             TimelineTableSeeder::class,
                             AccountsTableSeeder::class,
                             EmployeeSeeder::class,

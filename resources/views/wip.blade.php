@@ -7,6 +7,9 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <link rel="stylesheet" href="{{asset('css/student.css')}}">
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 
     @livewireStyles
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
@@ -20,11 +23,13 @@
 
 <div class="max-w-6xl mx-auto my-10 ">
     {{--<livewire:global-search/>--}}
-    @php $searchCol = 'name'; @endphp
-    <livewire:admin.global-table model="QUERY" :columns="['name','courses','mobile','email','p_timings']"
-         :col="$searchCol" :actions="['show','edit','delete']">
-    </livewire:admin.global-table>
+{{--    @php $searchCol = 'name'; @endphp--}}
+{{--    <livewire:admin.global-table model="QUERY" :columns="['name','courses','mobile','email','p_timings']"--}}
+{{--         :col="$searchCol" :actions="['show','edit','delete']">--}}
+{{--    </livewire:admin.global-table>--}}
     {{--<livewire:datatable/>--}}
+
+    <livewire:livewire-table/>
 
 
     @livewireScripts

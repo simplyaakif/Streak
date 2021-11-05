@@ -92,6 +92,9 @@
                             </td>
                             <td>
                                 <div class="flex justify-end">
+                                    @canImpersonate($guard = null)
+                                    <a href="{{ route('impersonate', $user->id) }}">Impersonate</a>
+                                    @endCanImpersonate
                                     @can('user_show')
                                         <a class="btn btn-sm btn-info mr-2" href="{{ route('admin.users.show', $user) }}">
                                             {{ trans('global.view') }}

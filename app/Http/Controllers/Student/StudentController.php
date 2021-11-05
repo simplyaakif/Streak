@@ -3,12 +3,14 @@
     namespace App\Http\Controllers\Student;
 
     use App\Http\Controllers\Controller;
+    use App\Models\Discussion;
 
     class StudentController extends Controller {
 
         public function index()
         {
-            return view('student.dashboard');
+            $discussions = Discussion::latest()->take(4)->get();
+            return view('student.dashboard',compact('discussions'));
         }
 
         public function courses()

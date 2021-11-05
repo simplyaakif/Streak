@@ -6,6 +6,7 @@
     use App\Models\Query;
     use App\Models\Timeline;
     use App\Models\User;
+    use Auth;
     use Carbon\Carbon;
     use Livewire\Component;
     use phpDocumentor\Reflection\Types\Collection;
@@ -39,21 +40,17 @@
         public function mount(Query $query)
         {
             $this->query     = $query;
+            if(!Auth::user()->is_admin){
+                $this->query->staff_user_id = Auth::id();
+            }
+
             $this->courses   = Course::all();
-            $this->users     = User::all();
+            $this->users     = User::where('is_staff',1)->get();
             $this->timelines = Timeline::all();
         }
 
         public function render()
         {
-            return view('livewire.query.create');
-        }
-
-        public function submit()
-        {
-
-//            dd($this->timeline);
-            $this->validationAlert = true;
             $errors                = $this->getErrorBag();
             if(count($errors) > 0) {
                 $this->validationAlert = true;
@@ -61,7 +58,16 @@
 
                 $this->validationAlert = false;
             }
+            return view('livewire.query.create');
+        }
+
+
+        public function submit()
+        {
+
+//            dd($this->timeline);
             $this->validate();
+
 
             $this->query->save();
             $this->qCourses['created_at'] = now();

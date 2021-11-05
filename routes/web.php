@@ -28,6 +28,8 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Student\StudentController as SC;
 
+Route::impersonate();
+
 Route::redirect('/', '/login');
 
 Route::get('/wip',[HomeController::class,'wip']);
@@ -35,13 +37,13 @@ Route::get('/wip',[HomeController::class,'wip']);
 Auth::routes(['register' => false]);
 
 
-Route::group(['prefix' => 'student'],function(){
+Route::group(['prefix' => 'student','middleware' => ['auth']],function(){
     Route::get('/',[SC::class,'index'])->name('student.dashboard');
     Route::get('/courses',[SC::class,'courses'])->name('student.courses');
     Route::get('/discussions',[DiscussionsController::class,'index'])->name('student.discussions');
 });
 
-Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], function () {
+Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','staff_only']], function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
 
     // Permissions
@@ -55,7 +57,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
 
     // Query
     Route::post('queries/media', [QueryController::class, 'storeMedia'])->name('queries.storeMedia');
-    Route::get('queries/dashboard`',[QueryController::class,'dashboard'])->name('queries.dashboard');
+    Route::get('queries/dashboard',[QueryController::class,'dashboard'])->name('queries.dashboard');
     Route::resource('queries', QueryController::class, ['except' => ['store', 'update', 'destroy']]);
 
     // Course
@@ -93,6 +95,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
     Route::resource('batches', BatchController::class, ['except' => ['store', 'update', 'destroy']]);
 
     // Student
+    Route::get('students/dashboard',[StudentController::class,'dashboard'])->name('students.dashboard');
     Route::post('students/media', [StudentController::class, 'storeMedia'])->name('students.storeMedia');
     Route::resource('students', StudentController::class, ['except' => ['store', 'update', 'destroy']]);
 

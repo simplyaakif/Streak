@@ -94,6 +94,7 @@ error="qCourses.course_id"
                     <x-common.data-input-select
                         error="query.staff_user_id"
                         wire:model.defer="query.staff_user_id">
+                        <option value="">-- Select Option --</option>
                         @foreach($users as $user)
                             <option value="{{$user->id}}">{{$user->name}}</option>
                         @endforeach
@@ -166,7 +167,6 @@ error="qCourses.course_id"
             </div>
 
         </div>
-
 
 
         <div class="form-group pt-6">

@@ -17,6 +17,22 @@ class StudentController extends Controller
         return view('admin.student.index');
     }
 
+    public function dashboard()
+    {
+        abort_if(Gate::denies('student_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $dStudent = Student::whereDate('created_at', now()->toDate())->get()->count();
+        $wStudent = Student::whereBetween('created_at', [now()->startOfWeek(),now()->endOfWeek()])->get()->count();
+        $mStudent = Student::whereMonth('created_at', now()->month)
+            ->whereYear('created_at',now()->year)
+            ->get()->count();
+        $pMstudent = Student::whereMonth('created_at', now()->subMonth()->month)
+            ->whereYear('created_at',now()->subMonth()->year)
+            ->get()->count();
+
+        $students = Student::latest()->take(10)->get();
+        return view('admin.student.dashboard',compact('dStudent','wStudent','mStudent','pMstudent','students'));
+    }
+
     public function create()
     {
         abort_if(Gate::denies('student_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');

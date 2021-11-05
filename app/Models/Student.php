@@ -85,7 +85,8 @@ class Student extends Model implements HasMedia
     }
     public function batches()
     {
-        return $this->belongsToMany(Batch::class);
+        return $this->belongsToMany(Batch::class)->withPivot('session_start_date','session_end_date','batch_status')
+            ->withTimestamps();
     }
 
     public function recoveries()

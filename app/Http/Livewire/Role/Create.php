@@ -9,6 +9,7 @@ use Livewire\Component;
 class Create extends Component
 {
     public Role $role;
+    public $options;
 
     public array $permissions = [];
 
@@ -16,6 +17,7 @@ class Create extends Component
 
     public function mount(Role $role)
     {
+        $this->options = Permission::all();
         $this->role = $role;
         $this->initListsForFields();
     }

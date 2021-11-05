@@ -6,6 +6,7 @@ module.exports = {
         './resources/views/**/*.blade.php',
         './resources/views/components/admin/**/*.blade.php',
         './resources/views/livewire/**/*.blade.php',
+        './vendor/rappasoft/laravel-livewire-tables/resources/views/tailwind/**/*.blade.php',
         // './resources/views/student/**/*.blade.php',
         // './resources/views/components/student/**/*.blade.php',
 
