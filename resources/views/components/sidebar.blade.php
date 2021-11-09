@@ -63,7 +63,7 @@
                             route="{{route('admin.students.dashboard')}}"
                             can="student_access"
                             label="Student Status"/>
-                        <x-admin.sidebar-dd-nav-subitem label="Student Batches"/>
+                        <x-admin.sidebar-dd-nav-subitem label="Classrooms" :route="route('admin.students.classrooms')"/>
                         <x-admin.sidebar-dd-nav-subitem
                             can="student_access"
                             label="All Admissions" route="{{route('admin.students.index')
@@ -120,8 +120,9 @@
                         <x-admin.sidebar-dd-nav-subitem
                             can="finance_managment_access"
                             label="Finance Status"/>
-                        <x-admin.sidebar-dd-nav-subitem label="Received"/>
-                        <x-admin.sidebar-dd-nav-subitem label="Upcoming/Pending"/>
+                        <x-admin.sidebar-dd-nav-subitem label="Received" :route="route('admin.recovery.index')"/>
+                        <x-admin.sidebar-dd-nav-subitem label="Upcoming/Pending"
+                                                        :route="route('admin.recovery.received')"/>
                         <x-admin.sidebar-dd-nav-subitem
                             can="income_access"
                             label="Incomes"

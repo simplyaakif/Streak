@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\StudentT;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -79,6 +80,12 @@ class Batch extends Model implements HasMedia
     public function course()
     {
         return $this->belongsTo(Course::class);
+    }
+
+    public function students()
+    {
+        return $this->belongsToMany(Student::class)->withPivot('session_start_date','session_end_date',
+                                                               'batch_status')->withTimestamps();
     }
 
     public function getBatchContentAttribute()

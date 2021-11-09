@@ -16,6 +16,7 @@
     <meta http-equiv="Expires" content="0"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;700&display=swap" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
@@ -49,10 +50,11 @@
                     <div>
                         Ace American Center of English
                     </div>
-                    <div>
+                    <div class="flex items-center">
 
-                    Made with Love by <span class="text-gray-700">
-                        App Soulz
+                    Made with <x-icons.heart class="w-5 mx-2 h-5 text-red-600" bold/> by <span
+                            class="ml-1 text-gray-700">
+                         App Soulz
                     </span>
                     </div>
                 </div>

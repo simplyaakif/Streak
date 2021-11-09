@@ -23,6 +23,7 @@ use App\Http\Controllers\Auth\UserProfileController;
     use App\Http\Controllers\EmployeesController;
     use App\Http\Controllers\ExpensesController;
     use App\Http\Controllers\IncomesController;
+    use App\Http\Controllers\RecoveriesController;
     use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -96,17 +97,23 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','st
 
     // Student
     Route::get('students/dashboard',[StudentController::class,'dashboard'])->name('students.dashboard');
+    Route::get('students/classrooms',[StudentController::class,'classrooms'])->name('students.classrooms');
+    Route::get('students/classroom/{id}',[StudentController::class,'classroom'])->name('students.classroom');
     Route::post('students/media', [StudentController::class, 'storeMedia'])->name('students.storeMedia');
     Route::resource('students', StudentController::class, ['except' => ['store', 'update', 'destroy']]);
 
     //    Expense
-    Route::resource('finance/expenses',ExpensesController::class);
+    Route::resource('finance/expenses',ExpensesController::class,['except' => ['store','update','destroy']]);
 
     //    Account
-    Route::resource('finance/accounts',AccountsController::class);
+    Route::resource('finance/accounts',AccountsController::class,['except' => ['store','update','destroy']]);
 
     //    Employee
     Route::resource('employees',EmployeesController::class,['except' => ['store','update','destroy']]);
+
+    //    Recovery
+    Route::get('recovery/recovery',[RecoveriesController::class,'recovery'])->name('recovery.received');
+    Route::resource('recovery',RecoveriesController::class,['except' => ['store','update','destroy']]);
 
     //    Income
     Route::resource('incomes',IncomesController::class,['except' => ['store','update','destroy']]);

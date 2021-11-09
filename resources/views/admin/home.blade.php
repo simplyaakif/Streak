@@ -1,6 +1,5 @@
 @extends('layouts.admin')
 @section('content')
-
     <main class="flex-1 relative pb-8 z-0 overflow-y-auto">
         <!-- Page header -->
         <div class="bg-white shadow">
@@ -90,7 +89,7 @@
                             <x-icons.invoice class="w-6 h-6 text-gray-400"/>
                         </x-slot>
                     </x-common.stat-card>
-                    <x-common.stat-card label="Daily Sale" stat="300,000 Rs">
+                    <x-common.stat-card label="Daily Sale" stat="{{$dSale}} Rs">
                         <x-slot name="icon">
                             <x-icons.money-check class="w-6 h-6 text-gray-400"/>
                         </x-slot>

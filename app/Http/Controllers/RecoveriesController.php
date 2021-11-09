@@ -9,7 +9,12 @@
 
         public function index()
         {
-            //
+            return view('admin.recovery.index');
+        }
+
+        public function recovery()
+        {
+            return view('admin.recovery.recovery');
         }
 
         public function create()

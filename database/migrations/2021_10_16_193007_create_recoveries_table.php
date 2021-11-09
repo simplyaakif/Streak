@@ -18,6 +18,7 @@
                 $table->boolean('is_paid')->default(0);
                 $table->date('paid_on')->nullable();
                 $table->bigInteger('account_id')->nullable();
+                $table->string('slip_number')->nullable();
                 $table->bigInteger('course_id');
 
                 //

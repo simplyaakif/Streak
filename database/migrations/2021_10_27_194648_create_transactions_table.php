@@ -10,9 +10,10 @@
         {
             Schema::create('transactions', function (Blueprint $table) {
                 $table->bigIncrements('id');
-                $table->integer('transactionable_id');
-                $table->string('transactionable_type');
+                $table->integer('transactionable_id')->nullable();
+                $table->string('transactionable_type')->nullable();
                 $table->string('amount');
+                $table->string('type')->nullable();
                 $table->boolean('is_expense')->default(0);
                 $table->boolean('is_paid')->default(0);
                 $table->dateTime('paid_on')->nullable();

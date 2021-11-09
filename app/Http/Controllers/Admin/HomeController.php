@@ -4,6 +4,7 @@
 
     use App\Models\Expense;
     use App\Models\Query;
+    use App\Models\Recovery;
     use App\Models\Student;
     use LaravelDaily\LaravelCharts\Classes\LaravelChart;
 
@@ -11,10 +12,14 @@
 
         public function index()
         {
+
             $dQuery = Query::whereDate('created_at', now()->day)->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->get()->count();
             $dStudent = Student::whereDate('created_at', now()->day)->whereMonth('created_at', now()->month)
                     ->whereYear('created_at', now()->year)->get()
                 ->count();
+
+            $dSale = Recovery::where('is_paid',1)->whereDate('paid_on',now()->day)
+                ->get()->sum('amount');
 
 
             $mQuery = Query::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->get()
@@ -26,6 +31,7 @@
                 ->sum('amount');
             $mExpense = Expense::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->get()
                 ->sum('amount');
+
 
             $chart_options = [
                 'chart_title' => 'Users by Day',
@@ -39,13 +45,16 @@
             $chart1 = new LaravelChart($chart_options);
             $chart2 = new LaravelChart($chart_options);
             $chart3 = new LaravelChart($chart_options);
+//            dd('workign');
 
             return view('admin.home', compact([
                                                   'dQuery','dStudent',
                                                   'mQuery','mStudent',
                                                   'dExpense','mExpense',
+                                                  'dSale',
                                                   'chart1','chart2','chart3',
                                               ]));
+
         }
 
         public function wip()

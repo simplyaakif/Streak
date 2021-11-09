@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -20,6 +21,7 @@ class Student extends Model implements HasMedia
     use SoftDeletes;
     use InteractsWithMedia;
     use Auditable;
+    use Notifiable;
 
     public const GENDER_SELECT = [
         'male'   => 'Male',
@@ -83,9 +85,14 @@ class Student extends Model implements HasMedia
     {
         return $this->belongsTo(Guardian::class);
     }
+    public function avatarUrl()
+    {
+
+        return 'https://avatars.dicebear.com/api/initials/' . $this->name . '.svg';
+    }
     public function batches()
     {
-        return $this->belongsToMany(Batch::class)->withPivot('session_start_date','session_end_date','batch_status')
+        return $this->belongsToMany(Batch::class)->withPivot('id','session_start_date','session_end_date','batch_status')
             ->withTimestamps();
     }
 
@@ -136,12 +143,12 @@ class Student extends Model implements HasMedia
 
     public function getDateOfBirthAttribute($value)
     {
-        return $value ? Carbon::parse($value)->format(config('project.date_format')) : null;
+//        return $value ? Carbon::parse($value)->format(config('project.date_format')) : null;
     }
 
     public function setDateOfBirthAttribute($value)
     {
-        $this->attributes['date_of_birth'] = $value ? Carbon::createFromFormat(config('project.date_format'), $value)->format('Y-m-d') : null;
+//        $this->attributes['date_of_birth'] = $value ? Carbon::createFromFormat(config('project.date_format'), $value)->format('Y-m-d') : null;
     }
 
     public function getDocumentsAttribute()

@@ -1,4 +1,9 @@
 <!-- This example requires Tailwind CSS v2.0+ -->
+@impersonating($guard = null)
+<a href="{{ route('impersonate.leave') }}">
+    <div class="bg-red-600 p-2 text-center text-white">Leave Impersonation</div>
+</a>
+@endImpersonating
 <nav x-data="{mobile:false}" class="bg-gray-800 relative z-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">

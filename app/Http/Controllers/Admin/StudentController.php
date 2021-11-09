@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Batch;
 use App\Models\Student;
 use Gate;
 use Illuminate\Http\Request;
@@ -31,6 +32,19 @@ class StudentController extends Controller
 
         $students = Student::latest()->take(10)->get();
         return view('admin.student.dashboard',compact('dStudent','wStudent','mStudent','pMstudent','students'));
+    }
+
+    public function classrooms()
+    {
+        $batches = Batch::with('students')->get();
+        return view('admin.student.classrooms',compact('batches'));
+    }
+
+    public function classroom($id)
+    {
+        $batch = Batch::find($id)->with('students')->first();
+//        dd($batch);
+        return view('admin.student.classroom',compact('batch'));
     }
 
     public function create()
