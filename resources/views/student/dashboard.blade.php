@@ -1,11 +1,9 @@
 @extends('layouts.student')
-
 @section('main')
 
     <!-- This example requires Tailwind CSS v2.0+ -->
-    <x-student.navbar/>
 
-    <div class="bg-indigo-50 py-6">
+    <div class="bg-cyan-50 py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
             <x-student.profile-header/>
         </div>
@@ -26,18 +24,30 @@
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             @forelse(Auth::user()->student->batches as $batch)
-                <div class="text-xl bg-indigo-100 rounded-md  flex justify-between items-center p-4 text-coolGray-900">
+                <a href="{{route('student.course',$batch->id)}}">
+                <div class="text-xl bg-cyan-50 shadow rounded-md  flex justify-between items-center p-4
+                text-coolGray-900">
                     <div>
                         <div class="font-bold mb-0">
                             {{$batch->title}}
                         </div>
+
+                        <div class="flex flex-col my-2">
                         <small class="text-coolGray-900 text-sm">Start Date:
-                            jkl
-                            {{Carbon\Carbon::parse($batch->pivot->session_start_date)->format('M d Y')}}</small>
+                            <strong>
+                            {{Carbon\Carbon::parse($batch->pivot->session_start_date)->format('M d Y')}}
+                            </strong>
+                        </small>
+                        <small class="text-coolGray-900 text-sm">End Date:
+                            <strong>
+                            {{Carbon\Carbon::parse($batch->pivot->session_end_date)->format('M d Y')}}
+                            </strong>
+                        </small>
+                        </div>
                     </div>
                     <div>
-                        <div class="group rounded-full bg-indigo-200 flex items-center justify-center w-8 h-8">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:text-white transition
+                        <div class="group rounded-full bg-cyan-100 flex items-center justify-center w-8 h-8">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:text-cyan-400 transition
                         transition-all
                         text-coolGray-900"
                                  viewBox="0 0 20 20"
@@ -48,6 +58,8 @@
                         </div>
                     </div>
                 </div>
+                </a>
+
             @empty
                 You are not enrolled in any batch currently
             @endforelse

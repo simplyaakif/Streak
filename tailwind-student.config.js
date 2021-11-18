@@ -7,8 +7,8 @@ module.exports = {
         './resources/views/components/admin/**/*.blade.php',
         './resources/views/livewire/**/*.blade.php',
         './vendor/rappasoft/laravel-livewire-tables/resources/views/tailwind/**/*.blade.php',
-        // './resources/views/student/**/*.blade.php',
-        // './resources/views/components/student/**/*.blade.php',
+        './resources/views/student/**/*.blade.php',
+        './resources/views/components/student/**/*.blade.php',
 
     ],
     theme: {
@@ -19,6 +19,7 @@ module.exports = {
                 coolGray: colors.coolGray,
                 red: colors.red,
                 cyan: colors.cyan,
+                sky:colors.sky,
                 'blue-gray': colors.blueGray,
             },
             fontFamily: {

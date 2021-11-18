@@ -1,7 +1,6 @@
 @extends('layouts.student')
 
 @section('main')
-    <x-student.navbar/>
 
 
     <div class="relative min-h-screen bg-gray-100">

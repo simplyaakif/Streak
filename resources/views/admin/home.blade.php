@@ -111,7 +111,7 @@
                             <x-icons.invoice class="w-6 h-6 text-gray-400"/>
                         </x-slot>
                     </x-common.stat-card>
-                    <x-common.stat-card label="Monthly Sale" :stat="@money(10000000000)">
+                    <x-common.stat-card label="Monthly Sale" :stat="$mSale">
                         <x-slot name="icon">
                             <x-icons.money-check class="w-6 h-6 text-gray-400"/>
                         </x-slot>

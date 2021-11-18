@@ -19,6 +19,7 @@
                 ->count();
 
             $dSale = Recovery::where('is_paid',1)->whereDate('paid_on',now()->day)
+                ->whereMonth('paid_on', now()->month)->whereYear('paid_on', now()->year)
                 ->get()->sum('amount');
 
 
@@ -31,6 +32,10 @@
                 ->sum('amount');
             $mExpense = Expense::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->get()
                 ->sum('amount');
+
+            $mSale = Recovery::where('is_paid',1)
+                ->whereMonth('paid_on', now()->month)->whereYear('paid_on', now()->year)
+                ->get()->sum('amount');
 
 
             $chart_options = [
@@ -51,7 +56,7 @@
                                                   'dQuery','dStudent',
                                                   'mQuery','mStudent',
                                                   'dExpense','mExpense',
-                                                  'dSale',
+                                                  'dSale','mSale',
                                                   'chart1','chart2','chart3',
                                               ]));
 

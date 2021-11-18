@@ -24,6 +24,8 @@ use App\Http\Controllers\Auth\UserProfileController;
     use App\Http\Controllers\ExpensesController;
     use App\Http\Controllers\IncomesController;
     use App\Http\Controllers\RecoveriesController;
+    use App\Http\Controllers\Student\IssuesController;
+    use App\Models\Issue;
     use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -38,9 +40,12 @@ Route::get('/wip',[HomeController::class,'wip']);
 Auth::routes(['register' => false]);
 
 
-Route::group(['prefix' => 'student','middleware' => ['auth']],function(){
+Route::group(['prefix' => 'student','middleware' => ['auth','student_guardian']],function(){
     Route::get('/',[SC::class,'index'])->name('student.dashboard');
     Route::get('/courses',[SC::class,'courses'])->name('student.courses');
+    Route::get('/course/{id}',[SC::class,'course'])->name('student.course');
+    Route::get('/support',[IssuesController::class,'index'])->name('student.issues');
+    Route::get('/support/{id}',[IssuesController::class,'show'])->name('student.issue');
     Route::get('/discussions',[DiscussionsController::class,'index'])->name('student.discussions');
 });
 

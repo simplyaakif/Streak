@@ -61,6 +61,10 @@ class User extends Authenticatable
     {
         return $this->roles()->where('title', 'Admin')->exists();
     }
+    public function getIsStudentAttribute()
+    {
+        return $this->roles()->where('title', 'Student')->exists();
+    }
 
     /**
      * @return bool

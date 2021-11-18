@@ -4,27 +4,29 @@
     <div class="bg-red-600 p-2 text-center text-white">Leave Impersonation</div>
 </a>
 @endImpersonating
-<nav x-data="{mobile:false}" class="bg-gray-800 relative z-10">
+<nav x-data="{mobile:false}" class="bg-cyan-700 relative z-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <img class="block lg:hidden h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg" alt="Workflow">
-                    <img class="hidden lg:block h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-logo-indigo-500-mark-white-text.svg" alt="Workflow">
+{{--                    <img class="block lg:hidden h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg" alt="Workflow">--}}
+{{--                    <img class="hidden lg:block h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-logo-indigo-500-mark-white-text.svg" alt="Workflow">--}}
+                    <x-logo-ace class="w-20 h-20 "/>
                 </div>
                 <div class="hidden sm:block sm:ml-6">
                     <div class="flex space-x-4">
                         <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
                        <x-student.nb-md-item route="{{route('student.dashboard')}}">Dashboard</x-student.nb-md-item>
                        <x-student.nb-md-item route="{{route('student.courses')}}">My Courses</x-student.nb-md-item>
-                       <x-student.nb-md-item>Support</x-student.nb-md-item>
+                       <x-student.nb-md-item route="{{route('student.issues')}}">Support Tickets</x-student.nb-md-item>
                        <x-student.nb-md-item route="{{route('student.discussions')}}">Discussions</x-student.nb-md-item>
                     </div>
                 </div>
             </div>
             <div class="hidden sm:ml-6 sm:block">
                 <div class="flex items-center">
-                    <button type="button" class="bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+                    <button type="button" class="bg-cyan-800 p-1 rounded-full text-cyan-100 hover:text-white
+                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
                         <span class="sr-only">View notifications</span>
                         <!-- Heroicon name: outline/bell -->
                         <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -126,8 +128,8 @@
                     <img class="h-10 w-10 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
                 </div>
                 <div class="ml-3">
-                    <div class="text-base font-medium text-white">Tom Cook</div>
-                    <div class="text-sm font-medium text-gray-400">tom@example.com</div>
+                    <div class="text-base font-medium text-white">{{Auth::user()->name}}</div>
+                    <div class="text-sm font-medium text-gray-400">{{Auth::user()->email}}</div>
                 </div>
                 <button type="button" class="ml-auto flex-shrink-0 bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
                     <span class="sr-only">View notifications</span>

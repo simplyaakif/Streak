@@ -16,7 +16,7 @@ const tailwindcss = require('tailwindcss')
 //         require("tailwindcss")
 //     ]);
 
-
+mix.js('resources/js/app.js', 'public/js')
 mix.css('resources/css/student.css','public/css',{},[
     tailwindcss('./tailwind-student.config.js')
 ])
