@@ -145,15 +145,14 @@
                         <x-admin.sidebar-dd-nav-subitem label="Employee Attendance"/>
                     </x-admin.sidebar-dd-nav-item>
 
-                    <x-admin.sidebar-dd-nav-item label="Asset Management">
+                    <x-admin.sidebar-dd-nav-item label="Task Management">
                         <x-slot name="icon">
-                            <x-icons.box class="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"/>
+                            <x-icons.task-square class="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"/>
                         </x-slot>
-                        <x-admin.sidebar-dd-nav-subitem label="Categories" route=""/>
-                        <x-admin.sidebar-dd-nav-subitem label="Assets" route=""/>
-                        <x-admin.sidebar-dd-nav-subitem label="Statuses" route=""/>
-                        <x-admin.sidebar-dd-nav-subitem label="Locations" route=""/>
-                        <x-admin.sidebar-dd-nav-subitem label="History" route=""/>
+                        <x-admin.sidebar-dd-nav-subitem label="Statuses" :route="route('admin.task-statuses.index')"/>
+                        <x-admin.sidebar-dd-nav-subitem label="Tags" :route="route('admin.task-tags.index')"/>
+                        <x-admin.sidebar-dd-nav-subitem label="Tasks" :route="route('admin.tasks.index')"/>
+                        <x-admin.sidebar-dd-nav-subitem label="Calendar" :route="route('admin.task-calendars.index')"/>
                     </x-admin.sidebar-dd-nav-item>
 
                     <x-admin.sidebar-nv-item label="Reports" route="{{route('admin.students.index')}}">
@@ -167,7 +166,7 @@
 
                     <x-admin.sidebar-nv-item
                         can="system_calendar_access"
-                        label="Calendar" route="{{route('admin.system-calendars.index')}}">
+                        label="Institution Calendar" route="{{route('admin.system-calendars.index')}}">
                         <x-icons.calendar class="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"/>
                     </x-admin.sidebar-nv-item>
 

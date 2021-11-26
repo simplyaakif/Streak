@@ -18,7 +18,8 @@ return [
     'except' => [
         'telescope*',
         'horizon*',
-        'chatify*'
+        'chatify*',
+        'stream*'
     ],
 
     /*

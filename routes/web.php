@@ -10,7 +10,8 @@ use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\QueryController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
-use App\Http\Controllers\Admin\StudentController;
+    use App\Http\Controllers\Admin\StreamingController;
+    use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\SystemCalendarController;
 use App\Http\Controllers\Admin\TaskCalendarController;
 use App\Http\Controllers\Admin\TaskController;
@@ -29,6 +30,7 @@ use App\Http\Controllers\Auth\UserProfileController;
     use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Student\StreamingController as STController;
 use App\Http\Controllers\Student\StudentController as SC;
 
 Route::impersonate();
@@ -47,6 +49,8 @@ Route::group(['prefix' => 'student','middleware' => ['auth','student_guardian']]
     Route::get('/support',[IssuesController::class,'index'])->name('student.issues');
     Route::get('/support/{id}',[IssuesController::class,'show'])->name('student.issue');
     Route::get('/discussions',[DiscussionsController::class,'index'])->name('student.discussions');
+    Route::get('/stream/online-class',[STController::class,'index'])->name('stream.class');
+
 });
 
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','staff_only']], function () {
@@ -122,6 +126,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','st
 
     //    Income
     Route::resource('incomes',IncomesController::class,['except' => ['store','update','destroy']]);
+
+
+    Route::get('stream/online-class',[StreamingController::class,'index'])->name('stream.class');
+    Route::get('stream/rtm-token',[StreamingController::class, 'rtm_token'])->name('stream.rtc-token');
 
 });
 

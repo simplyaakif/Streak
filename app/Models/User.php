@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Chatify\Facades\ChatifyMessenger;
 use \DateTimeInterface;
 use App\Support\HasAdvancedFilter;
 use Carbon\Carbon;
+use DB;
 use Hash;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -105,4 +107,10 @@ class User extends Authenticatable
     public function student(){
         return $this->hasOne(Student::class);
     }
+
+    public function chat_message(){
+        return DB::table('ch_messages')->where('to_id',$this->id)
+            ->where('seen',0)->get();
+    }
+
 }
