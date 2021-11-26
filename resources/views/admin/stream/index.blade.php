@@ -43,7 +43,7 @@
             // The user ID must be the same as the one you used for generating the RTM token
             userUuid: "{{$launch['userUuid']}}",
             userName: "{{$launch['userName']}}",
-            roomUuid: "{{$launch['roomUuid']}}}",
+            roomUuid: "{{$launch['roomUuid']}}",
             roomName: "{{$launch['roomName']}}",
             roleType: {{$launch['roleType']}},
             roomType: {{$launch['roomType']}},
