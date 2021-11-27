@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>AgoraFlexibleClassroomDemo</title>
+    <script src="https://download.agora.io/edu-apaas/release/edu_sdk_1.1.5.10.js"></script>
+
     {{--    <link rel="stylesheet" href="{{asset('css/student.css')}}">--}}
 </head>
 
@@ -28,7 +30,6 @@
 
 {{--<script src="https://solutions-apaas.agora.io/apaas/app/1.1.5-rc.15/static/js/2.c06c99b1.chunk.js"></script>--}}
 {{--<script src="https://solutions-apaas.agora.io/apaas/app/1.1.5-rc.15/static/js/main.e5a766f0.chunk.js"></script>--}}
-<script src="https://download.agora.io/edu-apaas/release/edu_sdk_1.1.5.10.js"></script>
 {{--<script src="https://sdk.netless.link/white-web-sdk/2.12.20.js"></script>--}}
 <script type="text/javascript">
     AgoraEduSDK.config({

@@ -39,6 +39,7 @@
 //            $channelName = $request->channelName;
 //            $channelName         = ''.Auth::id().'';
             $user                = ''.Auth::id().'';
+//            $user                = 'stream';
             $role = RtmTokenBuilder::RoleRtmUser;
             $expireTimeInSeconds = 3600;
             $currentTimestamp    = now()->getTimestamp();
