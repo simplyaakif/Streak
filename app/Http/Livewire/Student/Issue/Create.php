@@ -16,6 +16,7 @@
         public function mount()
         {
             $this->issue = Issue::make([]);
+            $this->issue->type = 0;
             $this->issue->student_id = Auth::user()->student->id;
             $this->issue->status = 0;
             $this->reply = IssueReplies::make([]);
@@ -26,10 +27,15 @@
         {
             return [
                 'issue.title'=>'required',
-                'issue.type'=>'required',
+                'issue.type'=>'nullable',
                 'reply.message'=>'required',
             ];
         }
+//
+//        public function ()
+//        {
+//
+//        }
 
         public function submit()
         {

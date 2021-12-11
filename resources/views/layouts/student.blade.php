@@ -60,7 +60,7 @@
 
     var channel = pusher.subscribe('online-class-start-notification');
     channel.bind('App\\Events\\OnlineClassStartNotificationEvent', function (data) {
-        alert(JSON.stringify(data));
+        // alert(JSON.stringify(data));
         console.log(data)
         popup = `<div id="alert" x-data="notification()" aria-live="assertive" class="fixed inset-0 flex items-end px-4
 py-6
@@ -88,10 +88,12 @@ sm:p-6 sm:items-start" style="z-index: 999">
         Sent you an invite to join ${data.batch.title} session.
         </p>
         <div class="mt-4 flex">
+<a href="{{route('student.dashboard')}}/stream/online-class/${data.batch.id}">
         <button type="button"
         class="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
         Accept
         </button>
+</a>
         <button @click="alert = false;" type="button"
         class="ml-3 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
         Decline

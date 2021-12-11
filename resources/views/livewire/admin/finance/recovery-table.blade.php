@@ -7,8 +7,8 @@
             <x-common.table.heading>Course</x-common.table.heading>
             <x-common.table.heading>Batch</x-common.table.heading>
             <x-common.table.heading>Due Date</x-common.table.heading>
-            <x-common.table.heading>Amount</x-common.table.heading>
             <x-common.table.heading>Status</x-common.table.heading>
+            <x-common.table.heading>Amount</x-common.table.heading>
             <x-common.table.heading>Actions</x-common.table.heading>
         </x-slot>
         <x-slot name="body">

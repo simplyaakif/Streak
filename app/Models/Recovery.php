@@ -37,9 +37,9 @@
         public function status()
         {
             if($this->attributes['due_date'] > now()) {
-                return 0;
-            } else {
                 return 1;
+            } else {
+                return 0;
             }
 
         }

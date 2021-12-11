@@ -50,7 +50,7 @@ Route::group(['prefix' => 'student','middleware' => ['auth','student_guardian']]
     Route::get('/support',[IssuesController::class,'index'])->name('student.issues');
     Route::get('/support/{id}',[IssuesController::class,'show'])->name('student.issue');
     Route::get('/discussions',[DiscussionsController::class,'index'])->name('student.discussions');
-    Route::get('/stream/online-class',[STController::class,'index'])->name('stream.class');
+    Route::get('/stream/online-class/{batch}',[STController::class,'index'])->name('stream.class');
     Route::get('/calendar',[SC::class,'calendar'])->name('student.institute_calendar');
 
 });
@@ -135,7 +135,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','st
 
 
     Route::get('stream/start-online-class/{batch}',[StreamingController::class,'startOnlineClass'])->name('stream.start-online-class');
-    Route::get('stream/online-class',[StreamingController::class,'index'])->name('stream.class');
+    Route::get('stream/online-class/{batch}',[StreamingController::class,'index'])->name('stream.class');
     Route::get('stream/rtm-token',[StreamingController::class, 'rtm_token'])->name('stream.rtc-token');
 
 });

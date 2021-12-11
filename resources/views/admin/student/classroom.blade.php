@@ -4,8 +4,8 @@
     <x-common.page-header>
         <x-common.ph-section-header title="{{$batch->title}}" subtitle="Batch Details"/>
         <div class="flex space-x-2">
-            <a href="{{route('admin.stream.start-online-class',$batch->id)}}">
-                <x-button.secondary>Start Online Class</x-button.secondary>
+            <a href="{{route('admin.stream.class',$batch->id)}}">
+                <x-button.secondary><x-icons.book class="w-6 h-6 text-gray-400" /></x-button.secondary>
             </a>
         </div>
     </x-common.page-header>
@@ -39,7 +39,10 @@
                                              src="{{$student->avatarUrl()}}"
                                              alt="">
                                     @endforelse
+                                        <a href="{{route('admin.students.show',$student->id)}}">
+
                                     <h3 class="mt-6 text-gray-900 text-sm font-medium">{{$student->name}}</h3>
+                                        </a>
                                     <dl class="mt-1 flex-grow flex flex-col justify-between">
                                         <dt class="sr-only">Student Details</dt>
                                         <dd class="mb-3">

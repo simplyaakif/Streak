@@ -12,18 +12,25 @@
 
     class StreamingController extends Controller {
 
-        public function index()
+        public function index(Batch $batch)
         {
+
             $launch = [
                 'rtmToken' => $this->rtm_token(),
                 'userUuid' => Auth::id(),
                 'userName' => Auth::user()->name,
-                'roomUuid' => 12,
-                'roomName' => 'Spoken English',
+                'roomUuid' => $batch->id,
+                'roomName' => $batch->title,
                 'roleType' => 1,
                 'roomType' => 4,
-                'duration' => 60,
+                'duration' => 90,
             ];
+
+            $classOptions=[
+                'classCode'=>$launch['roomUuid'],
+                'instructor'=>Auth::user()->name,
+            ];
+            OnlineClassStartNotificationEvent::dispatch($batch,$classOptions);
 
             return view('admin.stream.index', compact('launch'));
         }

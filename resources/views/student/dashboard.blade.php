@@ -5,7 +5,7 @@
 
     <div class="bg-cyan-50 py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
-            <x-student.profile-header/>
+            <x-student.profile-header :student="Auth::user()->student"/>
         </div>
     </div>
 

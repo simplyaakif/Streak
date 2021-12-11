@@ -13,7 +13,7 @@
                 <label for="">Issue Type</label>
                 <x-common.data-input-select
                     error="issue.type"
-                    wire:model="issue.type">
+                    wire:model.defer="issue.type">
                     <option value="">-- Select Option --</option>
                     @forelse(App\Models\Issue::TYPES as $key => $type)
                         <option value="{{$key}}">{{$type}}</option>
@@ -25,7 +25,7 @@
                 <x-common.data-textarea
                     cols="30" rows="10"
                     error="reply.message"
-                    wire:model="reply.message"
+                    wire:model.defer="reply.message"
                     placeholder="Kindly describe your Issue, Complaint, Request"
                 ></x-common.data-textarea>
             </x-slot>
