@@ -2,6 +2,19 @@
 <div class="md:flex md:items-center md:justify-between md:space-x-5">
     <div class="flex items-start space-x-5">
         <div class="flex-shrink-0">
+            @forelse($student->dp as $key => $entry)
+                {{--                            <a class="link-photo" href="{{ $entry['url'] }}">--}}
+                {{--                                <img src="{{ $entry['thumbnail'] }}" alt="{{ $entry['name'] }}" title="{{ $entry['name'] }}">--}}
+                {{--                            </a>--}}
+                <img class="w-24 h-24 flex-shrink-0 object-cover mx-auto rounded-full"
+                     src="{{ $entry['url'] }}" alt="{{ $entry['name'] }}"
+                     title="{{ $entry['name'] }}"
+                >
+            @empty
+                <img class="w-24 h-24 flex-shrink-0 mx-auto rounded-full"
+                     src="{{$student->avatarUrl()}}"
+                     alt="">
+            @endforelse
             <div class="relative">
                 <img class="h-16 w-16 rounded-full" src="https://images.unsplash.com/photo-1463453091185-61582044d556?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80" alt="">
                 <span class="absolute inset-0 shadow-inner rounded-full" aria-hidden="true"></span>
