@@ -4,8 +4,70 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "930ae9b6743e6dc99ff3880684b3770b",
+    "content-hash": "1a1458df4f57e763a1b2d855e863e6c1",
     "packages": [
+        {
+            "name": "asantibanez/livewire-calendar",
+            "version": "2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/asantibanez/livewire-calendar.git",
+                "reference": "21992f9eacd73dc603b5d9a7b0f7a194437a19bc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/asantibanez/livewire-calendar/zipball/21992f9eacd73dc603b5d9a7b0f7a194437a19bc",
+                "reference": "21992f9eacd73dc603b5d9a7b0f7a194437a19bc",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^6.0|^7.0|^8.0",
+                "livewire/livewire": "^2.0",
+                "php": "^7.2|^8.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^5.0|^6.0",
+                "phpunit/phpunit": "^8.0|^9.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Asantibanez\\LivewireCalendar\\LivewireCalendarServiceProvider"
+                    ],
+                    "aliases": {
+                        "LivewireCalendar": "Asantibanez\\LivewireCalendar\\LivewireCalendarFacade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Asantibanez\\LivewireCalendar\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andrés Santibáñez",
+                    "email": "santibanez.andres@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Laravel Livewire calendar component",
+            "homepage": "https://github.com/asantibanez/livewire-calendar",
+            "keywords": [
+                "asantibanez",
+                "livewire-calendar"
+            ],
+            "support": {
+                "issues": "https://github.com/asantibanez/livewire-calendar/issues",
+                "source": "https://github.com/asantibanez/livewire-calendar/tree/2.1.0"
+            },
+            "time": "2021-01-25T21:12:52+00:00"
+        },
         {
             "name": "asm89/stack-cors",
             "version": "v2.0.3",
@@ -1893,6 +1955,72 @@
                 }
             ],
             "time": "2021-10-06T17:43:30+00:00"
+        },
+        {
+            "name": "imanghafoori/laravel-masterpass",
+            "version": "v2.0.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/imanghafoori1/laravel-MasterPass.git",
+                "reference": "1c1a95ef94249280cf615fed4c9fe02bfc5d65c9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/imanghafoori1/laravel-MasterPass/zipball/1c1a95ef94249280cf615fed4c9fe02bfc5d65c9",
+                "reference": "1c1a95ef94249280cf615fed4c9fe02bfc5d65c9",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "^5.5|^6.0|^7.0|^8.0",
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^3.5|^4.0|^5.0"
+            },
+            "suggest": {
+                "imanghafoori/laravel-anypass": " Allows you login with any password in local environment.",
+                "imanghafoori/laravel-decorator": "Allows you to easily apply the decorator pattern in a laravel app.",
+                "imanghafoori/laravel-heyman": "It allows to write expressive code to authorize, validate and authenticate.",
+                "imanghafoori/laravel-terminator": "Gives you opportunity to refactor your controllers.",
+                "imanghafoori/laravel-widgetize": "Gives you a better structure and caching opportunity for your laravel apps."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Imanghafoori\\MasterPass\\MasterPassServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Imanghafoori\\MasterPass\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Iman Ghafoori",
+                    "email": "imanghafoori1@gmail.com"
+                }
+            ],
+            "description": "A minimal yet powerful package to help you easily impersonate your users.",
+            "homepage": "https://github.com/imanghafoori1/laravel-masterpass",
+            "keywords": [
+                "laravel",
+                "laravel-utility",
+                "laravel5",
+                "laravel5-package",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/imanghafoori1/laravel-MasterPass/issues",
+                "source": "https://github.com/imanghafoori1/laravel-MasterPass/tree/master"
+            },
+            "time": "2020-09-02T00:25:05+00:00"
         },
         {
             "name": "intervention/image",
@@ -4885,16 +5013,16 @@
         },
         {
             "name": "pusher/pusher-php-server",
-            "version": "7.0.1",
+            "version": "7.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pusher/pusher-http-php.git",
-                "reference": "7757a09209d20ff95b077ae48dc25f49a6ad94a2"
+                "reference": "af3eeaefc0c7959f5b3852f0a4dd5547245d33df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pusher/pusher-http-php/zipball/7757a09209d20ff95b077ae48dc25f49a6ad94a2",
-                "reference": "7757a09209d20ff95b077ae48dc25f49a6ad94a2",
+                "url": "https://api.github.com/repos/pusher/pusher-http-php/zipball/af3eeaefc0c7959f5b3852f0a4dd5547245d33df",
+                "reference": "af3eeaefc0c7959f5b3852f0a4dd5547245d33df",
                 "shasum": ""
             },
             "require": {
@@ -4903,7 +5031,7 @@
                 "guzzlehttp/guzzle": "^7.2",
                 "paragonie/sodium_compat": "^1.6",
                 "php": "^7.3|^8.0",
-                "psr/log": "^1.0"
+                "psr/log": "^1.0|^2.0|^3.0"
             },
             "require-dev": {
                 "overtrue/phplint": "^2.3",
@@ -4940,9 +5068,9 @@
             ],
             "support": {
                 "issues": "https://github.com/pusher/pusher-http-php/issues",
-                "source": "https://github.com/pusher/pusher-http-php/tree/7.0.1"
+                "source": "https://github.com/pusher/pusher-http-php/tree/7.0.2"
             },
-            "time": "2021-05-26T11:22:28+00:00"
+            "time": "2021-12-07T13:09:00+00:00"
         },
         {
             "name": "ralouphie/getallheaders",

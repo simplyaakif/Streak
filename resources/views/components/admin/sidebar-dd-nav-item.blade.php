@@ -16,7 +16,7 @@
                   {{$label}}
                 </span>
         <svg
-            class="ml-3 flex-shrink-0 h-5 w-5 transform group-hover:text-cyan-400 transition-colors ease-in-out
+            class="flex-shrink-0 h-5 w-5 transform group-hover:text-cyan-400 transition-colors ease-in-out
             duration-150 text-cyan-400 rotate-90"
             viewBox="0 0 20 20" x-state:on="Expanded" x-state:off="Collapsed" aria-hidden="true"
             :class="{ 'text-gray-400 rotate-90': open, 'text-gray-300': !(open) }">
@@ -47,7 +47,7 @@
                   {{$label}}
                 </span>
             <svg
-                class="ml-3 flex-shrink-0 h-5 w-5 transform group-hover:text-cyan-400 transition-colors ease-in-out
+                class="flex-shrink-0 h-5 w-5 transform group-hover:text-cyan-400 transition-colors ease-in-out
             duration-150 text-cyan-400 rotate-90"
                 viewBox="0 0 20 20" x-state:on="Expanded" x-state:off="Collapsed" aria-hidden="true"
                 :class="{ 'text-gray-400 rotate-90': open, 'text-gray-300': !(open) }">

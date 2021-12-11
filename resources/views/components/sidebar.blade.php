@@ -22,13 +22,13 @@
                         can="dashboard_access"
                         label="Dashboard"
                         route="{{route('admin.home')}}">
-                        <x-icons.home class="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"/>
+                        <x-icons.home class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
                     </x-admin.sidebar-nv-item>
 
                     <div x-show="features">
                         <x-admin.sidebar-dd-nav-item label="Appointment">
                             <x-slot name="icon">
-                                <x-icons.clock class="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"/>
+                                <x-icons.clock class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
                             </x-slot>
                             <x-admin.sidebar-dd-nav-subitem label="Appointment" route=""/>
                         </x-admin.sidebar-dd-nav-item>
@@ -38,7 +38,7 @@
                         can="query_management_access"
                         label="Query Management">
                         <x-slot name="icon">
-                            <x-icons.user-edit class="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"/>
+                            <x-icons.user-edit class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
                         </x-slot>
                         <x-admin.sidebar-dd-nav-subitem
                             can="query_access"
@@ -57,7 +57,7 @@
                         can="student_management_access"
                         label="Student Management" route="{{route('admin.students.index')}}">
                         <x-slot name="icon">
-                            <x-icons.users class="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"/>
+                            <x-icons.users class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
                         </x-slot>
                         <x-admin.sidebar-dd-nav-subitem
                             route="{{route('admin.students.dashboard')}}"
@@ -72,6 +72,17 @@
                             can="student_create"
                             label="Create Admission"
                             route="{{route('admin.students.create')}}"/>
+
+                        <x-admin.sidebar-dd-nav-subitem
+                            can=""
+                            label="Generate Student Card"
+                            route=""/>
+
+                        <x-admin.sidebar-dd-nav-subitem
+                            can=""
+                            label="Generate Certificate"
+                            :route="route('admin.certificates.index')"/>
+
                     </x-admin.sidebar-dd-nav-item>
 
                     <x-admin.sidebar-dd-nav-item
@@ -79,7 +90,7 @@
                         label="Academic Management"
                         route="{{route('admin.students.index')}}">
                         <x-slot name="icon">
-                            <x-icons.book class="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"/>
+                            <x-icons.book class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
                         </x-slot>
                         <x-admin.sidebar-dd-nav-subitem
                             can="academic_access"
@@ -101,7 +112,7 @@
                     <x-admin.sidebar-dd-nav-item
                         label="Notifications">
                         <x-slot name="icon">
-                            <x-icons.bell class="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"/>
+                            <x-icons.bell class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
                         </x-slot>
                         <x-admin.sidebar-dd-nav-subitem label="Notifications Status"/>
                         <x-admin.sidebar-dd-nav-subitem label="Send SMS or Email"/>
@@ -115,7 +126,7 @@
                         label="Finance Management"
                         route="{{route('admin.students.index')}}">
                         <x-slot name="icon">
-                            <x-icons.money class="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"/>
+                            <x-icons.money class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
                         </x-slot>
                         <x-admin.sidebar-dd-nav-subitem
                             can="finance_managment_access"
@@ -138,7 +149,7 @@
 
                     <x-admin.sidebar-dd-nav-item label="Employee Management">
                         <x-slot name="icon">
-                            <x-icons.id-card class="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"/>
+                            <x-icons.id-card class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
                         </x-slot>
                         <x-admin.sidebar-dd-nav-subitem label="Manage Employee"
                                                         route="{{route('admin.employees.index')}}"/>
@@ -147,7 +158,7 @@
 
                     <x-admin.sidebar-dd-nav-item label="Task Management">
                         <x-slot name="icon">
-                            <x-icons.task-square class="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"/>
+                            <x-icons.task-square class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
                         </x-slot>
                         <x-admin.sidebar-dd-nav-subitem label="Statuses" :route="route('admin.task-statuses.index')"/>
                         <x-admin.sidebar-dd-nav-subitem label="Tags" :route="route('admin.task-tags.index')"/>
@@ -155,19 +166,19 @@
                         <x-admin.sidebar-dd-nav-subitem label="Calendar" :route="route('admin.task-calendars.index')"/>
                     </x-admin.sidebar-dd-nav-item>
 
-                    <x-admin.sidebar-nv-item label="Reports" route="{{route('admin.students.index')}}">
-                        <svg class="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"
-                             x-description="Heroicon name: outline/document-report" xmlns="http://www.w3.org/2000/svg"
-                             fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                    </x-admin.sidebar-nv-item>
+{{--                    <x-admin.sidebar-nv-item label="Reports" route="{{route('admin.students.index')}}">--}}
+{{--                        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"--}}
+{{--                             x-description="Heroicon name: outline/document-report" xmlns="http://www.w3.org/2000/svg"--}}
+{{--                             fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">--}}
+{{--                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"--}}
+{{--                                  d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>--}}
+{{--                        </svg>--}}
+{{--                    </x-admin.sidebar-nv-item>--}}
 
                     <x-admin.sidebar-nv-item
                         can="system_calendar_access"
                         label="Institution Calendar" route="{{route('admin.system-calendars.index')}}">
-                        <x-icons.calendar class="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"/>
+                        <x-icons.calendar class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
                     </x-admin.sidebar-nv-item>
 
                 </div>
@@ -178,7 +189,7 @@
                             can="user_management_access"
                             label="User Management">
                             <x-slot name="icon">
-                                <x-icons.people class="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"/>
+                                <x-icons.people class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
                             </x-slot>
                             <x-admin.sidebar-dd-nav-subitem
                                 can="user_access"
@@ -198,13 +209,13 @@
                         <x-admin.sidebar-nv-item
                             can="setting_access"
                             label="Settings" route="{{route('admin.settings.index')}}">
-                            <x-icons.gear class="mr-4 h-6 w-6 text-cyan-200"/>
+                            <x-icons.gear class="mr-3 h-6 w-6 text-cyan-200"/>
                         </x-admin.sidebar-nv-item>
 
                         <x-admin.sidebar-nv-item
                             can="auth_profile_edit"
                             label="Profile" route="{{route('profile.show')}}">
-                            <x-icons.profile class="mr-4 h-6 w-6 text-cyan-200"/>
+                            <x-icons.profile class="mr-3 h-6 w-6 text-cyan-200"/>
                         </x-admin.sidebar-nv-item>
 
                     </div>

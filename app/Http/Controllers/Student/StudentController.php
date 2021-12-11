@@ -39,4 +39,9 @@
         {
             return view('student.discussions');
         }
+
+        public function calendar()
+        {
+            return view('student.InstituteCalendar.index');
+        }
     }

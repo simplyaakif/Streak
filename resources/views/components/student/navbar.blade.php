@@ -21,6 +21,8 @@
                         <x-student.nb-md-item route="{{route('student.issues')}}">Support Tickets</x-student.nb-md-item>
                         <x-student.nb-md-item route="{{route('student.discussions')}}">Discussions
                         </x-student.nb-md-item>
+                        <x-student.nb-md-item route="{{route('student.institute_calendar')}}">
+                            Institute Calendar</x-student.nb-md-item>
                     </div>
                 </div>
             </div>

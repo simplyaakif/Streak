@@ -108,6 +108,10 @@ class User extends Authenticatable
         return $this->hasOne(Student::class);
     }
 
+    public function employee(){
+        return $this->hasOne(Employee::class);
+    }
+
     public function chat_message(){
         return DB::table('ch_messages')->where('to_id',$this->id)
             ->where('seen',0)->get();

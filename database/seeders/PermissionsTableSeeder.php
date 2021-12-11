@@ -364,6 +364,64 @@ class PermissionsTableSeeder extends Seeder
                 'id'    => 89,
                 'title' => 'dashboard_access',
             ],
+            [
+                'id'    => 90,
+                'title' => 'institute_calendar_create',
+            ],
+            [
+                'id'    => 91,
+                'title' => 'institute_calendar_edit',
+            ],
+            [
+                'id'    => 92,
+                'title' => 'institute_calendar_show',
+            ],
+            [
+                'id'    => 93,
+                'title' => 'institute_calendar_delete',
+            ],
+            [
+                'id'    => 94,
+                'title' => 'institute_calendar_access',
+            ], [
+                'id'    => 95,
+                'title' => 'lesson_create',
+            ],
+            [
+                'id'    => 96,
+                'title' => 'lesson_edit',
+            ],
+            [
+                'id'    => 97,
+                'title' => 'lesson_show',
+            ],
+            [
+                'id'    => 98,
+                'title' => 'lesson_delete',
+            ],
+            [
+                'id'    => 99,
+                'title' => 'lesson_access',
+            ], [
+                'id'    => 100,
+                'title' => 'certificate_create',
+            ],
+            [
+                'id'    => 101,
+                'title' => 'certificate_edit',
+            ],
+            [
+                'id'    => 102,
+                'title' => 'certificate_show',
+            ],
+            [
+                'id'    => 103,
+                'title' => 'certificate_delete',
+            ],
+            [
+                'id'    => 104,
+                'title' => 'certificate_access',
+            ]
         ];
 
         Permission::insert($permissions);

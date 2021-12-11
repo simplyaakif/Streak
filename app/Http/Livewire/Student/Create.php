@@ -239,7 +239,7 @@
                 ],
                 'student.date_of_birth'                   => [
                     'nullable',
-                    'date_format:' . config('project.date_format'),
+//                    'date_format:' . config('project.date_format'),
                 ],
                 'student.cnic_passport'                   => [
                     'string',

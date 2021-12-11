@@ -141,15 +141,6 @@ class Student extends Model implements HasMedia
         return static::GENDER_SELECT[$this->gender] ?? null;
     }
 
-    public function getDateOfBirthAttribute($value)
-    {
-//        return $value ? Carbon::parse($value)->format(config('project.date_format')) : null;
-    }
-
-    public function setDateOfBirthAttribute($value)
-    {
-//        $this->attributes['date_of_birth'] = $value ? Carbon::createFromFormat(config('project.date_format'), $value)->format('Y-m-d') : null;
-    }
 
     public function getDocumentsAttribute()
     {

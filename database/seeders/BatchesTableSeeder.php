@@ -18,6 +18,33 @@
                     'created_at'=>now(),
                     'course_id'=>1,
 
+                ],
+                [
+                    'title'=>'IELTS',
+                    'limit'=>12,
+                    'session_duration'=>'6 Weeks',
+                    'description'=>'',
+                    'created_at'=>now(),
+                    'course_id'=>2,
+
+                ],
+                [
+                    'title'=>'Graphics Designing',
+                    'limit'=>6,
+                    'session_duration'=>'2 Months',
+                    'description'=>'',
+                    'created_at'=>now(),
+                    'course_id'=>3,
+
+                ],
+                [
+                    'title'=>'Web Course',
+                    'limit'=>6,
+                    'session_duration'=>'2 Months',
+                    'description'=>'',
+                    'created_at'=>now(),
+                    'course_id'=>4,
+
                 ]
             ];
             Batch::insert($batches);

@@ -16,7 +16,7 @@
                 //                'userUuid' => 'stream',
                 'userName' => Auth::user()->name,
                 //Batch Id
-                'roomUuid' => 1,
+                'roomUuid' => 12,
                 //Batch Name
                 'roomName' => 'Spoken English',
                 // Teacher
@@ -24,7 +24,7 @@
                 // Mini Class Room
                 'roomType' => 4,
                 // In minutes
-                'duration' => 30,
+                'duration' => 60,
             ];
 
 

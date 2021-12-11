@@ -22,14 +22,25 @@
 <body class="bg-gray-200">
 
 <div class="max-w-6xl mx-auto my-10 ">
-    {{--<livewire:global-search/>--}}
+{{--    --}}{{--<livewire:global-search/>--}}
 {{--    @php $searchCol = 'name'; @endphp--}}
 {{--    <livewire:admin.global-table model="QUERY" :columns="['name','courses','mobile','email','p_timings']"--}}
 {{--         :col="$searchCol" :actions="['show','edit','delete']">--}}
 {{--    </livewire:admin.global-table>--}}
-    {{--<livewire:datatable/>--}}
+{{--    --}}{{--<livewire:datatable/>--}}
 
-    <livewire:livewire-table/>
+{{--    <livewire:livewire-table/>--}}
+
+    <x-tabs first="profile" border="border-b border-solid border-gray-300" >
+        <x-slot name="tabs">
+            <x-tab tab="profile">Profile</x-tab>
+            <x-tab tab="account">Account</x-tab>
+        </x-slot>
+        <x-slot name="details">
+            <x-tab-details tab="profile">Working</x-tab-details>
+            <x-tab-details tab="account">Account</x-tab-details>
+        </x-slot>
+    </x-tabs>
 
 
     @livewireScripts

@@ -40,10 +40,9 @@ class StudentController extends Controller
         return view('admin.student.classrooms',compact('batches'));
     }
 
-    public function classroom($id)
+    public function classroom(Batch $batch)
     {
-        $batch = Batch::find($id)->with('students')->first();
-//        dd($batch);
+        $batch->load('students');
         return view('admin.student.classroom',compact('batch'));
     }
 

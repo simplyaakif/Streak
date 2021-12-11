@@ -3,7 +3,10 @@
     namespace App\Http\Controllers\Admin;
 
     use App\Classes\AgoraDynamicKey\RtcTokenBuilder;
+    use App\Events\MyEvent;
+    use App\Events\OnlineClassStartNotificationEvent;
     use App\Http\Controllers\Controller;
+    use App\Models\Batch;
     use Auth;
     use App\Classes\AgoraDynamicKey\RtmTokenBuilder;
 
@@ -12,21 +15,14 @@
         public function index()
         {
             $launch = [
-//                'rtmToken' => '006a289059beda142a6a59c891332b515a0IABbQmhn7Ed0WO2D3/KK/5bC9RpEC1vYVTUveIFw5jbrxhy+6fAAAAAAEAAGMGkoF7ygYQEAAQAXvKBh',
                 'rtmToken' => $this->rtm_token(),
                 'userUuid' => Auth::id(),
-//                'userUuid' => 'stream',
                 'userName' => Auth::user()->name,
-                //Batch Id
-                'roomUuid' => 11,
-                //Batch Name
-                'roomName' => 'Spoken English11',
-                // Teacher
+                'roomUuid' => 12,
+                'roomName' => 'Spoken English',
                 'roleType' => 1,
-                // Mini Class Room 0 1to1 , 2 Large Hall, 4 Small class
                 'roomType' => 4,
-                // In minutes
-                'duration' => 30,
+                'duration' => 60,
             ];
 
             return view('admin.stream.index', compact('launch'));
@@ -46,5 +42,15 @@
             $privilegeExpiredTs  = $currentTimestamp + $expireTimeInSeconds;
 
             return  RtmTokenBuilder::buildToken($appID, $appCertificate, $user, $role, $privilegeExpiredTs);
+        }
+        public function startOnlineClass(Batch $batch){
+            $classOptions=[
+                'classCode'=>'',
+                'instructor'=>Auth::user()->name,
+            ];
+//            event(new MyEvent('hello'));
+            OnlineClassStartNotificationEvent::dispatch($batch,$classOptions);
+//            event(new OnlineClassStartNotificationEvent('1','123'));
+            echo 'Done';
         }
     }

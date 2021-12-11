@@ -157,6 +157,8 @@
       <path value="$PROJECT_DIR$/vendor/munafio/chatify" />
       <path value="$PROJECT_DIR$/vendor/paragonie/sodium_compat" />
       <path value="$PROJECT_DIR$/vendor/paragonie/random_compat" />
+      <path value="$PROJECT_DIR$/vendor/asantibanez/livewire-calendar" />
+      <path value="$PROJECT_DIR$/vendor/imanghafoori/laravel-masterpass" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="7.4" />

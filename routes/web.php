@@ -3,7 +3,8 @@
     use App\Http\Controllers\AccountsController;
     use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\BatchController;
-use App\Http\Controllers\Admin\CourseController;
+    use App\Http\Controllers\Admin\CertificatesController;
+    use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\PermissionController;
@@ -50,6 +51,7 @@ Route::group(['prefix' => 'student','middleware' => ['auth','student_guardian']]
     Route::get('/support/{id}',[IssuesController::class,'show'])->name('student.issue');
     Route::get('/discussions',[DiscussionsController::class,'index'])->name('student.discussions');
     Route::get('/stream/online-class',[STController::class,'index'])->name('stream.class');
+    Route::get('/calendar',[SC::class,'calendar'])->name('student.institute_calendar');
 
 });
 
@@ -107,7 +109,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','st
     // Student
     Route::get('students/dashboard',[StudentController::class,'dashboard'])->name('students.dashboard');
     Route::get('students/classrooms',[StudentController::class,'classrooms'])->name('students.classrooms');
-    Route::get('students/classroom/{id}',[StudentController::class,'classroom'])->name('students.classroom');
+    Route::get('students/classroom/{batch}',[StudentController::class,'classroom'])->name('students.classroom');
     Route::post('students/media', [StudentController::class, 'storeMedia'])->name('students.storeMedia');
     Route::resource('students', StudentController::class, ['except' => ['store', 'update', 'destroy']]);
 
@@ -127,7 +129,12 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','st
     //    Income
     Route::resource('incomes',IncomesController::class,['except' => ['store','update','destroy']]);
 
+    //      Certificate
+    Route::resource('certificates',CertificatesController::class,['except' => ['store','update','destroy']]);
 
+
+
+    Route::get('stream/start-online-class/{batch}',[StreamingController::class,'startOnlineClass'])->name('stream.start-online-class');
     Route::get('stream/online-class',[StreamingController::class,'index'])->name('stream.class');
     Route::get('stream/rtm-token',[StreamingController::class, 'rtm_token'])->name('stream.rtc-token');
 
