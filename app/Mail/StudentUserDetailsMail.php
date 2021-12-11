@@ -2,10 +2,13 @@
 
     namespace App\Mail;
 
+    use Illuminate\Bus\Queueable;
+    use Illuminate\Contracts\Queue\ShouldQueue;
     use Illuminate\Mail\Mailable;
 
-    class StudentUserDetailsMail extends Mailable {
+    class StudentUserDetailsMail extends Mailable implements ShouldQueue {
 
+        use Queueable;
         public $details;
 
         public function __construct($details)
