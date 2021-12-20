@@ -10,16 +10,16 @@
             {{ trans('cruds.role.fields.title_helper') }}
         </div>
     </div>
-{{--    <div class="form-group {{ $errors->has('permissions') ? 'invalid' : '' }}">--}}
-{{--        <label class="form-label required" for="permissions">{{ trans('cruds.role.fields.permissions') }}</label>--}}
-{{--        <x-select-list class="form-control" required id="permissions" name="permissions" wire:model="permissions" :options="$this->listsForFields['permissions']" multiple />--}}
-{{--        <div class="validation-message">--}}
-{{--            {{ $errors->first('permissions') }}--}}
-{{--        </div>--}}
-{{--        <div class="help-block">--}}
-{{--            {{ trans('cruds.role.fields.permissions_helper') }}--}}
-{{--        </div>--}}
-{{--    </div>--}}
+    <div class="form-group {{ $errors->has('permissions') ? 'invalid' : '' }}">
+        <label class="form-label required" for="permissions">{{ trans('cruds.role.fields.permissions') }}</label>
+        <x-select-list class="form-control" required id="permissions" name="permissions" wire:model="permissions" :options="$this->listsForFields['permissions']" multiple />
+        <div class="validation-message">
+            {{ $errors->first('permissions') }}
+        </div>
+        <div class="help-block">
+            {{ trans('cruds.role.fields.permissions_helper') }}
+        </div>
+    </div>
 
     <div class="my-4">
         <h4 class="text-lg mb-4 ">Permissions</h4>

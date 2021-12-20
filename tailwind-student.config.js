@@ -1,8 +1,6 @@
-const colors = require('tailwindcss/colors')
 const defaultTheme = require('tailwindcss/defaultTheme')
 module.exports = {
-    mode: 'jit',
-    purge: [
+    content: [
         './resources/views/**/*.blade.php',
         './resources/views/components/admin/**/*.blade.php',
         './resources/views/livewire/**/*.blade.php',
@@ -14,22 +12,13 @@ module.exports = {
     ],
     theme: {
         extend: {
-            colors: {
-                indigo: colors.indigo,
-                rose: colors.rose,
-                coolGray: colors.coolGray,
-                red: colors.red,
-                cyan: colors.cyan,
-                sky:colors.sky,
-                'blue-gray': colors.blueGray,
-            },
             fontFamily: {
                 sans: ['Inter var','Poppins', ...defaultTheme.fontFamily.sans],
             },
         }
     },
     plugins: [
-        require('@tailwindcss/forms'),
+        require("@tailwindcss/forms")
     ],
 
 }

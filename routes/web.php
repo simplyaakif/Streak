@@ -27,6 +27,7 @@ use App\Http\Controllers\Auth\UserProfileController;
     use App\Http\Controllers\IncomesController;
     use App\Http\Controllers\RecoveriesController;
     use App\Http\Controllers\Student\IssuesController;
+    use App\Http\Controllers\VendorsController;
     use App\Models\Issue;
     use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -128,6 +129,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','st
 
     //    Income
     Route::resource('incomes',IncomesController::class,['except' => ['store','update','destroy']]);
+
+    //    Vendors
+    Route::resource('vendors',VendorsController::class,['except' => ['store','update','destroy']]);
 
     //      Certificate
     Route::resource('certificates',CertificatesController::class,['except' => ['store','update','destroy']]);

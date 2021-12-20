@@ -9,11 +9,10 @@
 
         protected $table = 'batch_student';
         const STATUS = [
-            0=>'Active',
+            0=>'Cancelled',
             1=>'Active',
             2=>'Completed',
-            3=>'Cancelled',
-            4=>'Frozen',
+            3=>'Frozen',
         ];
 
         public function student()

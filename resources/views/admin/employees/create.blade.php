@@ -45,6 +45,15 @@
                         @endforeach
                     </x-common.data-input-select>
                 </div>
+                <div>
+                    <label for="">Role</label>
+                    <x-common.data-input-select>
+                        @foreach(App\Models\Employee::DESIGNATION as $value => $label)
+                            <option value="{{$value}}">{{$label}}</option>
+                        @endforeach
+                    </x-common.data-input-select>
+                </div>
+
             </div>
         </div>
     </x-common.page-body>

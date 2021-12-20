@@ -123,33 +123,31 @@
 
 //        Create User with Student Role if Email Address Exists
             $randomPassword = Str::random(8);
-            $student = $this->student;
+            $student        = $this->student;
 
             if($this->student->email) {
 
-                if( $this->notifications['account']){
+                if($this->notifications['account']) {
 
-                $hashed_password = Hash::make($randomPassword);
-                $user            = User::create([
-                                                    'name'     => $this->student->name,
-                                                    'email'    => $this->student->email,
-                                                    'password' => $hashed_password
-                                                ]);
+                    $hashed_password = Hash::make($randomPassword);
+                    $user            = User::create([
+                                                        'name'     => $this->student->name,
+                                                        'email'    => $this->student->email,
+                                                        'password' => $hashed_password
+                                                    ]);
 
-                $student->user_id = $user->id;
-                $details = [
-                    'name'=>$this->student->name,
-                    'email'    => $this->student->email,
-                    'password'=>$randomPassword,
-                ];
+                    $student->user_id = $user->id;
+                    $details          = [
+                        'name'     => $this->student->name,
+                        'email'    => $this->student->email,
+                        'password' => $randomPassword,
+                    ];
 
-                $user->roles()->attach(4);
-                Mail::to($this->student->email)->send(new StudentUserDetailsMail($details));
+                    $user->roles()->attach(4);
+                    Mail::to($this->student->email)->send(new StudentUserDetailsMail($details));
 
-                $user->notify(new StudentAdmissionNotification());
+                    $user->notify(new StudentAdmissionNotification());
                 }
-
-
 
             }
 
@@ -239,7 +237,7 @@
                 ],
                 'student.date_of_birth'                   => [
                     'nullable',
-//                    'date_format:' . config('project.date_format'),
+                    //                    'date_format:' . config('project.date_format'),
                 ],
                 'student.cnic_passport'                   => [
                     'string',

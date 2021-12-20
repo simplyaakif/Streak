@@ -110,6 +110,7 @@
                     </x-admin.sidebar-dd-nav-item>
 
                     <x-admin.sidebar-dd-nav-item
+                        can="notifications_management_access"
                         label="Notifications">
                         <x-slot name="icon">
                             <x-icons.bell class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
@@ -129,7 +130,7 @@
                             <x-icons.money class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
                         </x-slot>
                         <x-admin.sidebar-dd-nav-subitem
-                            can="finance_managment_access"
+                            can="finance_management_access"
                             label="Finance Status"/>
                         <x-admin.sidebar-dd-nav-subitem label="Received" :route="route('admin.recovery.index')"/>
                         <x-admin.sidebar-dd-nav-subitem label="Upcoming/Pending"
@@ -145,18 +146,23 @@
                         <x-admin.sidebar-dd-nav-subitem
                             label="Accounts"
                             route="{{route('admin.accounts.index')}}"/>
+                        <x-admin.sidebar-dd-nav-subitem
+                            label="Vendors"
+                            route="{{route('admin.vendors.index')}}"/>
                     </x-admin.sidebar-dd-nav-item>
 
-                    <x-admin.sidebar-dd-nav-item label="Employee Management">
+                    <x-admin.sidebar-dd-nav-item can="employee_management_access" label="Employee Management">
                         <x-slot name="icon">
                             <x-icons.id-card class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
                         </x-slot>
-                        <x-admin.sidebar-dd-nav-subitem label="Manage Employee"
+                        <x-admin.sidebar-dd-nav-subitem
+                            can="employee_access"
+                            label="Manage Employee"
                                                         route="{{route('admin.employees.index')}}"/>
                         <x-admin.sidebar-dd-nav-subitem label="Employee Attendance"/>
                     </x-admin.sidebar-dd-nav-item>
 
-                    <x-admin.sidebar-dd-nav-item label="Task Management">
+                    <x-admin.sidebar-dd-nav-item can="task_management_access" label="Task Management">
                         <x-slot name="icon">
                             <x-icons.task-square class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
                         </x-slot>

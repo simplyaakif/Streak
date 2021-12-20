@@ -17,10 +17,10 @@
                 $table->string('mobile');
                 $table->string('telephone')->nullable() ;
                 $table->string('designation');
-                $table->string('earning_type');
+                $table->string('earning_type')->nullable();
                 $table->string('salary_amount')->nullable();
                 $table->string('salary_commission')->nullable();
-                $table->text('address');
+                $table->text('address')->nullable();
                 $table->bigInteger('user_id')->nullable();
                 //
 

@@ -15,7 +15,7 @@
 
 
         public $modal = false;
-        public $showEditModal = true;
+        public $showEditModal = false;
         public $showExpenseDetails = false;
 
 

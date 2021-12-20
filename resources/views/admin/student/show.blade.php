@@ -15,14 +15,16 @@
                                 {{--                            <a class="link-photo" href="{{ $entry['url'] }}">--}}
                                 {{--                                <img src="{{ $entry['thumbnail'] }}" alt="{{ $entry['name'] }}" title="{{ $entry['name'] }}">--}}
                                 {{--                            </a>--}}
-                                <img class="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32 flex-shrink-0 object-cover mx-auto rounded-full"
-                                     src="{{ $entry['url'] }}" alt="{{ $entry['name'] }}"
-                                     title="{{ $entry['name'] }}"
+                                <img
+                                    class="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32 flex-shrink-0 object-cover mx-auto rounded-full"
+                                    src="{{ $entry['url'] }}" alt="{{ $entry['name'] }}"
+                                    title="{{ $entry['name'] }}"
                                 >
                             @empty
-                                <img class="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32 flex-shrink-0 mx-auto rounded-full"
-                                     src="{{$student->avatarUrl()}}"
-                                     alt="">
+                                <img
+                                    class="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32 flex-shrink-0 mx-auto rounded-full"
+                                    src="{{$student->avatarUrl()}}"
+                                    alt="">
                             @endforelse
                         </div>
                         <div
@@ -67,60 +69,18 @@
                 </div>
             </div>
 
-            <div x-data="{tab: window.location.hash ? window.location.hash.substring(1) : 'profile' }">
-
-                <!-- Tabs -->
-                <div class="mt-6 sm:mt-2 2xl:mt-5">
-                    <div class="border-b border-gray-200">
-                        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-
-                                <a :class="{ 'border-cyan-500 border-b-2': tab === 'profile' }"
-                                   @click.prevent="tab = 'profile'; window.location.hash = 'profile'" href="#"
-                                   class=" text-gray-900 whitespace-nowrap py-4 px-1
-                        font-medium text-sm" x-state:on="Current" x-state:off="Default" aria-current="page"
-                                   x-state-description="Current: &quot;border-cyan-500 text-gray-900&quot;, Default: &quot;border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300&quot;">
-                                    Profile
-                                </a>
-
-                                <a :class="{ 'border-cyan-500 border-b-2': tab === 'sessions' }" @click.prevent="tab =
-                        'sessions'; window.location.hash = 'sessions'" href="#"
-                                   class="border-transparent text-gray-500 hover:text-gray-700
-                        hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-                                   x-state-description="undefined: &quot;border-cyan-500 text-gray-900&quot;, undefined: &quot;border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300&quot;">
-                                    Sessions
-                                </a>
-
-                                <a :class="{ 'border-cyan-500 border-b-2': tab === 'user_account' }" @click.prevent="tab =
-                        'user_account'; window.location.hash = 'user_account'" href="#"
-                                   class="border-transparent text-gray-500 hover:text-gray-700
-                        hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-                                   x-state-description="undefined: &quot;border-cyan-500 text-gray-900&quot;, undefined: &quot;border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300&quot;">
-                                    User Account
-                                </a>
-
-                                <a :class="{ 'border-cyan-500 border-b-2': tab === 'guardian' }" @click.prevent="tab =
-                        'guardian'; window.location.hash = 'guardian'" href="#" class="border-transparent
-                        text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-                                   x-state-description="undefined: &quot;border-cyan-500 text-gray-900&quot;, undefined: &quot;border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300&quot;">
-                                    Guardian
-                                </a>
-
-                                <a :class="{ 'border-cyan-500 border-b-2': tab === 'attendance' }" @click.prevent="tab =
-                        'attendance'; window.location.hash = 'attendance'" href="#" class="border-transparent
-                        text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-                                   x-state-description="undefined: &quot;border-cyan-500 text-gray-900&quot;, undefined: &quot;border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300&quot;">
-                                    Attendance Records
-                                </a>
-
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Description list -->
-                <div class="mt-6 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div x-show="tab === 'profile'">
+            <x-tabs first="profile" border="border-b border-solid">
+                <x-slot name="tabs">
+                    <x-tab tab="profile">Student Details</x-tab>
+                    <x-tab tab="sessions">Sessions</x-tab>
+                    <x-tab tab="user_account">User Account</x-tab>
+                    <x-tab tab="guardian">Guardian</x-tab>
+                    <x-tab tab="attendance">Attendance</x-tab>
+                    <x-tab tab="sms">SMS Records</x-tab>
+                    <x-tab tab="email">Email Records</x-tab>
+                </x-slot>
+                <x-slot name="details">
+                    <x-tab-details tab="profile">
                         <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
 
                             <div class="sm:col-span-1">
@@ -222,164 +182,71 @@
                                 </dd>
                             </div>
                         </dl>
-                    </div>
-
-                    <div x-show="tab === 'sessions'">
+                    </x-tab-details>
+                    <x-tab-details tab="sessions">
                         @foreach($student->batches as $batch)
-                            {{$batch->title}}
+                            <div class="">
+                                <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                                    <div class="px-4 py-5 sm:px-6">
+                                        <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                            {{$batch->title}}
+                                        </h3>
+                                        <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                                            {{$batch->duration}}
+                                        </p>
+                                    </div>
+                                    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+                                        <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
+                                            <div class="sm:col-span-1">
+                                                <dt class="text-sm font-medium text-gray-500">
+                                                    Start Date
+                                                </dt>
+                                                <dd class="mt-1 text-sm text-gray-900">
+                                                    {{    Carbon\Carbon::parse($batch->pivot->session_start_date)
+                                                    ->format('d M Y')  }}
+                                                </dd>
+                                            </div>
+                                            <div class="sm:col-span-1">
+                                                <dt class="text-sm font-medium text-gray-500">
+                                                    End Date
+                                                </dt>
+                                                <dd class="mt-1 text-sm text-gray-900">
+                                                    {{    Carbon\Carbon::parse($batch->pivot->session_end_date)
+                                                    ->format('d M Y')  }}
+                                                </dd>
+                                            </div>
+                                            <div class="sm:col-span-1">
+                                                <dt class="text-sm font-medium text-gray-500">
+                                                    Status
+                                                </dt>
+                                                <dd class="mt-1 text-sm text-gray-900">
+                                                    {{    App\Models\BatchStudent::STATUS[$batch->pivot->batch_status]
+                                                      }}
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+
+                            </div>
                         @endforeach
-                    </div>
-                    <div x-show="tab === 'user_account'">
+                    </x-tab-details>
 
-                    </div>
+                    <x-tab-details tab="user_account">
 
-                    <div x-show="tab === 'guardian'">
-                        <!-- This example requires Tailwind CSS v2.0+ -->
+                    </x-tab-details>
+                    <x-tab-details tab="guardian">
                         <x-common.empty-state title="No guardian" subtitle="Add a guardian to this student" label="Add
                 Guardian"/>
-                    </div>
+                    </x-tab-details>
+                    <x-tab-details tab="attendance">
 
-                    <div x-show="tab === 'attendance'">
-
-                    </div>
-
-                </div>
-
-            </div>
+                    </x-tab-details>
+                </x-slot>
+            </x-tabs>
 
         </article>
         <div class="card bg-blueGray-100">
-
-            {{--        <div class="card-body">--}}
-            {{--            <div class="pt-3">--}}
-            {{--                <table class="table table-view">--}}
-            {{--                    <tbody class="bg-white">--}}
-            {{--                        <tr>--}}
-            {{--                            <th>--}}
-            {{--                                {{ trans('cruds.student.fields.id') }}--}}
-            {{--                            </th>--}}
-            {{--                            <td>--}}
-            {{--                                {{ $student->id }}--}}
-            {{--                            </td>--}}
-            {{--                        </tr>--}}
-            {{--                        <tr>--}}
-            {{--                            <th>--}}
-            {{--                                {{ trans('cruds.student.fields.dp') }}--}}
-            {{--                            </th>--}}
-            {{--                            <td>--}}
-            {{--                                @foreach($student->dp as $key => $entry)--}}
-            {{--                                    <a class="link-photo" href="{{ $entry['url'] }}">--}}
-            {{--                                        <img src="{{ $entry['preview_thumbnail'] }}" alt="{{ $entry['name'] }}" title="{{ $entry['name'] }}">--}}
-            {{--                                    </a>--}}
-            {{--                                @endforeach--}}
-            {{--                            </td>--}}
-            {{--                        </tr>--}}
-            {{--                        <tr>--}}
-            {{--                            <th>--}}
-            {{--                                {{ trans('cruds.student.fields.name') }}--}}
-            {{--                            </th>--}}
-            {{--                            <td>--}}
-            {{--                                {{ $student->name }}--}}
-            {{--                            </td>--}}
-            {{--                        </tr>--}}
-            {{--                        <tr>--}}
-            {{--                            <th>--}}
-            {{--                                {{ trans('cruds.student.fields.user') }}--}}
-            {{--                            </th>--}}
-            {{--                            <td>--}}
-            {{--                                @if($student->user)--}}
-            {{--                                    <span class="badge badge-relationship">{{ $student->user->name ?? '' }}</span>--}}
-            {{--                                @endif--}}
-            {{--                            </td>--}}
-            {{--                        </tr>--}}
-            {{--                        <tr>--}}
-            {{--                            <th>--}}
-            {{--                                {{ trans('cruds.student.fields.father_name') }}--}}
-            {{--                            </th>--}}
-            {{--                            <td>--}}
-            {{--                                {{ $student->father_name }}--}}
-            {{--                            </td>--}}
-            {{--                        </tr>--}}
-            {{--                        <tr>--}}
-            {{--                            <th>--}}
-            {{--                                {{ trans('cruds.student.fields.gender') }}--}}
-            {{--                            </th>--}}
-            {{--                            <td>--}}
-            {{--                                {{ $student->gender_label }}--}}
-            {{--                            </td>--}}
-            {{--                        </tr>--}}
-            {{--                        <tr>--}}
-            {{--                            <th>--}}
-            {{--                                {{ trans('cruds.student.fields.nationality') }}--}}
-            {{--                            </th>--}}
-            {{--                            <td>--}}
-            {{--                                {{ $student->nationality }}--}}
-            {{--                            </td>--}}
-            {{--                        </tr>--}}
-            {{--                        <tr>--}}
-            {{--                            <th>--}}
-            {{--                                {{ trans('cruds.student.fields.date_of_birth') }}--}}
-            {{--                            </th>--}}
-            {{--                            <td>--}}
-            {{--                                {{ $student->date_of_birth }}--}}
-            {{--                            </td>--}}
-            {{--                        </tr>--}}
-            {{--                        <tr>--}}
-            {{--                            <th>--}}
-            {{--                                {{ trans('cruds.student.fields.cnic_passport') }}--}}
-            {{--                            </th>--}}
-            {{--                            <td>--}}
-            {{--                                {{ $student->cnic_passport }}--}}
-            {{--                            </td>--}}
-            {{--                        </tr>--}}
-            {{--                        <tr>--}}
-            {{--                            <th>--}}
-            {{--                                {{ trans('cruds.student.fields.mobile') }}--}}
-            {{--                            </th>--}}
-            {{--                            <td>--}}
-            {{--                                {{ $student->mobile }}--}}
-            {{--                            </td>--}}
-            {{--                        </tr>--}}
-            {{--                        <tr>--}}
-            {{--                            <th>--}}
-            {{--                                {{ trans('cruds.student.fields.email') }}--}}
-            {{--                            </th>--}}
-            {{--                            <td>--}}
-            {{--                                <a class="link-light-blue" href="mailto:{{ $student->email }}">--}}
-            {{--                                    <i class="far fa-envelope fa-fw">--}}
-            {{--                                    </i>--}}
-            {{--                                    {{ $student->email }}--}}
-            {{--                                </a>--}}
-            {{--                            </td>--}}
-            {{--                        </tr>--}}
-            {{--                        <tr>--}}
-            {{--                            <th>--}}
-            {{--                                {{ trans('cruds.student.fields.documents') }}--}}
-            {{--                            </th>--}}
-            {{--                            <td>--}}
-            {{--                                @foreach($student->documents as $key => $entry)--}}
-            {{--                                    <a class="link-light-blue" href="{{ $entry['url'] }}">--}}
-            {{--                                        <i class="far fa-file">--}}
-            {{--                                        </i>--}}
-            {{--                                        {{ $entry['file_name'] }}--}}
-            {{--                                    </a>--}}
-            {{--                                @endforeach--}}
-            {{--                            </td>--}}
-            {{--                        </tr>--}}
-            {{--                    </tbody>--}}
-            {{--                </table>--}}
-            {{--            </div>--}}
-            {{--            <div class="form-group">--}}
-            {{--                @can('student_edit')--}}
-            {{--                    <a href="{{ route('admin.students.edit', $student) }}" class="btn btn-cyan mr-2">--}}
-            {{--                        {{ trans('global.edit') }}--}}
-            {{--                    </a>--}}
-            {{--                @endcan--}}
-            {{--                <a href="{{ route('admin.students.index') }}" class="btn btn-secondary">--}}
-            {{--                    {{ trans('global.back') }}--}}
-            {{--                </a>--}}
-            {{--            </div>--}}
-            {{--        </div>--}}
         </div>
     </div>
 @endsection
