@@ -7,9 +7,9 @@
     use Illuminate\Bus\Queueable;
     use Illuminate\Contracts\Queue\ShouldQueue;
 
-    class EmployeeCreateNotification extends Notification implements ShouldQueue {
+    class EmployeeCreateNotification extends Notification{
 
-        use Queueable;
+//        use Queueable;
         public $details;
 
         public function __construct($details)
@@ -26,7 +26,7 @@
         {
             $data = $this->details;
             return (new MailMessage)
-                ->from('info@ace.org.pk')
+                ->from('no-reply@ace.org.pk')
                 ->subject('Employee Account Created')
                 ->markdown('emails.employee-create-notification',compact('data'));
         }
