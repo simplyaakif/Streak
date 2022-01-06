@@ -54,7 +54,22 @@
             focusButton()" @click.away="onClickAway($event)" class="ml-3 relative">
                 <div>
                     <button type="button" class="max-w-xs bg-white rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 lg:p-2 lg:rounded-md lg:hover:bg-gray-50" id="user-menu-button" x-ref="button" @click="onButtonClick()" @keyup.space.prevent="onButtonEnter()" @keydown.enter.prevent="onButtonEnter()" aria-expanded="false" aria-haspopup="true" x-bind:aria-expanded="open.toString()" @keydown.arrow-up.prevent="onArrowUp()" @keydown.arrow-down.prevent="onArrowDown()">
-                        <img class="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80" alt="">
+                        @forelse(Auth::user()->employee->dp as $key => $entry)
+                            {{--                            <a class="link-photo" href="{{ $entry['url'] }}">--}}
+                            {{--                                <img src="{{ $entry['thumbnail'] }}" alt="{{ $entry['name'] }}" title="{{ $entry['name'] }}">--}}
+                            {{--                            </a>--}}
+                            <img
+                                class="h-8 w-8 rounded-full"
+                                src="{{ $entry['url'] }}" alt="{{ $entry['name'] }}"
+                                title="{{ $entry['name'] }}"
+                            >
+                        @empty
+                            <img
+                                class="h-8 w-8 rounded-full"
+                                src="{{Auth::user()->employee->avatarUrl()}}"
+                                alt="">
+                        @endforelse
+{{--                        <img class="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80" alt="">--}}
                         <span class="hidden ml-3 text-gray-700 text-sm font-medium lg:block"><span
                                 class="sr-only">Open user menu for </span>{{Auth::user()->name}}</span>
                         <svg class="hidden flex-shrink-0 ml-1 h-5 w-5 text-gray-400 lg:block" x-description="Heroicon name: solid/chevron-down" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

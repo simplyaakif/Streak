@@ -18,7 +18,7 @@
 
         public function via($notifiable): array
         {
-            return ['mail'];
+            return ['mail', LifetimesmsNotification::class];
         }
 
         public function toMail($notifiable): MailMessage
@@ -27,6 +27,10 @@
                 ->line('Congratulations. You have been successfully admitted to Ace American Center of English')
 //                ->action('Notification Action', url('/'))
                 ->line('Welcome to the ACE American Institute community.');
+        }
+
+        public function toSms($notifiable){
+
         }
 
         public function toArray($notifiable): array

@@ -8,9 +8,24 @@
                     <div class="flex-1 min-w-0">
                         <!-- Profile -->
                         <div class="flex items-center">
-                            <img class="hidden h-16 w-16 rounded-full sm:block"
-                                 src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2.6&amp;w=256&amp;h=256&amp;q=80"
-                                 alt="">
+{{--                            <img class="hidden h-16 w-16 rounded-full sm:block"--}}
+{{--                                 src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2.6&amp;w=256&amp;h=256&amp;q=80"--}}
+{{--                                 alt="">--}}
+                            @forelse(Auth::user()->employee->dp as $key => $entry)
+                                {{--                            <a class="link-photo" href="{{ $entry['url'] }}">--}}
+                                {{--                                <img src="{{ $entry['thumbnail'] }}" alt="{{ $entry['name'] }}" title="{{ $entry['name'] }}">--}}
+                                {{--                            </a>--}}
+                                <img
+                                    class="hidden h-16 w-16 rounded-full sm:block"
+                                    src="{{ $entry['url'] }}" alt="{{ $entry['name'] }}"
+                                    title="{{ $entry['name'] }}"
+                                >
+                            @empty
+                                <img
+                                    class="hidden h-16 w-16 rounded-full sm:block"
+                                    src="{{Auth::user()->employee->avatarUrl()}}"
+                                    alt="">
+                            @endforelse
                             <div>
                                 <div class="flex items-center">
                                     <img class="h-16 w-16 rounded-full sm:hidden"

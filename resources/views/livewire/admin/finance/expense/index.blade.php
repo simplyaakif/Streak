@@ -44,7 +44,7 @@
 
                     <div>
                         <label for="">Paid On</label>
-                        <x-date-picker wire:model="editing.paid_on" placeholder="Enter Payee Name"/>
+                        <x-common.data-input-text type="date" wire:model="editing.paid_on"/>
                     </div>
                 </div>
             </x-slot>
