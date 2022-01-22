@@ -10,19 +10,19 @@
 
     <x-common.layout-subpage>
         <div class="divide-y">
-            <div>
-                <h2 class="text-lg leading-6 font-medium text-gray-900">Overview</h2>
-                <div class="mt-2 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
-                    <!-- Card -->
-                    <x-common.stat-card label="" stat="10">
-                        <x-slot name="icon">
-                            <x-icons.user-comment class="w-6 h-6 text-gray-400"/>
-                        </x-slot>
-                    </x-common.stat-card>
+            {{--            <div>--}}
+            {{--                <h2 class="text-lg leading-6 font-medium text-gray-900">Overview</h2>--}}
+            {{--                <div class="mt-2 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">--}}
+            {{--                    <!-- Card -->--}}
+            {{--                    <x-common.stat-card label="" stat="10">--}}
+            {{--                        <x-slot name="icon">--}}
+            {{--                            <x-icons.user-comment class="w-6 h-6 text-gray-400"/>--}}
+            {{--                        </x-slot>--}}
+            {{--                    </x-common.stat-card>--}}
 
-                </div>
-            </div>
-            <div class="mt-8 py-8">
+            {{--                </div>--}}
+            {{--            </div>--}}
+            <div class="">
                 <h2 class="text-lg leading-6 font-medium text-gray-900">Follow Ups</h2>
                 <x-common.table class="mt-2">
                     <x-slot name="head">
@@ -58,8 +58,8 @@
                                 <x-common.table.cell>
                                     <div class="flex text-center space-x-2 max-w-xs">
                                         @foreach($query->courses as $course)
-                                            <div>
-                                                <div class="px-2 py-1 truncate rounded-full bg-gray-100 text-xs">
+                                            <div class="bg-gray-100 px-2 py-1 rounded-lg">
+                                                <div class="w-20 text-xs">
                                                     {{$course->title}}
                                                 </div>
                                             </div>
@@ -71,13 +71,15 @@
                             <span class="bg-gray-50 text-xs rounded-full">
                         {{$query->recent_timeline_title }}
                             </span>
-                                        <span class="text-red-600 text-xs">
+                                        <span class="text-red-600 text-xs font-bold">
                                 {{$query->recent_timeline_date }}
                             </span>
                                     </div>
                                 </x-common.table.cell>
-                                <x-common.table.cell>
+                                <x-common.table.cell class="">
+                                    <div class="text-xs">
                                     {{$query->recent_timeline_remark }}
+                                    </div>
                                 </x-common.table.cell>
                                 <x-common.table.cell>
                                     <span class="text-xs">{{$query->human_date}}</span>
