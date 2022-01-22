@@ -69,9 +69,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','st
     Route::resource('users', UserController::class, ['except' => ['store', 'update', 'destroy']]);
 
     // Query
+    Route::get('queries/follow',[QueryController::class,'follow'])->name('queries.follow');
     Route::post('queries/media', [QueryController::class, 'storeMedia'])->name('queries.storeMedia');
     Route::get('queries/dashboard',[QueryController::class,'dashboard'])->name('queries.dashboard');
     Route::resource('queries', QueryController::class, ['except' => ['store', 'update', 'destroy']]);
+
 
     // Course
     Route::post('courses/media', [CourseController::class, 'storeMedia'])->name('courses.storeMedia');

@@ -79,6 +79,7 @@
                             ]);
             $query = $this->showQueryDetails;
             $query->timelines()->attach($this->addTimelineData['timeline_id'],$this->addTimelineData);
+            $this->redirectRoute('admin.queries.index');
         }
         public function mount()
         {
@@ -129,7 +130,7 @@
                 ->when($this->filters['search'], fn($query, $search) => $query->where('name', 'like', '%'.$search.'%'))
                     ->orderBy($this->sortField, $this->sortDirection)
                     ->latest()
-                    ->paginate(10)
+                    ->paginate(50)
             ]);
         }
 

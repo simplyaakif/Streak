@@ -1109,6 +1109,9 @@ select {
 .max-w-prose {
   max-width: 65ch;
 }
+.max-w-xl {
+  max-width: 36rem;
+}
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -1186,6 +1189,11 @@ select {
 .cursor-default {
   cursor: default;
 }
+.select-all {
+  -webkit-user-select: all;
+     -moz-user-select: all;
+          user-select: all;
+}
 .list-none {
   list-style-type: none;
 }
@@ -1205,6 +1213,9 @@ select {
 }
 .grid-cols-3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.grid-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 .grid-cols-6 {
   grid-template-columns: repeat(6, minmax(0, 1fr));

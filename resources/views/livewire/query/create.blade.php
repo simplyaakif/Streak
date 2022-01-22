@@ -117,9 +117,9 @@ error="qCourses.course_id"
             </div>
             <div class="sm:col-span-3">
                 <x-common.data-label class="form-label required" label="Preferred Timings" for=""/>
-                <x-common.data-input-select  wire:model="query.p_timings">
+                <x-common.data-input-select  wire:model.defer="query.p_timings">
                     @foreach(App\Models\Query::preferred_timings as $id => $label)
-                        <option value="{{$id}}">{{$label}}</option>
+                        <option value="{{$label}}">{{$label}}</option>
                     @endforeach
                 </x-common.data-input-select>
             </div>
@@ -163,7 +163,11 @@ error="qCourses.course_id"
 
             <div class="sm:col-span-3">
                 <x-common.data-label class="form-label required" label="Follow Up Date & Time" for=""/>
-                <x-date-picker picker="" id="follow_up" name="follow_up" wire:model="timeline.fw_date_time" />
+{{--                <x-date-picker picker="" id="follow_up" name="follow_up"--}}
+{{--                               wire:model="timeline.fw_date_time" />--}}
+                <x-common.data-input-text
+                    id="follow_up" name="follow_up"
+                    type="datetime-local" wire:model="timeline.fw_date_time" />
             </div>
 
         </div>

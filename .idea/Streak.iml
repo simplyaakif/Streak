@@ -156,7 +156,6 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/laraveldaily/laravel-charts" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/lab404/laravel-impersonate" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/pusher/pusher-php-server" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/munafio/chatify" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/paragonie/sodium_compat" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/paragonie/random_compat" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/asantibanez/livewire-calendar" />
@@ -167,7 +166,6 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/nette/utils" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/livewire/livewire" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/laravel/sanctum" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/lifetimesms/gateway" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

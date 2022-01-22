@@ -36,6 +36,23 @@
                                                          ]));
         }
 
+        public function follow()
+        {
+            $queries = Query::with('latestTimeline')
+                ->whereBetween('created_at',[now()->subMonths(3),now()])
+                ->latest()->get();
+            $followUps = [];
+            foreach($queries as $query){
+                $followUps[]=[
+                    'query'=>$query,
+                    'date'=>$query->timelines->reverse()->first()->pivot->fw_date_time
+                ];
+            }
+            $followUps = collect($followUps)->sortBy('date');
+
+            return view('admin.query.follow',compact('followUps'));
+        }
+
         public function create()
         {
             abort_if(Gate::denies('query_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');

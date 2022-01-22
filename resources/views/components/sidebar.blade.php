@@ -45,6 +45,10 @@
                             label="Queries Status"
                             route="{{route('admin.queries.dashboard')}}"/>
                         <x-admin.sidebar-dd-nav-subitem
+                            can="query_follow"
+                            label="Follow Ups"
+                            route="{{route('admin.queries.follow')}}"/>
+                        <x-admin.sidebar-dd-nav-subitem
                             can="query_access"
                             label="All Queries"
                             route="{{route('admin.queries.index')}}"/>

@@ -128,10 +128,20 @@
             return $this->courses()->first();
         }
 
-        public function getRecentTimelineTitleAttribute($value)
+        public function getRecentTimelineTitleAttribute()
         {
             return $this->timelines->last() ? $this->timelines->last()->title : null;
 
+        }
+
+        public function getRecentTimelineRemarkAttribute()
+        {
+            return $this->timelines->last() ? $this->timelines->last()->pivot->remarks : null;
+
+        }
+
+        public function latestTimeline(){
+            return $this->belongsToMany(Timeline::class)->latest();
         }
 
         public function getRecentTimelineDateAttribute($value)
@@ -149,10 +159,10 @@
             return User::find($this->attributes['staff_user_id'])->name;
         }
 
-        public function getPTimingsAttribute($value)
-        {
-            return static::preferred_timings[$value] ?? null;
-        }
+//        public function getPTimingsAttribute($value)
+//        {
+//            return static::preferred_timings[$value] ?? null;
+//        }
 
         public function getReferenceAttribute($value)
         {

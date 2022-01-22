@@ -73,7 +73,7 @@ sm:rounded-lg">
 
     </div>
 
-    <x-common.table>
+    <x-common.table class="max-w-full">
         <x-slot name="head">
             <x-common.table.heading>
                 #
@@ -112,13 +112,14 @@ sm:rounded-lg">
                         </div>
 
                     </x-common.table.cell>
-                    <x-common.table.cell>
-                        <div class="flex text-center space-x-2 max-w-xs">
+                    <x-common.table.cell class=" overflow-hidden">
+                        <div class="flex text-center space-x-2">
                             @foreach($query->courses as $course)
-                                <div>
-                                <span class="px-2 py-1 truncate rounded-full bg-gray-100 text-xs">
+                                <div class="bg-gray-100 px-2 py-1 rounded-lg">
+
+                                <div class=" text-center  text-xs w-20">
                                     {{$course->title}}
-                                </span>
+                                </div>
                                 </div>
                             @endforeach
                         </div>
@@ -134,7 +135,7 @@ sm:rounded-lg">
                             <span class="bg-gray-50 text-xs rounded-full">
                         {{$query->recent_timeline_title }}
                             </span>
-                            <span class="text-red-600 text-xs">
+                            <span class="text-red-600 text-xs font-bold">
                                 {{$query->recent_timeline_date }}
                             </span>
                         </div>
@@ -276,14 +277,6 @@ sm:rounded-lg">
                                                     {{$showQueryDetails->mobile}}
                                                 </dd>
                                             </div>
-{{--                                            <div>--}}
-{{--                                                <dt class="text-sm font-medium text-gray-500 sm:w-40 sm:flex-shrink-0">--}}
-{{--                                                    Telephone--}}
-{{--                                                </dt>--}}
-{{--                                                <dd class="mt-1 text-sm text-gray-900 sm:col-span-2">--}}
-{{--                                                    {{$showQueryDetails->telephone}}--}}
-{{--                                                </dd>--}}
-{{--                                            </div>--}}
                                             <div>
                                                 <dt class="text-sm font-medium text-gray-500 sm:w-40 sm:flex-shrink-0">
                                                     Location
@@ -347,6 +340,7 @@ sm:rounded-lg">
                                                         <div>
                                                             <label for="">Status </label>
                                                             <x-common.data-input-select
+                                                                error="addTimelineData.timeline_id"
                                                                 wire:model="addTimelineData.timeline_id">
                                                                 @foreach($timelines as $timeline)
                                                                     <option
@@ -357,13 +351,16 @@ sm:rounded-lg">
                                                         <div>
                                                             <label for="">Follow Up date </label>
                                                             <x-common.data-input-text label="Follow Up Date"
+                                                                                      error="addTimelineData.fw_date_time"
                                                           wire:model="addTimelineData.fw_date_time"
                                                                                       type="datetime-local"/>
                                                         </div>
                                                     </div>
                                                     <div>
                                                         <label for="">Remarks</label>
-                                                        <x-common.data-input-text wire:model="addTimelineData.remarks"/>
+                                                        <x-common.data-input-text
+                                                            error="addTimelineData.remarks"
+                                                            wire:model="addTimelineData.remarks"/>
                                                     </div>
                                                     <div>
                                                         <x-button.primary type="submit">Add Status</x-button.primary>
