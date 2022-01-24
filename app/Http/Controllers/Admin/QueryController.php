@@ -4,6 +4,7 @@
 
     use App\Http\Controllers\Controller;
     use App\Models\Query;
+    use Carbon\Carbon;
     use Gate;
     use Illuminate\Http\Request;
     use Illuminate\Http\Response;
@@ -41,16 +42,24 @@
             $queries = Query::with('latestTimeline')
                 ->whereBetween('created_at',[now()->subMonths(3),now()])
                 ->latest()->get();
-            $followUps = [];
-            foreach($queries as $query){
-                $followUps[]=[
+            $followUps = $queries->map(function ($query){
+                return [
                     'query'=>$query,
                     'date'=>$query->timelines->reverse()->first()->pivot->fw_date_time
-                ];
-            }
-            $followUps = collect($followUps)->sortBy('date');
+                ] ;
+            })->sortBy('date');
 
-            return view('admin.query.follow',compact('followUps'));
+            $todays = $followUps->filter(function($follow){
+                $date = Carbon::parse($follow["date"]);
+                return $date->isToday();
+            })->count();
+
+            $tomorrows = $followUps->filter(function($follow){
+                $date = Carbon::parse($follow["date"]);
+                return $date->isTomorrow();
+            })->count();
+
+            return view('admin.query.follow',compact('followUps','todays','tomorrows'));
         }
 
         public function create()

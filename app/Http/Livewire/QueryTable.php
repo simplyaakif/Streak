@@ -6,6 +6,7 @@
     use App\Models\Income;
     use App\Models\Query;
     use App\Models\Timeline;
+    use Auth;
     use Carbon\Carbon;
     use Livewire\Component;
     use Livewire\WithPagination;
@@ -22,9 +23,10 @@
 
         public Query $editing;
         public $addTimelineData=[
-            'timeline_id'=>2,
+            'timeline_id'=>1,
             'fw_date_time'=>null,
             'remarks'=>null,
+            'user_id'=>null,
         ];
 
         public $timelines;
@@ -78,12 +80,13 @@
                                 'addTimelineData.remarks'=>'string'
                             ]);
             $query = $this->showQueryDetails;
+            $this->addTimelineData['user_id']= Auth::id();
             $query->timelines()->attach($this->addTimelineData['timeline_id'],$this->addTimelineData);
             $this->redirectRoute('admin.queries.index');
         }
         public function mount()
         {
-            $this->timelines = Timeline::all();
+            $this->timelines = Timeline::orderBy('title')->get();
             $this->editing = Query::first();
             $this->showQueryDetails = Query::make(['created_at' => now()]);
             $this->courses = Course::all('id','title');

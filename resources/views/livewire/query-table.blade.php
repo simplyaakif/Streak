@@ -341,7 +341,7 @@ sm:rounded-lg">
                                                             <label for="">Status </label>
                                                             <x-common.data-input-select
                                                                 error="addTimelineData.timeline_id"
-                                                                wire:model="addTimelineData.timeline_id">
+                                                                wire:model.defer="addTimelineData.timeline_id">
                                                                 @foreach($timelines as $timeline)
                                                                     <option
                                                                         value="{{$timeline->id}}">{{$timeline->title}}</option>
@@ -352,7 +352,7 @@ sm:rounded-lg">
                                                             <label for="">Follow Up date </label>
                                                             <x-common.data-input-text label="Follow Up Date"
                                                                                       error="addTimelineData.fw_date_time"
-                                                          wire:model="addTimelineData.fw_date_time"
+                                                          wire:model.defer="addTimelineData.fw_date_time"
                                                                                       type="datetime-local"/>
                                                         </div>
                                                     </div>
@@ -360,7 +360,7 @@ sm:rounded-lg">
                                                         <label for="">Remarks</label>
                                                         <x-common.data-input-text
                                                             error="addTimelineData.remarks"
-                                                            wire:model="addTimelineData.remarks"/>
+                                                            wire:model.defer="addTimelineData.remarks"/>
                                                     </div>
                                                     <div>
                                                         <x-button.primary type="submit">Add Status</x-button.primary>

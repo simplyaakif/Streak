@@ -9,20 +9,25 @@
     </x-common.page-header>
 
     <x-common.layout-subpage>
-        <div class="divide-y">
-            {{--            <div>--}}
-            {{--                <h2 class="text-lg leading-6 font-medium text-gray-900">Overview</h2>--}}
-            {{--                <div class="mt-2 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">--}}
-            {{--                    <!-- Card -->--}}
-            {{--                    <x-common.stat-card label="" stat="10">--}}
-            {{--                        <x-slot name="icon">--}}
-            {{--                            <x-icons.user-comment class="w-6 h-6 text-gray-400"/>--}}
-            {{--                        </x-slot>--}}
-            {{--                    </x-common.stat-card>--}}
+        <div class="divide-y mb-8">
+                        <div>
+                            <h2 class="text-lg leading-6 font-medium text-gray-900">Overview</h2>
+                            <div class="mt-2 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
+                                <!-- Card -->
+                                <x-common.stat-card label="Today Follow Ups" :stat="$todays">
+                                    <x-slot name="icon">
+                                        <x-icons.user-comment class="w-6 h-6 text-gray-400"/>
+                                    </x-slot>
+                                </x-common.stat-card>
+                                <x-common.stat-card label="Tomorrow Follow Ups" :stat="$tomorrows">
+                                    <x-slot name="icon">
+                                        <x-icons.user-comment class="w-6 h-6 text-gray-400"/>
+                                    </x-slot>
+                                </x-common.stat-card>
 
-            {{--                </div>--}}
-            {{--            </div>--}}
-            <div class="">
+                            </div>
+                        </div>
+            <div class="mt-8 pt-8">
                 <h2 class="text-lg leading-6 font-medium text-gray-900">Follow Ups</h2>
                 <x-common.table class="mt-2">
                     <x-slot name="head">
@@ -31,7 +36,7 @@
                         <x-common.table.heading>Course</x-common.table.heading>
                         <x-common.table.heading>Status</x-common.table.heading>
                         <x-common.table.heading>Remark</x-common.table.heading>
-                        <x-common.table.heading>Entry Date</x-common.table.heading>
+                        <x-common.table.heading>Entry Details</x-common.table.heading>
                     </x-slot>
                     <x-slot name="body">
                         @forelse($followUps as $followUp)
@@ -82,7 +87,18 @@
                                     </div>
                                 </x-common.table.cell>
                                 <x-common.table.cell>
-                                    <span class="text-xs">{{$query->human_date}}</span>
+                                    <div>
+                                        @if($query->recent_timeline_by)
+                                        <div class="text-xs">Status By:
+                                            <span class="font-bold">
+{{$query->recent_timeline_by->name}}
+                                            </span>
+                                        </div>
+                                        @endif
+                                    <span class="text-xs">{{$query->recent_timeline->pivot->created_at
+                                    }}</span>
+                                    </div>
+
                                 </x-common.table.cell>
                             </x-common.table.row>
                         @empty

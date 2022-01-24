@@ -74,6 +74,7 @@
             $this->query->courses()->attach($this->qCourses['course_id'], $this->qCourses);
 
             $this->timeline['created_at'] = now();
+            $this->timeline['user_id'] = Auth::id();
 
             if($this->timeline['fw_date_time']) {
                 $this->timeline['fw_date_time'] = Carbon::parse($this->timeline['fw_date_time']);

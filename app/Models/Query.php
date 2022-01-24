@@ -114,7 +114,8 @@
             return $this->belongsToMany(Timeline::class)->withPivot([
                                                                         'created_at',
                                                                         'remarks',
-                                                                        'fw_date_time'
+                                                                        'fw_date_time',
+                                                                        'user_id'
                                                                     ])->withTimestamps();
         }
 
@@ -137,6 +138,18 @@
         public function getRecentTimelineRemarkAttribute()
         {
             return $this->timelines->last() ? $this->timelines->last()->pivot->remarks : null;
+
+        }
+        public function getRecentTimelineAttribute()
+        {
+            return $this->timelines->last() ? $this->timelines->last() : null;
+
+        }
+        public function getRecentTimelineByAttribute()
+        {
+            $last_timeline = $this->timelines->last() ? $this->timelines->last() : null;
+
+            return User::find($last_timeline->pivot->user_id);
 
         }
 

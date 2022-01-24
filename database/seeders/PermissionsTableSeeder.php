@@ -421,6 +421,10 @@ class PermissionsTableSeeder extends Seeder
             [
                 'id'    => 104,
                 'title' => 'certificate_access',
+            ],
+            [
+                'id'    => 105,
+                'title' => 'query_follow',
             ]
         ];
 
