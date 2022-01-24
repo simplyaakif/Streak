@@ -95,7 +95,8 @@
                                             </span>
                                         </div>
                                         @endif
-                                    <span class="text-xs">{{$query->recent_timeline->pivot->created_at
+                                    <span class="text-xs">{{
+    Carbon\Carbon::parse($query->recent_timeline->pivot->created_at)->format('h:i:s a d-m-Y')
                                     }}</span>
                                     </div>
 
