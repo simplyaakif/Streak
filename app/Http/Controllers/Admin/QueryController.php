@@ -22,44 +22,56 @@
         {
             abort_if(Gate::denies('query_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
             $dQuery = Query::whereDate('created_at', now()->toDate())->get()->count();
-            $wQuery = Query::whereBetween('created_at', [now()->startOfWeek(),now()->endOfWeek()])->get()->count();
-            $mQuery = Query::whereMonth('created_at', now()->month)
-                ->whereYear('created_at',now()->year)
-                ->get()->count();
-            $pMquery = Query::whereMonth('created_at', now()->subMonth()->month)
-                ->whereYear('created_at',now()->subMonth()->year)
-                ->get()->count();
+            $wQuery = Query::whereBetween('created_at', [
+                now()->startOfWeek(),
+                now()->endOfWeek()
+            ])->get()->count();
+            $mQuery
+                    = Query::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->get()->count();
+            $pMquery
+                    = Query::whereMonth('created_at', now()->subMonth()->month)->whereYear('created_at', now()->subMonth()->year)->get()->count();
 
             $queries = Query::latest()->take(10)->get();
 
             return view('admin.query.dashboard', compact([
-                                                             'dQuery','mQuery','wQuery','pMquery','queries'
+                                                             'dQuery',
+                                                             'mQuery',
+                                                             'wQuery',
+                                                             'pMquery',
+                                                             'queries'
                                                          ]));
         }
 
         public function follow()
         {
-            $queries = Query::with('latestTimeline')
-                ->whereBetween('created_at',[now()->subMonths(3),now()])
-                ->latest()->get();
-            $followUps = $queries->map(function ($query){
-                return [
-                    'query'=>$query,
-                    'date'=>$query->timelines->reverse()->first()->pivot->fw_date_time
-                ] ;
-            })->sortBy('date');
+            $queries   = Query::with('latestTimeline')->whereBetween('created_at', [
+                    now()->subMonths(3),
+                    now()
+                ])->latest()->get();
+            $followUps = $queries->map(function ($query) {
+                if($query->timelines->reverse()->first()->id == 5 || $query->timelines->reverse()->first()->id == 6) {
+                    return null;
+                }
 
-            $todays = $followUps->filter(function($follow){
+                return [
+                    'query' => $query,
+                    'date'  => $query->timelines->reverse()->first()->pivot->fw_date_time
+                ];
+            })->sortBy('date')->filter(function ($follow) {
+                return $follow !== null;
+            });
+
+            $todays = $followUps->filter(function ($follow) {
                 $date = Carbon::parse($follow["date"]);
                 return $date->isToday();
             })->count();
 
-            $tomorrows = $followUps->filter(function($follow){
+            $tomorrows = $followUps->filter(function ($follow) {
                 $date = Carbon::parse($follow["date"]);
                 return $date->isTomorrow();
             })->count();
 
-            return view('admin.query.follow',compact('followUps','todays','tomorrows'));
+            return view('admin.query.follow', compact('followUps', 'todays', 'tomorrows'));
         }
 
         public function create()
