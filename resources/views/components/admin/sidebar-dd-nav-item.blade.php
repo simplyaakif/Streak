@@ -7,7 +7,7 @@
 <div x-data="{ open: false }" class="space-y-1">
     <button type="button"
             class="text-cyan-600 hover:text-white hover:bg-cyan-600 group w-full flex items-center pl-2 pr-1 py-2
-            text-left text-sm font-medium rounded-md "
+            text-left text-base lg:text-sm font-medium rounded-md "
             x-state:on="Current" x-state:off="Default" aria-controls="sub-menu-1"
             @click="open = !open" aria-expanded="true" x-bind:aria-expanded="open.toString()"
             x-state-description="Current: &quot;bg-gray-100 text-gray-900&quot;, Default: &quot;bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-900&quot;">
@@ -38,7 +38,7 @@
     <div x-data="{ open: false }" class="space-y-1">
         <button type="button"
                 class="text-cyan-600 hover:text-white hover:bg-cyan-600 group w-full flex items-center pl-2 pr-1 py-2
-            text-left text-sm font-medium rounded-md "
+            text-left text-base lg:text-sm font-medium rounded-md "
                 x-state:on="Current" x-state:off="Default" aria-controls="sub-menu-1"
                 @click="open = !open" aria-expanded="true" x-bind:aria-expanded="open.toString()"
                 x-state-description="Current: &quot;bg-gray-100 text-gray-900&quot;, Default: &quot;bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-900&quot;">
