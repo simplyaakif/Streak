@@ -26,17 +26,32 @@
             return $this->morphOne(Transaction::class,'transactionable');
         }
 
-        public function getPaidByAttribute($value)
+//        public function getPaidByAttribute($value)
+//        {
+//            return $value ? User::findOrFail($value)->name : '';
+//        }
+
+        public function getIsPaidHumanAttribute()
         {
-            return $value ? User::findOrFail($value)->name : '';
+            return $this->is_paid ? "Yes" : "No";
         }
 
-        public function getIsPaidAttribute($value)
-        {
-            return $value? "Yes" : "No";
-        }
-
-        public function getPaidOnAttribute($value){
+        public function getPaidOnHumanAttribute($value){
             return Carbon::parse($value)->format('h:i:s A d-M-Y');
         }
+
+        public function vendor()
+        {
+            return $this->belongsTo(Vendor::class);
+        }
+
+        public function getDueDateHumanAttribute()
+        {
+            return $this->due_date? Carbon::parse($this->due_date)->format('d-M-Y'):null;
+        }
+
+//        public function getPaidByHumanAttribute()
+//        {
+//            return $this->paid_by? Carbon::parse($this->paid_by)->format('d-M-Y'):null;
+//        }
     }

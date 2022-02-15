@@ -6,46 +6,81 @@
             <x-slot name="content">
                 <div class="grid sm:grid-cols-2 gap-2">
                     <div>
-                        <label for="">Expense Type</label>
-                        <x-common.data-input-select wire:model="editing.type">
-                            @foreach(App\Models\Expense::types as $val =>$label)
-                                <option value="{{$val}}">{{$label}}</option>
+                        <label for="">Expense Vendor</label>
+                        <x-common.data-input-select wire:model="editing.vendor_id"
+                                                    error="editing.vendor_id">
+                            <option value="0" >Select Vendor</option>
+                            @foreach($vendors as $vendor)
+                                <option value="{{$vendor->id}}">{{$vendor->name}}</option>
                             @endforeach
                         </x-common.data-input-select>
                     </div>
 
                     <div>
                         <label for="">Expense Amount</label>
-                        <x-common.data-input-text wire:model="editing.amount" placeholder="Enter Expense Amount"/>
+                        <x-common.data-input-text type="number"
+                                                  name="amount"
+                                                  error="editing.amount"
+                                                  wire:model.defer="editing.amount" placeholder="Enter Expense Amount"/>
                     </div>
 
                     <div>
-                        <label for="">Pay from Account</label>
-                        <x-common.data-input-select wire:model="account_id">
-                            @foreach($accounts as $account)
-                                <option value="{{$account->id}}">{{$account->title}}</option>
-                            @endforeach
+                        <label for="">Due Date</label>
+                        <x-common.data-input-text type="date"
+                                                  error="editing.due_date"
+                                                  wire:model="editing.due_date"/>
+                    </div>
+
+                    <div>
+                        <label for="">Is paid</label>
+                        <x-common.data-input-select wire:model="editing.is_paid"
+                                                    error="editing.is_paid">
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
                         </x-common.data-input-select>
+
                     </div>
 
-                    <div>
-                        <label for="">Paid By</label>
-                        <x-common.data-input-select  wire:model="editing.paid_by">
-                            @foreach($users as $user)
-                                <option  value="{{$user->id}}">{{$user->name}}</option>
-                            @endforeach
-                        </x-common.data-input-select>
-                    </div>
+                    @if($editing->is_paid)
+                        <div class="grid sm:grid-cols-2 gap-2 col-span-2">
+                            <div>
+                                <label for="">Pay from Account</label>
+                                <x-common.data-input-select
+                                    error="account_id"
+                                    wire:model="account_id">
+                                    @foreach($accounts as $account)
+                                        <option value="{{$account->id}}">{{$account->title}}</option>
+                                    @endforeach
+                                </x-common.data-input-select>
+                            </div>
 
-                    <div>
-                        <label for="">Paid To</label>
-                        <x-common.data-input-text wire:model="editing.paid_to" placeholder="Enter Payee Name"/>
-                    </div>
+                            <div>
+                                <label for="">Paid By</label>
+                                <x-common.data-input-select
+                                    error="editing.paid_by"
+                                    wire:model.defer="editing.paid_by">
+                                    @foreach($users as $user)
+                                        <option value="{{$user->id}}">{{$user->name}}</option>
+                                    @endforeach
+                                </x-common.data-input-select>
+                            </div>
 
-                    <div>
-                        <label for="">Paid On</label>
-                        <x-common.data-input-text type="date" wire:model="editing.paid_on"/>
-                    </div>
+                            <div>
+                                <label for="">Paid To</label>
+                                <x-common.data-input-text wire:model="editing.paid_to"
+                                                          name="name"
+                                                          error="editing.paid_to"
+                                                          placeholder="Enter Payee Name"/>
+                            </div>
+                            <div>
+                                <label for="">Paid On</label>
+                                <x-common.data-input-text type="date"
+                                                          error="editing.paid_on"
+                                                          wire:model="editing.paid_on"/>
+                            </div>
+                        </div>
+                    @endif
+
                 </div>
             </x-slot>
             <x-slot name="footer">
@@ -60,18 +95,6 @@
             class="btn btn-indigo text-center flex justify-center"
             wire:click="$toggle('showEditModal')">Create
         </button>
-        {{--        <x-common.filter-wrapper label="Search by Name">--}}
-        {{--            <x-common.data-input-text wire:model="filters.search" placeholder="Search Query by Name"/>--}}
-        {{--        </x-common.filter-wrapper>--}}
-        {{--        <div>--}}
-
-        {{--            <x-common.filter-select label="Select Course"  >--}}
-        {{--                <x-common.data-input-text/>--}}
-        {{--            </x-common.filter-select>--}}
-        {{--        </div>--}}
-        {{--        <div>--}}
-        {{--            <x-common.filter-date-interval label="Added Dates"/>--}}
-        {{--        </div>--}}
 
     </div>
 
@@ -79,10 +102,11 @@
     <x-common.table>
         <x-slot name="head">
             <x-common.table.heading>#</x-common.table.heading>
-            <x-common.table.heading>Type</x-common.table.heading>
+            <x-common.table.heading>Vendor</x-common.table.heading>
             <x-common.table.heading>Amount</x-common.table.heading>
-            <x-common.table.heading>Status</x-common.table.heading>
-            <x-common.table.heading>Date of Payment</x-common.table.heading>
+            <x-common.table.heading>Is Paid?</x-common.table.heading>
+            <x-common.table.heading>Due Date</x-common.table.heading>
+            <x-common.table.heading>Paid On</x-common.table.heading>
             <x-common.table.heading>Paid To</x-common.table.heading>
             <x-common.table.heading>Paid By</x-common.table.heading>
             <x-common.table.heading>Actions</x-common.table.heading>
@@ -92,10 +116,11 @@
                 <x-common.table.row wire:loading.class.delay="opacity-50">
                     <x-common.table.cell>{{$expenses->firstItem() + $loop->index}}</x-common.table.cell>
 
-                    <x-common.table.cell>{{$expense->type}}</x-common.table.cell>
+                    <x-common.table.cell>{{$expense->vendor->name}}</x-common.table.cell>
                     <x-common.table.cell>{{$expense->amount}} Rs</x-common.table.cell>
-                    <x-common.table.cell>{{$expense->is_paid}}</x-common.table.cell>
-                    <x-common.table.cell>{{$expense->paid_on}}</x-common.table.cell>
+                    <x-common.table.cell>{{$expense->is_paid_human}}</x-common.table.cell>
+                    <x-common.table.cell>{{$expense->due_date_human}}</x-common.table.cell>
+                    <x-common.table.cell>{{$expense->paid_on_human}}</x-common.table.cell>
                     <x-common.table.cell>{{$expense->paid_to}}</x-common.table.cell>
                     <x-common.table.cell>{{$expense->paid_by}}</x-common.table.cell>
                     <x-common.table.cell>

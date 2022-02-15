@@ -10,11 +10,11 @@
         {
             Schema::create('expenses', function (Blueprint $table) {
                 $table->bigIncrements('id');
-                    $table->string('type');
-                    $table->string('amount');
-                    $table->boolean('is_paid');
-                    $table->dateTime('paid_on');
-                    $table->bigInteger('paid_by');
+                    $table->string('type')->nullable();
+                    $table->string('amount')->nullable();
+                    $table->boolean('is_paid')->nullable();
+                    $table->dateTime('paid_on')->nullable();
+                    $table->bigInteger('paid_by')->nullable();
                     $table->string('paid_to');
                 //
 

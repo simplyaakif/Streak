@@ -10,8 +10,12 @@
         <div class="relative container mx-auto">
 
         <livewire:admin.institute-calendar.index
+            :event-click-enabled="false"
+            :drag-and-drop-enabled="false"
             week-starts-at="1"
             before-calendar-view="admin/institute-calendar/before-calendar-view"
+            event-view="admin/institute-calendar/event"
+
         />
         </div>
     </x-common.page-body>

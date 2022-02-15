@@ -5,6 +5,7 @@
     use App\Models\Account;
     use App\Models\Expense;
     use App\Models\User;
+    use App\Models\Vendor;
     use Auth;
     use Livewire\Component;
     use Livewire\WithPagination;
@@ -26,6 +27,7 @@
 
         public $accounts;
         public $users;
+        public $vendors;
 
         public Expense $expense;
         public $newExpense;
@@ -49,44 +51,50 @@
         {
             return [
                 'editing.amount' => 'required',
+                'editing.vendor_id'=>'required',
+
+                'account_id'=>'nullable',
                 'editing.paid_on' => 'nullable',
-                'editing.paid_by' => 'numeric',
-                'editing.paid_to' => 'string',
+                'editing.paid_to' => 'nullable',
+                'editing.paid_by' => 'nullable',
                 'editing.is_paid' => 'nullable',
-                'editing.type'=>'numeric',
+                'editing.due_date'=>'required',
 
             ];
         }
 
-        public function delete($id)
-        {
-            $model = Expense::findOrFail($id);
-            $model->delete();
-        }
+//        public function delete($id)
+//        {
+//            $model = Expense::findOrFail($id);
+//            $model->delete();
+//        }
 
         public function makeBlankExpense()
         {
-            return Expense::make();
+            return Expense::make([
+                'paid_on'=>null
+                                 ]);
         }
 
-        public function edit(Expense $expense)
-        {
-            $this->showEditModal = true;
-            $this->editing = $expense;
-        }
+//        public function edit(Expense $expense)
+//        {
+//            $this->showEditModal = true;
+//            $this->editing = $expense;
+//        }
 
         public function save()
         {
             $this->account_id = Auth::id();
             $this->validate();
+//            dd('Working');
             $this->editing->save();
 
         }
-        public function show($expense)
-        {
-            $this->showExpenseDetails = $expense;
-            $this->showExpense        = true;
-        }
+//        public function show($expense)
+//        {
+//            $this->showExpenseDetails = $expense;
+//            $this->showExpense        = true;
+//        }
 
         public function submit()
         {
@@ -94,8 +102,7 @@
             $transaction = [
                 'amount'     => $this->newExpense['amount'],
                 'is_expense' => 1,
-                'is_paid'    => 1,
-                'paid_on'    => now(),
+                'is_paid'    => 0,
                 'account_id' => $this->account_id
             ];
 
@@ -104,13 +111,15 @@
             $account->save();
             $expense->transaction()->create($transaction);
 
+
         }
 
         public function mount()
         {
             $this->editing = $this->makeBlankExpense();
             $this->accounts = Account::all();
-            $this->users = User::all();
+            $this->vendors = Vendor::all();
+            $this->users = User::where('is_staff',1)->get();
             $this->account_id = Auth::id();
         }
 
@@ -138,7 +147,7 @@
         public function render()
         {
             return view('livewire.admin.finance.expense.index', [
-                'expenses' => Expense::paginate()
+                'expenses' => Expense::paginate(10)
             ]);
         }
     }

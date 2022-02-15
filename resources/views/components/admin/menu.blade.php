@@ -131,11 +131,11 @@
                 label="Expenses"
                 route="{{route('admin.expenses.index')}}"/>
             <x-admin.sidebar-dd-nav-subitem
+                label="Expense Vendors"
+                route="{{route('admin.vendors.index')}}"/>
+            <x-admin.sidebar-dd-nav-subitem
                 label="Accounts"
                 route="{{route('admin.accounts.index')}}"/>
-            <x-admin.sidebar-dd-nav-subitem
-                label="Vendors"
-                route="{{route('admin.vendors.index')}}"/>
         </x-admin.sidebar-dd-nav-item>
 
         <x-admin.sidebar-dd-nav-item can="employee_management_access" label="Employee Management">

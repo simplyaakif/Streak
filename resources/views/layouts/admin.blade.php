@@ -20,7 +20,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;700&display=swap" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.2/dist/alpine.min.js" defer></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="{{asset('js/components.js')}}"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -45,8 +45,10 @@
         <div class="flex-1 overflow-auto focus:outline-none">
             <x-nav/>
             @yield('content')
+
             <div class="bg-white ">
                 <div class="max-w-6xl p-2 px-8 flex justify-between text-sm text-gray-500 mx-auto">
+
                     <div>
                         Ace American Center of English
                     </div>
@@ -69,8 +71,10 @@
 <script type="text/javascript" src="{{ asset('js/app.js') }}"></script>
 <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
 @livewireScripts
+@livewire('livewire-ui-spotlight')
 @yield('scripts')
 @stack('scripts')
+
 <script>
     function closeAlert(event) {
         let element = event.target;
@@ -81,5 +85,4 @@
     }
 </script>
 </body>
-
 </html>
