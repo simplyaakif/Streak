@@ -7,6 +7,7 @@
     use App\Models\Recovery;
     use App\Models\Student;
     use LaravelDaily\LaravelCharts\Classes\LaravelChart;
+    use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 
     class HomeController {
 
@@ -34,6 +35,11 @@
             $mSale = Recovery::where('is_paid',1)
                 ->whereMonth('paid_on', now()->month)->whereYear('paid_on', now()->year)
                 ->get()->sum('amount');
+
+            $rQueries= Query::select()->latest()->with('courses')->get(10);
+            $rAdmissions = Student::select()->latest()->get(10);
+            $rExpenses= Expense::select()->with('vendor')->latest()
+                ->get(10);
 
 
             $query_chart_options = [
@@ -77,6 +83,7 @@
                                                   'dExpense','mExpense',
                                                   'dSale','mSale',
                                                   'chart1','chart2','chart3',
+                                                  'rAdmissions','rQueries','rExpenses'
                                               ]));
 
         }

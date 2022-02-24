@@ -33,7 +33,11 @@
 
         public function getIsPaidHumanAttribute()
         {
-            return $this->is_paid ? "Yes" : "No";
+            if($this->is_paid == "1")
+                return "Yes";
+            else{
+                return "No";
+            }
         }
 
         public function getPaidOnHumanAttribute($value){

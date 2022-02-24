@@ -67,6 +67,14 @@ class Create extends Component
                 'string',
                 'nullable',
             ],
+            'course.price' => [
+                'numeric',
+                'required',
+            ],
+            'course.duration' => [
+                'string',
+                'required',
+            ],
         ];
     }
 

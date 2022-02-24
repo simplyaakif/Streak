@@ -31,6 +31,24 @@
         </div>
     </div>
 
+    <div>
+        <label for="">Price
+        <x-common.data-input-text label="Price"
+                                  error="course.price"
+                                  wire:model.defer="course.price"
+                                  type="number" placeholder="Course Price" />
+        </label>
+    </div>
+
+    <div>
+        <label for="">Duration
+        <x-common.data-input-text label="Duration"
+                                  error="course.duration"
+                                  wire:model.defer="course.duration"
+                                  type="text" placeholder="Course Duration" />
+        </label>
+    </div>
+
     <div class=" mt-12 block">
         <button class="btn btn-indigo mr-2 inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500" type="submit">
             {{ trans('global.save') }}
