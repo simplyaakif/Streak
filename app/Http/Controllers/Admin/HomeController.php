@@ -36,10 +36,10 @@
                 ->whereMonth('paid_on', now()->month)->whereYear('paid_on', now()->year)
                 ->get()->sum('amount');
 
-            $rQueries= Query::select()->latest()->with('courses')->get(10);
-            $rAdmissions = Student::select()->latest()->get(10);
-            $rExpenses= Expense::select()->with('vendor')->latest()
-                ->get(10);
+            $rQueries= Query::select()->latest()->with('courses')->take(10)->get();
+            $rAdmissions = Student::select()->latest()->take(10)->get();
+            $rExpenses= Expense::select()->with('vendor')->latest()->take(10)
+                ->get();
 
 
             $query_chart_options = [
