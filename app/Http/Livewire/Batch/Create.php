@@ -78,7 +78,7 @@ class Create extends Component
             ],
             'batch.time' => [
                 'nullable',
-                'date_format:' . config('project.datetime_format'),
+
             ],
             'batch.description' => [
                 'string',

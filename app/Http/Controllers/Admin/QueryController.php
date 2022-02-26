@@ -71,7 +71,17 @@
                 return $date->isTomorrow();
             })->count();
 
-            return view('admin.query.follow', compact('followUps', 'todays', 'tomorrows'));
+            $previous = $followUps->filter(function ($follow) {
+                $date = Carbon::parse($follow["date"]);
+                return $date->lt(now()->format('Y-m-d'));
+            })->count();
+
+            $future = $followUps->filter(function ($follow) {
+                $date = Carbon::parse($follow["date"]);
+                return $date->gt(now()->addDays(2));
+            })->count();
+
+            return view('admin.query.follow', compact('followUps', 'todays', 'tomorrows','previous','future'));
         }
 
         public function create()

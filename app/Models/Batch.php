@@ -98,15 +98,15 @@ class Batch extends Model implements HasMedia
         });
     }
 
-    public function getTimeAttribute($value)
-    {
-        return $value ? Carbon::createFromFormat('Y-m-d H:i:s', $value)->format(config('project.datetime_format')) : null;
-    }
-
-    public function setTimeAttribute($value)
-    {
-        $this->attributes['time'] = $value ? Carbon::createFromFormat(config('project.datetime_format'), $value)->format('Y-m-d H:i:s') : null;
-    }
+//    public function getTimeAttribute($value)
+//    {
+//        return $value ? Carbon::createFromFormat('Y-m-d H:i:s', $value)->format(config('project.datetime_format')) : null;
+//    }
+//
+//    public function setTimeAttribute($value)
+//    {
+//        $this->attributes['time'] = $value ? Carbon::createFromFormat(config('project.datetime_format'), $value)->format('Y-m-d H:i:s') : null;
+//    }
 
     public function getFeaturedImageAttribute()
     {

@@ -12,17 +12,19 @@
     </div>
     <div class="form-group {{ $errors->has('batch.limit') ? 'invalid' : '' }}">
         <label class="form-label" for="limit">{{ trans('cruds.batch.fields.limit') }}</label>
-        <input class="form-control" type="text" name="limit" id="limit" wire:model.defer="batch.limit">
-        <div class="validation-message">
-            {{ $errors->first('batch.limit') }}
-        </div>
-        <div class="help-block">
-            {{ trans('cruds.batch.fields.limit_helper') }}
-        </div>
+{{--        <input class="form-control" type="text" name="limit" id="limit" wire:model.defer="batch.limit">--}}
+{{--        <div class="validation-message">--}}
+{{--            {{ $errors->first('batch.limit') }}--}}
+{{--        </div>--}}
+{{--        <div class="help-block">--}}
+{{--            {{ trans('cruds.batch.fields.limit_helper') }}--}}
+{{--        </div>--}}
+        <x-common.data-input-text type="number" wire:model.defer="batch.limit" error="batch.limit"/>
     </div>
     <div class="form-group {{ $errors->has('batch.course_id') ? 'invalid' : '' }}">
         <label class="form-label required" for="course">{{ trans('cruds.batch.fields.course') }}</label>
-        <x-select-list class="form-control" required id="course" name="course" :options="$this->listsForFields['course']" wire:model="batch.course_id" />
+        <x-select-list class="form-control" required id="course" name="course"
+                       :options="$this->listsForFields['course']" wire:model="batch.course_id" />
         <div class="validation-message">
             {{ $errors->first('batch.course_id') }}
         </div>
@@ -42,13 +44,14 @@
     </div>
     <div class="form-group {{ $errors->has('batch.time') ? 'invalid' : '' }}">
         <label class="form-label" for="time">{{ trans('cruds.batch.fields.time') }}</label>
-        <x-date-picker class="form-control" wire:model="batch.time" id="time" name="time" />
-        <div class="validation-message">
-            {{ $errors->first('batch.time') }}
-        </div>
-        <div class="help-block">
-            {{ trans('cruds.batch.fields.time_helper') }}
-        </div>
+{{--        <x-date-picker class="form-control" wire:model="batch.time" id="time" name="time" />--}}
+{{--        <div class="validation-message">--}}
+{{--            {{ $errors->first('batch.time') }}--}}
+{{--        </div>--}}
+{{--        <div class="help-block">--}}
+{{--            {{ trans('cruds.batch.fields.time_helper') }}--}}
+{{--        </div>--}}
+        <x-common.data-input-text wire:model.defer="batch.time" type="time" error="batch.time"/>
     </div>
     <div class="form-group {{ $errors->has('batch.description') ? 'invalid' : '' }}">
         <label class="form-label" for="description">{{ trans('cruds.batch.fields.description') }}</label>
