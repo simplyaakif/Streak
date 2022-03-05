@@ -98,14 +98,14 @@
                                 {{App\Models\BatchStudent::STATUS[$student->batch_status]}}
                         </span>
                     </x-common.table.cell>
-                    <x-common.table.ceLL class="text-sm justify-center items-center align-middle">
+                    <x-common.table.cell class="text-sm justify-center items-center align-middle">
                         <div>
                             {{carbon($student->session_start_date)->format('d-M-Y')}}
                         </div>
                         <div>
                             {{carbon($student->session_end_date)->format('d-M-Y')}}
                         </div>
-                    </x-common.table.ceLL>
+                    </x-common.table.cell>
                     <x-common.table.cell>
                         {{carbon($student->created_at)->diffForHumans()}}
                     </x-common.table.cell>

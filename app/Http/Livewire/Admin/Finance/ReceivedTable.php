@@ -14,9 +14,15 @@
         public function render()
         {
             return view('livewire.admin.finance.received-table',[
-                'recoveries'=>Recovery::with('batch','course')
-                    ->with('student',function($query){
+                'recoveries'=>Recovery::query()
+                ->with('student',function($query){
                         $query->withTrashed();
+                    })
+                    ->with('batch',function($batch){
+                        $batch->withTrashed();
+                    })
+                    ->with('course',function($course){
+                        $course->withTrashed();
                     })
                     ->where('is_paid',1)
                     ->paginate(10)
