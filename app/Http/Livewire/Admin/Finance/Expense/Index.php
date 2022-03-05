@@ -147,7 +147,7 @@
         public function render()
         {
             return view('livewire.admin.finance.expense.index', [
-                'expenses' => Expense::paginate(10)
+                'expenses' => Expense::paginate(50)
             ]);
         }
     }

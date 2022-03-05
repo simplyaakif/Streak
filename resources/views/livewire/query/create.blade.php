@@ -110,6 +110,19 @@ error="qCourses.course_id"
             </div>
 
             <div class="sm:col-span-3">
+                <x-common.data-label class="form-label required" label="Contact Type" for=""/>
+                    <x-common.data-input-select
+                        error="query.contact_type"
+                        wire:model.defer="query.contact_type">
+                        <option value="">-- Select Option --</option>
+                @foreach(App\Models\Query::contact_type as $id => $label)
+                            <option value="{{$id}}">{{$label}}</option>
+                @endforeach
+                    </x-common.data-input-select>
+
+            </div>
+
+            <div class="sm:col-span-3">
                 <x-common.data-label class="form-label required" label="Query Remarks/Comments" for=""/>
                 <x-common.data-input-text
                     placeholder="Staff remarks regarding query"

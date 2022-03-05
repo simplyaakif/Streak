@@ -162,6 +162,7 @@
       <path value="$PROJECT_DIR$/vendor/munafio/chatify" />
       <path value="$PROJECT_DIR$/vendor/lifetimesms/gateway" />
       <path value="$PROJECT_DIR$/vendor/wire-elements/spotlight" />
+      <path value="$PROJECT_DIR$/vendor/calebporzio/awesome-helpers" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.0" />

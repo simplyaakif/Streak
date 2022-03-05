@@ -83,11 +83,11 @@ sm:rounded-lg">
                                     $sortDirection:null">Query Name
             </x-common.table.heading>
             <x-common.table.heading> Course</x-common.table.heading>
-            <x-common.table.heading>Entry By</x-common.table.heading>
+            <x-common.table.heading>Contact Medium</x-common.table.heading>
             <x-common.table.heading>Recent Status</x-common.table.heading>
             <x-common.table.heading sortable wire:click="sortBy('created_at')"
                                     :direction="$sortDirection  === 'created_at' ?
-                                    $sortDirection:null">Entry Date
+                                    $sortDirection:null">Entry By & Date
             </x-common.table.heading>
             <x-common.table.heading> Actions</x-common.table.heading>
         </x-slot>
@@ -113,21 +113,19 @@ sm:rounded-lg">
 
                     </x-common.table.cell>
                     <x-common.table.cell class=" overflow-hidden">
-                        <div class="flex text-center space-x-2">
+                        <div class="flex flex-wrap text-center ">
                             @foreach($query->courses as $course)
-                                <div class="bg-gray-100 px-2 py-1 rounded-lg">
-
-                                <div class=" text-center  text-xs w-20">
-                                    {{$course->title}}
-                                </div>
+                                <div class="bg-gray-100 m-1 px-2 py-1 rounded-lg">
+                                    <div class=" text-center  text-xs w-20">
+                                        {{$course->title}}
+                                    </div>
                                 </div>
                             @endforeach
                         </div>
                     </x-common.table.cell>
-                    <x-common.table.cell>
-                        <span class="text-sm">
-
-                        {{$query->entry_by}}
+                    <x-common.table.cell class="text-center">
+                        <span class="text-xs ">
+                        {{$query->contact_type_label}}
                         </span>
                     </x-common.table.cell>
                     <x-common.table.cell>
@@ -140,7 +138,16 @@ sm:rounded-lg">
                             </span>
                         </div>
                     </x-common.table.cell>
-                    <x-common.table.cell><span class="text-xs">{{$query->human_date}}</span></x-common.table.cell>
+                    <x-common.table.cell>
+                        <div class="text-center">
+                            <div class="text-sm">
+                                {{$query->entry_by}}
+                            </div>
+                            <span class="text-xs">
+                            {{$query->human_date}}
+                            </span>
+                        </div>
+                    </x-common.table.cell>
                     <x-common.table.cell>
                         <div class="flex space-x-2 items-center">
                             @can('query_show')

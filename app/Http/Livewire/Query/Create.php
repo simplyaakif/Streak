@@ -163,6 +163,9 @@
                     'nullable',
                     'string'
                 ],
+                'query.contact_type'               => [
+                    'nullable',
+                ],
 
             ];
         }

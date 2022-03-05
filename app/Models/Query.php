@@ -42,6 +42,16 @@
                 4 => 'Newspaper/Advertisement',
             ];
 
+
+        public const contact_type
+            = [
+                0 => 'Visit to Campus',
+                1 => 'Phone Call',
+                2 => 'Tawk.to Chat',
+                3 => 'Facebook Chat',
+                4 => 'Whatsapp Text/Call',
+            ];
+
         public const preferred_timings
             = [
                 0  => '9:00 - 10:00 AM',
@@ -180,6 +190,11 @@
         public function getReferenceAttribute($value)
         {
             return static::marketing[$value] ?? null;
+        }
+
+        public function getContactTypeLabelAttribute()
+        {
+            return static::contact_type[$this->contact_type] ?? null;
         }
 
         public function registerMediaConversions(Media $media = null): void

@@ -12,8 +12,8 @@
 
 
     <x-common.page-body>
-
-        @livewire('student.index')
+        @livewire('admin.student.student-table')
+{{--        @livewire('student.index')--}}
     </x-common.page-body>
 </div>
 @endsection
