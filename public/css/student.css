@@ -1082,6 +1082,12 @@ select {
 .min-w-full {
   min-width: 100%;
 }
+.min-w-\[100px\] {
+  min-width: 100px;
+}
+.min-w-\[110px\] {
+  min-width: 110px;
+}
 .max-w-6xl {
   max-width: 72rem;
 }

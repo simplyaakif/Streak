@@ -99,10 +99,10 @@
                         </span>
                     </x-common.table.cell>
                     <x-common.table.cell class="text-sm justify-center items-center align-middle">
-                        <div>
+                        <div class="min-w-[100px]">
                             {{carbon($student->session_start_date)->format('d-M-Y')}}
                         </div>
-                        <div>
+                        <div class="min-w-[100px]">
                             {{carbon($student->session_end_date)->format('d-M-Y')}}
                         </div>
                     </x-common.table.cell>
