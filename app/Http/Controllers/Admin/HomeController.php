@@ -17,8 +17,8 @@
             $dQuery = Query::whereDate('created_at',date('Y-m-d'))->get()->count();
             $dStudent = Student::whereDate('created_at', date('Y-m-d'))->get()->count();
 
-            $dSale = Recovery::where('is_paid',1)->whereDate('paid_on',now()->day)
-                ->whereMonth('paid_on', now()->month)->whereYear('paid_on', now()->year)
+            $dSale = Recovery::where('is_paid',1)
+                ->whereDate('updated_at',now())
                 ->get()->sum('amount');
 
 
