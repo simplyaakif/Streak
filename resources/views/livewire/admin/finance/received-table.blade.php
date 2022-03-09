@@ -3,7 +3,8 @@
     <x-common.table>
         <x-slot name="head">
             <x-common.table.heading>#</x-common.table.heading>
-            <x-common.table.heading>Student Name</x-common.table.heading>
+            <x-common.table.heading>D.P</x-common.table.heading>
+            <x-common.table.heading>Name</x-common.table.heading>
             <x-common.table.heading>Course</x-common.table.heading>
             <x-common.table.heading>Batch</x-common.table.heading>
             <x-common.table.heading>Paid On</x-common.table.heading>
@@ -16,6 +17,18 @@
                 <x-common.table.row>
                     <x-common.table.cell>
                         {{$recoveries->firstItem() + $loop->iteration -1}}
+                    </x-common.table.cell>
+                    <x-common.table.cell>
+                        <div class="w-12">
+                            @forelse($recovery->student->dp as $key => $entry)
+                                <a class="link-photo" href="{{ $entry['url'] }}">
+                                    <img src="{{ $entry['thumbnail'] }}" alt="{{ $entry['name'] }}"
+                                         title="{{ $entry['name'] }}">
+                                </a>
+                            @empty
+                                <img class="h-10 w-10 rounded-full" src="{{$recovery->student->avatarUrl()}}" alt="">
+                            @endforelse
+                        </div>
                     </x-common.table.cell>
                     <x-common.table.cell>
                         {{$recovery->student->name}}
