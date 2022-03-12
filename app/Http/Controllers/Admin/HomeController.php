@@ -18,7 +18,7 @@
             $dStudent = Student::whereDate('created_at', date('Y-m-d'))->get()->count();
 
             $dSale = Recovery::where('is_paid',1)
-                ->whereDate('updated_at',now())
+                ->whereDate('paid_on',now())
                 ->get()->sum('amount');
 
 

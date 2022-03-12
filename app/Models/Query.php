@@ -179,7 +179,7 @@
 
         public function getEntryByAttribute()
         {
-            return User::find($this->attributes['staff_user_id'])->name;
+            return User::find($this->attributes['staff_user_id'])->name ?? null;
         }
 
 //        public function getPTimingsAttribute($value)

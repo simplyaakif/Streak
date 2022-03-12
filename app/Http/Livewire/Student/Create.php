@@ -162,17 +162,32 @@
                 $result
                     = DB::table('batch_student')->where('student_id', '=', $student->id)->where('batch_id', '=', $admit['batch']['id'])->latest()->first();
                 foreach($admit['installments'] as $installment) {
-                    Recovery::create([
-                                         'batch_student_id' => $result->id,
-                                         'batch_id'         => $admit['batch']['id'],
-                                         'course_id'        => $admit['batch']['course_id'],
-                                         'student_id'       => $student->id,
-                                         'amount'           => $installment['installment_amount'],
-                                         'due_date'         => $installment['installment_due_date'],
-                                         'is_paid'          => $installment['installment_paid_status'],
-                                         'account_id'       => $installment['installment_account_id'],
-                                         'slip_number'      => $installment['installment_transaction_number'],
-                                     ]);
+                    if($installment['installment_paid_status']) {
+                        Recovery::create([
+                                             'paid_on'          => $installment['installment_paid_on'],
+                                             'batch_student_id' => $result->id,
+                                             'batch_id'         => $admit['batch']['id'],
+                                             'course_id'        => $admit['batch']['course_id'],
+                                             'student_id'       => $student->id,
+                                             'amount'           => $installment['installment_amount'],
+                                             'due_date'         => $installment['installment_due_date'],
+                                             'is_paid'          => $installment['installment_paid_status'],
+                                             'account_id'       => $installment['installment_account_id'],
+                                             'slip_number'      => $installment['installment_transaction_number'],
+                                         ]);
+                    } else {
+                        Recovery::create([
+                                             'batch_student_id' => $result->id,
+                                             'batch_id'         => $admit['batch']['id'],
+                                             'course_id'        => $admit['batch']['course_id'],
+                                             'student_id'       => $student->id,
+                                             'amount'           => $installment['installment_amount'],
+                                             'due_date'         => $installment['installment_due_date'],
+                                             'is_paid'          => $installment['installment_paid_status'],
+                                             'account_id'       => $installment['installment_account_id'],
+                                             'slip_number'      => $installment['installment_transaction_number'],
+                                         ]);
+                    }
 
                 }
 

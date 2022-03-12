@@ -6,7 +6,8 @@ use App\Http\Controllers\Admin\BatchController;
     use App\Http\Controllers\Admin\CertificatesController;
     use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\DepartmentController;
-use App\Http\Controllers\Admin\HomeController;
+    use App\Http\Controllers\Admin\FinanceController;
+    use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\QueryController;
 use App\Http\Controllers\Admin\RoleController;
@@ -116,6 +117,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','st
     Route::post('students/media', [StudentController::class, 'storeMedia'])->name('students.storeMedia');
     Route::resource('students', StudentController::class, ['except' => ['store', 'update', 'destroy']]);
 
+
+
+    Route::get('finance/dashboard',[FinanceController::class,'index'])->name('finance.dashboard');
     //    Expense
     Route::resource('finance/expenses',ExpensesController::class,['except' => ['store','update','destroy']]);
 
