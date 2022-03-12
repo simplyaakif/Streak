@@ -118,7 +118,7 @@
             </x-slot>
             <x-admin.sidebar-dd-nav-subitem
                 can="finance_access"
-                :route="route('admin.finance.dashboard)"
+                :route="route('admin.finance.dashboard')"
                 label="Finance Status"/>
             <x-admin.sidebar-dd-nav-subitem label="Received" :route="route('admin.recovery.index')"/>
             <x-admin.sidebar-dd-nav-subitem label="Upcoming/Pending"
