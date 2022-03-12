@@ -7,10 +7,10 @@
 
     <x-common.layout-subpage>
         <div class="grid md:grid-cols-4 gap-4 mb-10">
-            @forelse($account_status as $account)
+            @forelse($accounts as $key=>$account)
                 <x-common.stat-card
                     sublabel="In {{now()->monthName}}"
-                    :label="$account->first()->title" :stat="$account->first()->amount">
+                    :label="$account['bank']" :stat="$account['total']">
                     <x-slot name="icon">
                         <x-icons.user-comment class="w-6 h-6 text-gray-400"/>
                     </x-slot>

@@ -24,7 +24,7 @@
 
             $account_status = collect($account_status)->groupBy('title');
 
-            $account_status->map(function ($account){
+            $accounts = $account_status->map(function ($account){
                 return [
                     'bank'=>$account->first()->title,
                     'total'=>$account->sum('amount')
@@ -32,6 +32,7 @@
             });
 
 
-            return view('admin.finance.dashboard',compact('account_status'));
+
+            return view('admin.finance.dashboard',compact('accounts'));
         }
     }
