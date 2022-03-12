@@ -117,7 +117,8 @@
                 <x-icons.money class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
             </x-slot>
             <x-admin.sidebar-dd-nav-subitem
-                can="finance_management_access"
+                can="finance_access"
+                :route="route('admin.finance.dashboard)"
                 label="Finance Status"/>
             <x-admin.sidebar-dd-nav-subitem label="Received" :route="route('admin.recovery.index')"/>
             <x-admin.sidebar-dd-nav-subitem label="Upcoming/Pending"
