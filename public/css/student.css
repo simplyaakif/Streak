@@ -875,6 +875,9 @@ select {
 .mr-0 {
   margin-right: 0px;
 }
+.mb-10 {
+  margin-bottom: 2.5rem;
+}
 .mb-8 {
   margin-bottom: 2rem;
 }
@@ -901,9 +904,6 @@ select {
 }
 .ml-0 {
   margin-left: 0px;
-}
-.mb-10 {
-  margin-bottom: 2.5rem;
 }
 .block {
   display: block;

@@ -1,5 +1,47 @@
 <div wire:loading.class="opacity-50">
-
+    <form wire:submit.prevent="submit">
+        <x-modal.dialog wire:model="showModal">
+            <x-slot name="title">Recovery Sections</x-slot>
+            <x-slot name="content">
+                <label for="">
+                    Recovery Amount
+                    <x-common.data-input-text
+                        disabled
+                        error="recovery.amount"
+                        wire:model="recovery.amount"/>
+                </label>
+                <div class="grid grid-cols-3 gap-2">
+                    <label for="">
+                        Account
+                        <x-common.data-input-select
+                            error="recovery.account_id"
+                            wire:model="recovery.account_id">
+                            @forelse($accounts as $account)
+                                <option value="{{$account->id}}">{{$account->title}}</option>
+                            @empty
+                            @endforelse
+                        </x-common.data-input-select>
+                    </label>
+                    <label for="">
+                        Transaction Id/ Slip #
+                        <x-common.data-input-text  wire:model="recovery.slip_number"
+                                                   error="recovery.slip_number"
+                        />
+                    </label>
+                    <label for="">
+                        Date of Payment
+                        <x-common.data-input-text
+                            error="recovery.paying_date"
+                            type="date"  wire:model="recovery.paid_on"/>
+                    </label>
+                </div>
+            </x-slot>
+            <x-slot name="footer">
+                <x-button.secondary wire:click="$set('showModal',false)">Cancel</x-button.secondary>
+                <x-button.primary type="submit">Submit</x-button.primary>
+            </x-slot>
+        </x-modal.dialog>
+    </form>
     <x-common.table>
         <x-slot name="head">
             <x-common.table.heading>#</x-common.table.heading>
@@ -43,15 +85,17 @@
                         {{carbon($recovery->due_date)->format('d-M-Y')}}
                     </x-common.table.cell>
                     <x-common.table.cell>
-                        <div class="rounded-lg px-2 py-1 flex text-xs items-center justify-center text-center
+                        <div wire:click="showModal({{$recovery->id}})" class="rounded-lg px-2 py-1 flex text-xs
+                        items-center cursor-pointer
+                        justify-center
+                        text-center
                             {{$recovery->status() ? 'bg-cyan-100 text-cyan-600':'bg-red-100 text-red-600'}} ">
-                         {{$recovery->status() ? 'Upcoming':'Over Due'}}
+                            {{$recovery->status() ? 'Upcoming':'Over Due'}}
                         </div>
                     </x-common.table.cell>
                     <x-common.table.cell class="text-right">
                         {{$recovery->amount}} PKR
                     </x-common.table.cell>
-
 
                     <x-common.table.cell>
                         <a href="{{route('admin.students.show',$recovery->student_id)}}">
