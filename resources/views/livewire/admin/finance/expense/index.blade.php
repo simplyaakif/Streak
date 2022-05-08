@@ -147,7 +147,7 @@
                 </x-common.table.row>
             @empty
                 <x-common.table.row wire:loading.class.delay="opacity-50">
-                    <x-common.table.cell colspan="8">
+                    <x-common.table.cell colspan="9">
                         <div class="py-10 flex justify-center items-center text-gray-300 text-xl">
                             No Expense Found...
                         </div>

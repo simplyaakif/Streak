@@ -5,7 +5,6 @@ namespace App\Models;
 use \DateTimeInterface;
 use App\Support\HasAdvancedFilter;
 use App\Traits\Auditable;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -85,6 +84,13 @@ class Student extends Model implements HasMedia
     {
         return $this->belongsTo(Guardian::class);
     }
+
+
+    public function routeNotificationForSms($notifiable)
+    {
+        return $this->mobile;
+    }
+
     public function avatarUrl()
     {
 

@@ -3,6 +3,7 @@
     use App\Spotlight\Dashboard;
     use App\Spotlight\Expenses;
     use App\Spotlight\QueryFollowUps;
+    use App\Spotlight\SmsHub;
 
     return [
 
@@ -38,6 +39,7 @@
         QueryFollowUps::class,
 
         Expenses::class,
+        SmsHub::class,
 
     ],
 

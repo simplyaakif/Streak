@@ -6,6 +6,7 @@
     use App\Models\Query;
     use App\Models\Timeline;
     use App\Models\User;
+    use App\Notifications\NewQueryNotification;
     use Auth;
     use Carbon\Carbon;
     use Livewire\Component;
@@ -85,6 +86,8 @@
             $this->query->timelines()->attach($this->timeline['timeline_id'], $this->timeline);
 
             $this->syncMedia();
+
+            $this->query->notify(new NewQueryNotification());
 
             return redirect()->route('admin.queries.index');
         }

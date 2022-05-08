@@ -24,7 +24,7 @@
                     </label>
                     <label for="">
                         Transaction Id/ Slip #
-                        <x-common.data-input-text  wire:model="recovery.slip_number"
+                        <x-common.data-input-text  wire:x-model.defer="recovery.slip_number"
                                                    error="recovery.slip_number"
                         />
                     </label>

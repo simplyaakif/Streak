@@ -27,6 +27,7 @@ use App\Http\Controllers\Auth\UserProfileController;
     use App\Http\Controllers\ExpensesController;
     use App\Http\Controllers\IncomesController;
     use App\Http\Controllers\RecoveriesController;
+    use App\Http\Controllers\SmsController;
     use App\Http\Controllers\Student\IssuesController;
     use App\Http\Controllers\VendorsController;
     use App\Models\Issue;
@@ -141,6 +142,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','st
 
     //      Certificate
     Route::resource('certificates',CertificatesController::class,['except' => ['store','update','destroy']]);
+
+// Sms Hub
+    Route::resource('sms',SmsController::class,['except' => ['store','update','destroy','create']]);
+
+
 
 
 

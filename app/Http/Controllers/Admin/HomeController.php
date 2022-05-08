@@ -26,8 +26,8 @@
                 ->count();
             $mStudent = Student::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->get()
                 ->count();
-            $dExpense = Expense::whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)->get()
+            $dExpense = Expense::whereDate('created_at', date('Y-m-d'))
+                ->get()
                 ->sum('amount');
             $mExpense = Expense::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->get()
                 ->sum('amount');

@@ -146,13 +146,13 @@
                     $user->roles()->attach(4);
                     Mail::to($this->student->email)->send(new StudentUserDetailsMail($details));
 
-                    $user->notify(new StudentAdmissionNotification());
                 }
 
             }
 
             $student = $this->student;
             $student->save();
+            $student->notify(new StudentAdmissionNotification());
             $this->syncMedia();
 
 

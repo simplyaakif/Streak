@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'site_title' => 'Streak TW',
+    'site_title' => 'Portal | Ace American Center of English',
 ];

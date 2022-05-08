@@ -272,7 +272,7 @@
                         <!-- Activity list (smallest breakpoint only) -->
                         <div class="shadow sm:hidden">
                             <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
-                                @forelse($rQueries as $query)
+                                @forelse($rAdmissions as $admission)
                                     <li>
                                         <a href="{{route('admin.queries.show',$query->id)}}" class="block px-4 py-4
                                     bg-white
@@ -282,7 +282,7 @@
                           <x-icons.user-comment class="flex-shrink-0 h-5 w-5 text-gray-400"/>
 
                         <span class="flex flex-col text-gray-500 text-sm truncate">
-                          <span class="truncate">{{$query->name}}</span>
+                          <span class="truncate">{{$admission->name}}</span>
                           <span><span class="text-gray-900 font-medium">{{$query->course->title}}</span> </span>
                           <span class="text-xs">{{$query->entry_by}}</span>
                         </span>

@@ -15,7 +15,7 @@
                     $table->boolean('is_paid')->nullable();
                     $table->dateTime('paid_on')->nullable();
                     $table->bigInteger('paid_by')->nullable();
-                    $table->string('paid_to');
+                    $table->string('paid_to')->nullable();
                 //
 
                 $table->timestamps();

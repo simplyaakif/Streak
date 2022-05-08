@@ -9,12 +9,14 @@
     use Illuminate\Database\Eloquent\Factories\HasFactory;
     use Illuminate\Database\Eloquent\Model;
     use Illuminate\Database\Eloquent\SoftDeletes;
+    use Illuminate\Notifications\Notifiable;
     use Spatie\MediaLibrary\HasMedia;
     use Spatie\MediaLibrary\InteractsWithMedia;
     use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
     class Query extends Model implements HasMedia {
 
+        use Notifiable;
         use HasFactory;
         use HasAdvancedFilter;
         use SoftDeletes;
@@ -111,6 +113,24 @@
         public function getHumanDateAttribute()
         {
             return $this->created_at ? $this->created_at->format('d-M-Y') : null;
+        }
+
+
+        public function routeNotificationForSms($notifiable)
+        {
+            return $this->mobile;
+        }
+
+        public function routeNotificationForMail($notification)
+        {
+            // Return email address only...
+            return $this->email;
+
+        }
+
+        public function sms()
+        {
+            return $this->morphOne(Sms::class, 'smsable');
         }
 
         public function avatarUrl()

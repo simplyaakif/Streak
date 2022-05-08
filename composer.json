@@ -32,7 +32,8 @@
         "rappasoft/laravel-livewire-tables": "^1.20",
         "spatie/laravel-medialibrary": "^9.4",
         "staudenmeir/eloquent-has-many-deep": "^1.7",
-        "wire-elements/spotlight": "^1.0"
+        "wire-elements/spotlight": "^1.0",
+      "ext-curl": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",

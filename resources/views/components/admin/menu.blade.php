@@ -8,14 +8,14 @@
             <x-icons.home class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
         </x-admin.sidebar-nv-item>
 
-{{--        <div x-show="features">--}}
-{{--            <x-admin.sidebar-dd-nav-item label="Appointment">--}}
-{{--                <x-slot name="icon">--}}
-{{--                    <x-icons.clock class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>--}}
-{{--                </x-slot>--}}
-{{--                <x-admin.sidebar-dd-nav-subitem label="Appointment" route=""/>--}}
-{{--            </x-admin.sidebar-dd-nav-item>--}}
-{{--        </div>--}}
+        {{--        <div x-show="features">--}}
+        {{--            <x-admin.sidebar-dd-nav-item label="Appointment">--}}
+        {{--                <x-slot name="icon">--}}
+        {{--                    <x-icons.clock class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>--}}
+        {{--                </x-slot>--}}
+        {{--                <x-admin.sidebar-dd-nav-subitem label="Appointment" route=""/>--}}
+        {{--            </x-admin.sidebar-dd-nav-item>--}}
+        {{--        </div>--}}
 
         <x-admin.sidebar-dd-nav-item
             can="query_management_access"
@@ -174,6 +174,16 @@
             label="Institution Calendar" route="{{route('admin.system-calendars.index')}}">
             <x-icons.calendar class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
         </x-admin.sidebar-nv-item>
+
+        <x-admin.sidebar-dd-nav-item
+            can="communication_access"
+            label="Communication Hub"
+        >
+            <x-slot name="icon">
+                <x-icons.message class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
+            </x-slot>
+            <x-admin.sidebar-dd-nav-subitem label="Sms Center" :route="route('admin.sms.index')"/>
+        </x-admin.sidebar-dd-nav-item>
 
     </div>
 
