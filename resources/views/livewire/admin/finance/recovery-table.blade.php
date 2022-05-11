@@ -24,14 +24,14 @@
                     </label>
                     <label for="">
                         Transaction Id/ Slip #
-                        <x-common.data-input-text wire:x-model.defer="recovery.slip_number"
+                        <x-common.data-input-text wire:model.defer="recovery.slip_number"
                                                   error="recovery.slip_number"
                         />
                     </label>
                     <label for="">
                         Date of Payment
                         <x-common.data-input-text
-                            error="recovery.paying_date"
+                            error="recovery.paid_on"
                             type="date" wire:model="recovery.paid_on"/>
                     </label>
                 </div>

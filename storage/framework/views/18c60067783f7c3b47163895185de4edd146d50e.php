@@ -46,11 +46,11 @@
                     <label for="">
                         Transaction Id/ Slip #
                         <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.data-input-text','data' => ['wire:xModel.defer' => 'recovery.slip_number','error' => 'recovery.slip_number']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.data-input-text','data' => ['wire:model.defer' => 'recovery.slip_number','error' => 'recovery.slip_number']]); ?>
 <?php $component->withName('common.data-input-text'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes(['wire:x-model.defer' => 'recovery.slip_number','error' => 'recovery.slip_number']); ?>
+<?php $component->withAttributes(['wire:model.defer' => 'recovery.slip_number','error' => 'recovery.slip_number']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
@@ -61,11 +61,11 @@
                     <label for="">
                         Date of Payment
                         <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.data-input-text','data' => ['error' => 'recovery.paying_date','type' => 'date','wire:model' => 'recovery.paid_on']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.data-input-text','data' => ['error' => 'recovery.paid_on','type' => 'date','wire:model' => 'recovery.paid_on']]); ?>
 <?php $component->withName('common.data-input-text'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes(['error' => 'recovery.paying_date','type' => 'date','wire:model' => 'recovery.paid_on']); ?>
+<?php $component->withAttributes(['error' => 'recovery.paid_on','type' => 'date','wire:model' => 'recovery.paid_on']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
