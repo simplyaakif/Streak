@@ -114,7 +114,7 @@
                         $course->withTrashed();
                     })
                     ->where('is_paid',0)
-                    ->latest()
+                    ->orderBy('due_date')
                     ->paginate(50),
             ]);
         }
