@@ -25,7 +25,7 @@
                         $course->withTrashed();
                     })
                     ->where('is_paid',1)
-                    ->latest()
+                    ->orderBy('paid_on')
                     ->paginate(50)
             ]);
         }
