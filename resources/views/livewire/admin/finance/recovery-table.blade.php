@@ -24,15 +24,15 @@
                     </label>
                     <label for="">
                         Transaction Id/ Slip #
-                        <x-common.data-input-text  wire:x-model.defer="recovery.slip_number"
-                                                   error="recovery.slip_number"
+                        <x-common.data-input-text wire:x-model.defer="recovery.slip_number"
+                                                  error="recovery.slip_number"
                         />
                     </label>
                     <label for="">
                         Date of Payment
                         <x-common.data-input-text
                             error="recovery.paying_date"
-                            type="date"  wire:model="recovery.paid_on"/>
+                            type="date" wire:model="recovery.paid_on"/>
                     </label>
                 </div>
             </x-slot>
@@ -42,6 +42,79 @@
             </x-slot>
         </x-modal.dialog>
     </form>
+
+    <form wire:submit.prevent="updateNewRecoveries">
+        <x-modal.dialog wire:model="showEditModal">
+            <x-slot name="title">Edit Unpaid Recoveries</x-slot>
+            <x-slot name="content">
+                <x-common.table>
+                    <x-slot name="head">
+                        <x-common.table.heading>Student Name</x-common.table.heading>
+                        <x-common.table.heading>Batch Recovery</x-common.table.heading>
+                        <x-common.table.heading>Amount</x-common.table.heading>
+                        <x-common.table.heading>Due Date</x-common.table.heading>
+                    </x-slot>
+                    <x-slot name="body">
+                        @forelse($oldRecoveries as $recovery)
+                            <x-common.table.row>
+                                <x-common.table.cell>{{$recovery->student->name}}</x-common.table.cell>
+                                <x-common.table.cell>{{$recovery->batch->title}}</x-common.table.cell>
+                                <x-common.table.cell>{{$recovery->amount}}</x-common.table.cell>
+                                <x-common.table.cell>
+                                    {{carbon($recovery->due_date)->format('d-M-Y')}}
+                                </x-common.table.cell>
+                            </x-common.table.row>
+                        @empty
+                            <x-common.table.row>
+                                <x-common.table.cell colspan="4"> No data found</x-common.table.cell>
+                            </x-common.table.row>
+                        @endforelse
+                        <x-common.table.row>
+                            <x-common.table.cell colspan=""> Total Amount Pending</x-common.table.cell>
+                            <x-common.table.cell colspan="3" class="text-right font-bold">
+                                {{collect($oldRecoveries)->sum('amount')}} Rs
+                            </x-common.table.cell>
+                        </x-common.table.row>
+                    </x-slot>
+                </x-common.table>
+
+                <hr class="my-4 border-b border-gray-200">
+
+                <div class="flex justify-between">
+                    <h2 class="text-lg mb-4">Create New Recoveries</h2>
+                    <x-button wire:click="addInstallment">
+                        <x-icons.add class="w-4 h-4 text-gray-300"/>
+                    </x-button>
+                </div>
+
+                @foreach($newRecoveries as $k=>$installment)
+                <div class="grid grid-cols-7 gap-2 items-center" wire:key="{{$k}}">
+                    <label for="" class="col-span-3 text-xs">
+                        Amount
+                        <x-common.data-input-text wire:model="newRecoveries.{{$k}}.amount"/>
+                    </label>
+                    <label for="" class="col-span-3 text-xs">
+                        Due Date
+                        <x-common.data-input-text type="date" wire:model="newRecoveries.{{$k}}.due_date"/>
+                    </label>
+                    <label for="" class="text-xs">
+                        Remove
+                        <div>
+                            <x-button wire:click="removeInstallment({{$k}})">
+                                <x-icons.minus class="w-4 h-4 text-red-400"/>
+                            </x-button>
+                        </div>
+                    </label>
+                </div>
+                @endforeach
+            </x-slot>
+            <x-slot name="footer">
+                <x-button.secondary wire:click="$set('showEditModal',false)">Cancel</x-button.secondary>
+                <x-button.primary type="submit">Submit</x-button.primary>
+            </x-slot>
+        </x-modal.dialog>
+    </form>
+
     <x-common.table>
         <x-slot name="head">
             <x-common.table.heading>#</x-common.table.heading>
@@ -98,9 +171,15 @@
                     </x-common.table.cell>
 
                     <x-common.table.cell>
-                        <a href="{{route('admin.students.show',$recovery->student_id)}}">
-                            <x-icons.eye class="w-6 h-6 text-gray-400"/>
-                        </a>
+                        <div class="flex space-x-2">
+
+                            <a href="{{route('admin.students.show',$recovery->student_id)}}">
+                                <x-icons.eye class="w-6 h-6 text-gray-400"/>
+                            </a>
+                            <span wire:click="showEditModal({{$recovery->id}})">
+                                <x-icons.edit class="w-6 h-6 text-cyan-400"/>
+                            </span>
+                        </div>
                     </x-common.table.cell>
 
                 </x-common.table.row>

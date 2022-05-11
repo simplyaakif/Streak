@@ -433,7 +433,26 @@ class PermissionsTableSeeder extends Seeder
             [
                 'id'    => 107,
                 'title' => 'communication_access',
-            ]
+            ], [
+                'id'    => 108,
+                'title' => 'recovery_create',
+            ],
+            [
+                'id'    => 109,
+                'title' => 'recovery_edit',
+            ],
+            [
+                'id'    => 110,
+                'title' => 'recovery_show',
+            ],
+            [
+                'id'    => 111,
+                'title' => 'recovery_delete',
+            ],
+            [
+                'id'    => 112,
+                'title' => 'recovery_access',
+            ],
         ];
 
         Permission::insert($permissions);
