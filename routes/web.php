@@ -99,6 +99,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','st
 
     // Task
     Route::post('tasks/media', [TaskController::class, 'storeMedia'])->name('tasks.storeMedia');
+    Route::get('tasks/done/{id}', [TaskController::class, 'done'])->name('task_done');
     Route::resource('tasks', TaskController::class, ['except' => ['store', 'update', 'destroy']]);
 
     // Task Calendar

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Task;
+use App\Models\TaskStatus;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -38,6 +39,16 @@ class TaskController extends Controller
         $task->load('status', 'tag', 'assignedTo');
 
         return view('admin.task.show', compact('task'));
+    }
+
+    public function done($id){
+        $task = Task::find($id);
+        $completed = TaskStatus::find(2);
+        $task->status()->associate($completed);
+        $task->save();
+
+
+        return redirect()->route('admin.home');
     }
 
     public function storeMedia(Request $request)

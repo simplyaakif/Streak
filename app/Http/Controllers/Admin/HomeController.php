@@ -6,6 +6,7 @@
     use App\Models\Query;
     use App\Models\Recovery;
     use App\Models\Student;
+    use App\Models\Task;
     use LaravelDaily\LaravelCharts\Classes\LaravelChart;
     use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 
@@ -41,6 +42,10 @@
             $rExpenses= Expense::select()->with('vendor')->latest()->take(5)
                 ->get();
 
+            $user_tasks = Task::where('assigned_to_id',\Auth::id())
+                    ->where('status_id','!=',2)
+                    ->get();
+
 
             $query_chart_options = [
                 'chart_title' => 'Query by Day',
@@ -72,9 +77,23 @@
                 'chart_color'=>'200,0,0'
             ];
 
+            $sale_chart_options = [
+                'chart_title' => 'Sale by Day',
+                'report_type' => 'group_by_date',
+                'model' => 'App\Models\Recovery',
+                'group_by_field' => 'created_at',
+                'aggregate_function' => 'sum',
+                'aggregate_field' => 'amount',
+                'where_raw'=>'is_paid=1',
+                'group_by_period' => 'day',
+                'chart_type' => 'bar',
+                'chart_color'=>'0,255,0'
+            ];
+
             $chart1 = new LaravelChart($query_chart_options);
             $chart2 = new LaravelChart($admission_chart_options);
             $chart3 = new LaravelChart($expense_chart_options);
+            $chart4 = new LaravelChart($sale_chart_options);
 //            dd('workign');
 
             return view('admin.home', compact([
@@ -82,8 +101,9 @@
                                                   'mQuery','mStudent',
                                                   'dExpense','mExpense',
                                                   'dSale','mSale',
-                                                  'chart1','chart2','chart3',
-                                                  'rAdmissions','rQueries','rExpenses'
+                                                  'chart1','chart2','chart3','chart4',
+                                                  'rAdmissions','rQueries','rExpenses',
+                                                  'user_tasks'
                                               ]));
 
         }

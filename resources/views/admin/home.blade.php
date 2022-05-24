@@ -89,49 +89,92 @@
 
         <div class="mt-8">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-lg leading-6 font-medium text-gray-900 mb-2">Tasks For {{Auth::user()->name}}</h2>
+                <div class="bg-yellow-100 border-yellow-400 border rounded-lg py-4 px-8">
+                    <ul class="list-decimal text-gray-700 divide-y divide-yellow-200 space-y-2">
+                        @forelse($user_tasks as $task)
+                            <li class="w-full items-center">
+                                <div class=" grid grid-cols-1 md:grid-cols-6 items-center ">
+                                    <div class="md:col-span-4">
+                                        <h3 class="text-base">{{$task->name}}</h3>
+                                        <p class="text-sm">{{$task->description}}</p>
+                                    </div>
+                                    <div>
+                                        <div class="flex space-x-2">
+                                        {{$task->status->name}}
+                                            <span>
+                                                <a
+                                                onclick = "if (! confirm('Did you Actually Completed?')) { return false; }"
+                                                   href="{{route('admin.task_done',$task->id)}}">
+                                                <x-icons.add class="w-6 h-6"/>
+                                                </a>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            @forelse($task->tag as $tag)
+                                            <span class="text-sm  text-yellow-600">{{$tag->name}}</span>
+                                            @empty
+                                            @endforelse
+                                        </div>
+                                    </div>
+                                    <div class="text-sm">
+                                        Due by <span class="">{{carbon($task->due_date)->format('d-m-Y')}}</span>
+                                    </div>
+                                </div>
+                            </li>
+                        @empty
+                            <li class="flex">No Task Assigned to You</li>
+                        @endforelse
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h2 class="text-lg leading-6 font-medium text-gray-900">Overview</h2>
                 <div class="mt-2 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
                     <!-- Card -->
-                    <x-common.stat-card label="Daily Queries" stat="{{$dQuery}}">
+                    <x-common.stat-card can="view_daily_queries" label="Daily Queries" stat="{{$dQuery}}">
                         <x-slot name="icon">
                             <x-icons.user-comment class="w-6 h-6 text-gray-400"/>
                         </x-slot>
                     </x-common.stat-card>
 
-                    <x-common.stat-card label="New Daily Admission" stat="{{$dStudent}}">
+                    <x-common.stat-card can="view_daily_admission" label="New Daily Admission" stat="{{$dStudent}}">
                         <x-slot name="icon">
                             <x-icons.todo-list class="w-6 h-6 text-gray-400"/>
                         </x-slot>
                     </x-common.stat-card>
 
-                    <x-common.stat-card label="Daily Expense" stat="{{$dExpense}} Rs">
+                    <x-common.stat-card can="view_daily_expenses" label="Daily Expense" stat="{{$dExpense}} Rs">
                         <x-slot name="icon">
                             <x-icons.invoice class="w-6 h-6 text-gray-400"/>
                         </x-slot>
                     </x-common.stat-card>
-                    <x-common.stat-card label="Daily Sale" stat="{{$dSale}} Rs">
+                    <x-common.stat-card can="view_daily_sale" label="Daily Sale" stat="{{$dSale}} Rs">
                         <x-slot name="icon">
                             <x-icons.money-check class="w-6 h-6 text-gray-400"/>
                         </x-slot>
                     </x-common.stat-card>
 
-                    <x-common.stat-card label="Monthly Queries" stat="{{$mQuery}}">
+                    <x-common.stat-card can="view_monthly_queries" label="Monthly Queries" stat="{{$mQuery}}">
                         <x-slot name="icon">
                             <x-icons.user-comment class="w-6 h-6 text-gray-400"/>
                         </x-slot>
                     </x-common.stat-card>
 
-                    <x-common.stat-card label="Monthly Admission" stat="{{$mStudent}}">
+                    <x-common.stat-card can="view_monthly_admission" label="Monthly Admission" stat="{{$mStudent}}">
                         <x-slot name="icon">
                             <x-icons.todo-list class="w-6 h-6 text-gray-400"/>
                         </x-slot>
                     </x-common.stat-card>
-                    <x-common.stat-card label="Monthly Expenses" stat="{{$mExpense}} Rs">
+                    <x-common.stat-card can="view_monthly_expenses" label="Monthly Expenses" stat="{{$mExpense}} Rs">
                         <x-slot name="icon">
                             <x-icons.invoice class="w-6 h-6 text-gray-400"/>
                         </x-slot>
                     </x-common.stat-card>
-                    <x-common.stat-card label="Monthly Sale" :stat="$mSale">
+                    <x-common.stat-card can="view_monthly_sale" label="Monthly Sale" :stat="$mSale">
                         <x-slot name="icon">
                             <x-icons.money-check class="w-6 h-6 text-gray-400"/>
                         </x-slot>
@@ -144,21 +187,34 @@
             </h2>
             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-2">
-                    <div class="bg-white p-4 rounded-lg">
-                        <div>
-                            {!! $chart1->renderHtml() !!}
+                    @can('query_show')
+                        <div class="bg-white p-4 rounded-lg">
+                            <div>
+                                {!! $chart1->renderHtml() !!}
+                            </div>
                         </div>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg">
-                        <div>
-                            {!! $chart2->renderHtml() !!}
+                    @endcan
+                    @can('student_show')
+                        <div class="bg-white p-4 rounded-lg">
+                            <div>
+                                {!! $chart2->renderHtml() !!}
+                            </div>
                         </div>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg">
-                        <div>
-                            {!! $chart3->renderHtml() !!}
+                    @endcan
+                    @can('expense_show')
+                        <div class="bg-white p-4 rounded-lg">
+                            <div>
+                                {!! $chart3->renderHtml() !!}
+                            </div>
                         </div>
-                    </div>
+                    @endcan
+                    {{--                    @can('recovery_show')--}}
+                    {{--                        <div class="bg-white p-4 rounded-lg">--}}
+                    {{--                            <div>--}}
+                    {{--                                {!! $chart4->renderHtml() !!}--}}
+                    {{--                            </div>--}}
+                    {{--                        </div>--}}
+                    {{--                    @endcan--}}
                 </div>
             </div>
 
@@ -166,20 +222,23 @@
             {!! $chart1->renderJs() !!}
             {!! $chart2->renderJs() !!}
             {!! $chart3->renderJs() !!}
+            {{--            {!! $chart4->renderJs() !!}--}}
 
             <div class="max-w-6xl mt-8 mx-auto px-4 sm:px-6 lg:px-8">
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                        <h2 class="text-lg leading-6 font-medium text-gray-900 ">
-                            Recent Queries
-                        </h2>
-                        <!-- Activity list (smallest breakpoint only) -->
-                        <div class="shadow sm:hidden">
-                            <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
-                                @forelse($rQueries as $query)
-                                    <li>
-                                        <a href="{{route('admin.queries.show',$query->id)}}" class="block px-4 py-4
+                    @can('query_show')
+
+                        <div>
+                            <h2 class="text-lg leading-6 font-medium text-gray-900 ">
+                                Recent Queries
+                            </h2>
+                            <!-- Activity list (smallest breakpoint only) -->
+                            <div class="shadow sm:hidden">
+                                <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
+                                    @forelse($rQueries as $query)
+                                        <li>
+                                            <a href="{{route('admin.queries.show',$query->id)}}" class="block px-4 py-4
                                     bg-white
                                     hover:bg-gray-50">
                     <span class="flex items-center space-x-4">
@@ -200,81 +259,84 @@
         clip-rule="evenodd"></path>
 </svg>
                     </span>
-                                        </a>
-                                    </li>
-                                @empty
-                                    <li>
-                                        No Query in System
-                                    </li>
-                                @endforelse
-                            </ul>
-                        </div>
-                        <!-- Activity table (small breakpoint and up) -->
-                        <div class="hidden sm:block">
-                            <div class="">
-                                <div class="flex flex-col mt-2">
-                                    <div
-                                        class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
-                                        <table class="min-w-full divide-y divide-gray-200">
-                                            <thead>
-                                            <tr>
-                                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Name
-                                                </th>
-                                                <th class=" px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
-                                                    Course
-                                                </th>
-                                                <th class="px-6 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Added By
-                                                </th>
-                                            </tr>
-                                            </thead>
-                                            <tbody class="bg-white divide-y divide-gray-200">
-                                            @forelse($rQueries as $query)
-                                                <tr class="bg-white">
-                                                    <td class=" w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                        <div class="flex flex-col">
+                                            </a>
+                                        </li>
+                                    @empty
+                                        <li>
+                                            No Query in System
+                                        </li>
+                                    @endforelse
+                                </ul>
+                            </div>
+                            <!-- Activity table (small breakpoint and up) -->
+                            <div class="hidden sm:block">
+                                <div class="">
+                                    <div class="flex flex-col mt-2">
+                                        <div
+                                            class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
+                                            <table class="min-w-full divide-y divide-gray-200">
+                                                <thead>
+                                                <tr>
+                                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Name
+                                                    </th>
+                                                    <th class=" px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
+                                                        Course
+                                                    </th>
+                                                    <th class="px-6 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Added By
+                                                    </th>
+                                                </tr>
+                                                </thead>
+                                                <tbody class="bg-white divide-y divide-gray-200">
+                                                @forelse($rQueries as $query)
+                                                    <tr class="bg-white">
+                                                        <td class=" w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                            <div class="flex flex-col">
                                                         <span>
                                                             {{$query->name}}
                                                         </span>
-                                                            <span class="text-xs">
+                                                                <span class="text-xs">
                                                         {{$query->mobile}}
                                                         </span>
-                                                        </div>
+                                                            </div>
 
-                                                    </td>
-                                                    <td class="hidden px-6 py-4 whitespace-nowrap text-sm text-gray-500 md:block">
-                                                        {{$query->course->title}}
-                                                    </td>
-                                                    <td class="max-w-0 px-6 py-4 text-right whitespace-nowrap text-xs truncate
+                                                        </td>
+                                                        <td class="hidden px-6 py-4 whitespace-nowrap text-sm text-gray-500 md:block">
+                                                            {{$query->course->title}}
+                                                        </td>
+                                                        <td class="max-w-0 px-6 py-4 text-right whitespace-nowrap text-xs truncate
                                                 text-gray-500">
-                                                        {{$query->entry_by}}
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td></td>
-                                                </tr>
-                                            @endforelse
+                                                            {{$query->entry_by}}
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td></td>
+                                                    </tr>
+                                                @endforelse
 
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
 
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div>
-                        <h2 class="  text-lg leading-6 font-medium text-gray-900">
-                            Recent Admissions
-                        </h2>
-                        <!-- Activity list (smallest breakpoint only) -->
-                        <div class="shadow sm:hidden">
-                            <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
-                                @forelse($rAdmissions as $admission)
-                                    <li>
-                                        <a href="{{route('admin.queries.show',$query->id)}}" class="block px-4 py-4
+                    @endcan
+                    @can('student_show')
+
+                        <div>
+                            <h2 class="  text-lg leading-6 font-medium text-gray-900">
+                                Recent Admissions
+                            </h2>
+                            <!-- Activity list (smallest breakpoint only) -->
+                            <div class="shadow sm:hidden">
+                                <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
+                                    @forelse($rAdmissions as $admission)
+                                        <li>
+                                            <a href="{{route('admin.queries.show',$query->id)}}" class="block px-4 py-4
                                     bg-white
                                     hover:bg-gray-50">
                     <span class="flex items-center space-x-4">
@@ -295,86 +357,88 @@
         clip-rule="evenodd"></path>
 </svg>
                     </span>
-                                        </a>
-                                    </li>
-                                @empty
-                                    <li>
-                                        No Query in System
-                                    </li>
-                                @endforelse
-                            </ul>
-                        </div>
-                        <!-- Activity table (small breakpoint and up) -->
-                        <div class="hidden sm:block">
-                            <div class="">
-                                <div class="flex flex-col mt-2">
-                                    <div
-                                        class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
-                                        <table class="min-w-full divide-y divide-gray-200">
-                                            <thead>
-                                            <tr>
-                                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Name
-                                                </th>
-                                                <th class=" px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
-                                                    Course
-                                                </th>
-                                                <th class="px-6 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Added By
-                                                </th>
-                                            </tr>
-                                            </thead>
-                                            <tbody class="bg-white divide-y divide-gray-200">
-                                            @forelse($rAdmissions as $admission)
-                                                <tr class="bg-white">
-                                                    <td class=" w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                        <div class="flex flex-col">
+                                            </a>
+                                        </li>
+                                    @empty
+                                        <li>
+                                            No Query in System
+                                        </li>
+                                    @endforelse
+                                </ul>
+                            </div>
+                            <!-- Activity table (small breakpoint and up) -->
+                            <div class="hidden sm:block">
+                                <div class="">
+                                    <div class="flex flex-col mt-2">
+                                        <div
+                                            class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
+                                            <table class="min-w-full divide-y divide-gray-200">
+                                                <thead>
+                                                <tr>
+                                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Name
+                                                    </th>
+                                                    <th class=" px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
+                                                        Course
+                                                    </th>
+                                                    <th class="px-6 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Added By
+                                                    </th>
+                                                </tr>
+                                                </thead>
+                                                <tbody class="bg-white divide-y divide-gray-200">
+                                                @forelse($rAdmissions as $admission)
+                                                    <tr class="bg-white">
+                                                        <td class=" w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                            <div class="flex flex-col">
                                                         <span>
                                                             {{$admission->name}}
                                                         </span>
-                                                            <span class="text-xs">
+                                                                <span class="text-xs">
                                                         {{$admission->mobile}}
                                                         </span>
-                                                        </div>
+                                                            </div>
 
-                                                    </td>
-                                                    <td class="hidden px-6 py-4 whitespace-nowrap text-sm text-gray-500 md:block">
-                                                        {{$query->course->title}}
-                                                    </td>
-                                                    <td class="max-w-0 px-6 py-4 text-right whitespace-nowrap text-xs truncate
+                                                        </td>
+                                                        <td class="hidden px-6 py-4 whitespace-nowrap text-sm text-gray-500 md:block">
+                                                            {{$query->course->title}}
+                                                        </td>
+                                                        <td class="max-w-0 px-6 py-4 text-right whitespace-nowrap text-xs truncate
                                                 text-gray-500">
-                                                        {{$query->entry_by}}
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="3">
-                                                        <div class="p-2 text-gray-500 text-center">
-                                                        No Student in the System
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            @endforelse
+                                                            {{$query->entry_by}}
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="3">
+                                                            <div class="p-2 text-gray-500 text-center">
+                                                                No Student in the System
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endforelse
 
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
 
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    @endcan
+                    @can('expense_show')
 
-                    <div>
-                        <h2 class="  text-lg leading-6 font-medium text-gray-900">
-                            Recent Expenses
-                        </h2>
-                        <!-- Activity list (smallest breakpoint only) -->
-                        <div class="shadow sm:hidden">
-                            <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
-                                @forelse($rExpenses as $expense)
-                                    <li>
-                                        <a href="{{route('admin.queries.show',$expense->id)}}" class="block px-4 py-4
+                        <div>
+                            <h2 class="  text-lg leading-6 font-medium text-gray-900">
+                                Recent Expenses
+                            </h2>
+                            <!-- Activity list (smallest breakpoint only) -->
+                            <div class="shadow sm:hidden">
+                                <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
+                                    @forelse($rExpenses as $expense)
+                                        <li>
+                                            <a href="{{route('admin.queries.show',$expense->id)}}" class="block px-4 py-4
                                     bg-white
                                     hover:bg-gray-50">
                     <span class="flex items-center space-x-4">
@@ -395,81 +459,83 @@
         clip-rule="evenodd"></path>
 </svg>
                     </span>
-                                        </a>
-                                    </li>
-                                @empty
-                                    <li>
-                                        No Expense in System
-                                    </li>
-                                @endforelse
-                            </ul>
-                        </div>
-                        <!-- Activity table (small breakpoint and up) -->
-                        <div class="hidden sm:block">
-                            <div class="">
-                                <div class="flex flex-col mt-2">
-                                    <div
-                                        class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
-                                        <table class="min-w-full divide-y divide-gray-200">
-                                            <thead>
-                                            <tr>
-                                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Vendor
-                                                </th>
-                                                <th class=" px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
-                                                    Amount
-                                                </th>
-                                                <th class=" px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
-                                                    Paid Status
-                                                </th>
-                                                <th class="px-6 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Due Date
-                                                </th>
-                                            </tr>
-                                            </thead>
-                                            <tbody class="bg-white divide-y divide-gray-200">
-                                            @forelse($rExpenses as $expense)
-                                                <tr class="bg-white">
-                                                    <td class=" w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                        <div class="flex flex-col">
+                                            </a>
+                                        </li>
+                                    @empty
+                                        <li>
+                                            No Expense in System
+                                        </li>
+                                    @endforelse
+                                </ul>
+                            </div>
+                            <!-- Activity table (small breakpoint and up) -->
+                            <div class="hidden sm:block">
+                                <div class="">
+                                    <div class="flex flex-col mt-2">
+                                        <div
+                                            class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
+                                            <table class="min-w-full divide-y divide-gray-200">
+                                                <thead>
+                                                <tr>
+                                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Vendor
+                                                    </th>
+                                                    <th class=" px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
+                                                        Amount
+                                                    </th>
+                                                    <th class=" px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
+                                                        Paid Status
+                                                    </th>
+                                                    <th class="px-6 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Due Date
+                                                    </th>
+                                                </tr>
+                                                </thead>
+                                                <tbody class="bg-white divide-y divide-gray-200">
+                                                @forelse($rExpenses as $expense)
+                                                    <tr class="bg-white">
+                                                        <td class=" w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                            <div class="flex flex-col">
                                                         <span>
                                                             {{$expense->vendor->name}}
                                                         </span>
-                                                            <span class="text-xs">
+                                                                <span class="text-xs">
                                                         {{$expense->vendor->mobile}}
                                                         </span>
-                                                        </div>
+                                                            </div>
 
-                                                    </td>
-                                                    <td class=" px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        {{$expense->amount}} Rs
-                                                    </td>
-                                                    <td class=" px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        {{$expense->is_paid_human}}
-                                                    </td>
-                                                    <td class=" px-6 py-4 text-right whitespace-nowrap text-xs
+                                                        </td>
+                                                        <td class=" px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            {{$expense->amount}} Rs
+                                                        </td>
+                                                        <td class=" px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            {{$expense->is_paid_human}}
+                                                        </td>
+                                                        <td class=" px-6 py-4 text-right whitespace-nowrap text-xs
                                                 text-gray-500">
-                                                        @if(!$expense->is_paid)
-                                                        {{Carbon\Carbon::parse($expense->due_date)->diffForHumans()}}
-                                                        @else
-                                                             Paid
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td></td>
-                                                </tr>
-                                            @endforelse
+                                                            @if(!$expense->is_paid)
+                                                                {{Carbon\Carbon::parse($expense->due_date)->diffForHumans()}}
+                                                            @else
+                                                                Paid
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td></td>
+                                                    </tr>
+                                                @endforelse
 
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
 
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    @endcan
+
                 </div>
             </div>
 

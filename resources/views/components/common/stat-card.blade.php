@@ -4,9 +4,11 @@
     'icon'=>'',
     'route'=>'',
     'sublabel'=>'',
-    'route_label'=>'View All'
-])
+    'route_label'=>'View All',
+    'can'=>''
 
+])
+@can($can)
 <div class="bg-white overflow-hidden shadow rounded-lg">
     <div class="p-5">
         <div class="flex items-center">
@@ -38,3 +40,4 @@
         </div>
     </div>
 </div>
+@endcan
