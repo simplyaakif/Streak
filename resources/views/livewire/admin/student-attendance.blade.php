@@ -46,7 +46,7 @@
                             @forelse($attendanceRecord as $record)
                                 <x-common.table.row>
                                     <x-common.table.cell>{{$loop->iteration}}</x-common.table.cell>
-                                    <x-common.table.cell>{{$record['student_id']}}</x-common.table.cell>
+                                    <x-common.table.cell>{{$record["student"]["name"]}}</x-common.table.cell>
                                     <x-common.table.cell>{{$record['attendance_status']}}</x-common.table.cell>
                                 </x-common.table.row>
                             @empty

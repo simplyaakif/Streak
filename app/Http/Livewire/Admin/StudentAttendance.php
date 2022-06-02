@@ -29,7 +29,10 @@
 //            $this->attendanceRecords = SAttendance::
 //            select('id', 'student_id', 'attendance_status', 'batch_id', DB::raw('DATE(datetime) as date'))->get()->groupBy('date')->toArray();
 
-            $records                 = SAttendance::where('batch_id', $this->batch->id)->get()->groupBy(function ($item) {
+            $records                 = SAttendance::where('batch_id', $this->batch->id)
+                ->with('student')
+                ->get()
+                ->groupBy(function ($item) {
                 return Carbon::parse($item->datetime)->format('d-m-Y');
             });
             $this->attendanceRecords = collect($records);

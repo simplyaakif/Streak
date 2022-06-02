@@ -86,6 +86,8 @@ class Student extends Model implements HasMedia
     }
 
 
+
+
     public function routeNotificationForSms($notifiable)
     {
         return $this->mobile;

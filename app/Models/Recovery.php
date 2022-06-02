@@ -19,6 +19,7 @@
             return $this->belongsTo(Course::class);
         }
 
+
         public function batch()
         {
             return $this->belongsTo(Batch::class);

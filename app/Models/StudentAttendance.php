@@ -14,4 +14,9 @@
             'Leave'
         ];
 
+
+        public function student(){
+            return $this->belongsTo(Student::class);
+        }
+
     }

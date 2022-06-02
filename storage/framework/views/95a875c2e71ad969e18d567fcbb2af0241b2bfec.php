@@ -1,4 +1,3 @@
-
 <?php $__env->startSection('content'); ?>
     <div class="row">
         <article>
@@ -329,6 +328,39 @@
                                                 </dd>
                                             </div>
                                         </dl>
+                                    </div>
+                                    <div class="bg-gray-100 px-4 py-5 sm:px-6">
+
+                                        <?php
+                                        $recoveries = App\Models\Recovery::where('batch_id',$batch->id)
+                                                      ->where('student_id',$student->id)->get()
+                                        ?>
+                                        <h3 class="text-xl font-bold">Fee Schedule</h3>
+                                        <div>
+                                            <ul>
+                                                <li>
+                                                    <div class="grid gap-4 md:grid-cols-5">
+                                                        <div class="font-bold">Amount</div>
+                                                        <div class="font-bold">Due Date</div>
+                                                        <div class="font-bold">Status</div>
+                                                        <div class="font-bold">Paid On</div>
+                                                        <div class="font-bold">Slip/Transaction ID</div>
+                                                    </div>
+                                                </li>
+                                                <?php $__empty_1 = true; $__currentLoopData = $recoveries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $recovery): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                                <li>
+                                                    <div class="grid gap-4 md:grid-cols-5">
+                                                    <div><?php echo e($recovery->amount); ?> Rs</div>
+                                                    <div><?php echo e($recovery->due_date); ?></div>
+                                                    <div><?php echo e($recovery->is_paid ? "Paid":"Pending"); ?></div>
+                                                    <div><?php echo e($recovery->paid_on); ?></div>
+                                                    <div><?php echo e($recovery->slip_number); ?></div>
+                                                    </div>
+                                                </li>
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                                <?php endif; ?>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
 

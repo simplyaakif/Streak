@@ -1,4 +1,3 @@
-
 <?php $__env->startSection('content'); ?>
     <main class="flex-1 relative pb-8 z-0 overflow-y-auto">
         <!-- Page header -->
@@ -91,15 +90,70 @@
 
         <div class="mt-8">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-lg leading-6 font-medium text-gray-900 mb-2">Tasks For <?php echo e(Auth::user()->name); ?></h2>
+                <div class="bg-yellow-100 border-yellow-400 border rounded-lg py-4 px-8">
+                    <ul class="list-decimal text-gray-700 divide-y divide-yellow-200 space-y-2">
+                        <?php $__empty_1 = true; $__currentLoopData = $user_tasks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $task): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                            <li class="w-full items-center">
+                                <div class=" grid grid-cols-1 md:grid-cols-6 items-center ">
+                                    <div class="md:col-span-4">
+                                        <h3 class="text-base"><?php echo e($task->name); ?></h3>
+                                        <p class="text-sm"><?php echo e($task->description); ?></p>
+                                    </div>
+                                    <div>
+                                        <div class="flex space-x-2">
+                                        <?php echo e($task->status->name); ?>
+
+                                            <span>
+                                                <a
+                                                onclick = "if (! confirm('Did you Actually Completed?')) { return false; }"
+                                                   href="<?php echo e(route('admin.task_done',$task->id)); ?>">
+                                                <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.add','data' => ['class' => 'w-6 h-6']]); ?>
+<?php $component->withName('icons.add'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php $component->withAttributes(['class' => 'w-6 h-6']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
+<?php $component = $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4; ?>
+<?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
+<?php endif; ?>
+                                                </a>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <?php $__empty_2 = true; $__currentLoopData = $task->tag; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tag): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_2 = false; ?>
+                                            <span class="text-sm  text-yellow-600"><?php echo e($tag->name); ?></span>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_2): ?>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                    <div class="text-sm">
+                                        Due by <span class=""><?php echo e(carbon($task->due_date)->format('d-m-Y')); ?></span>
+                                    </div>
+                                </div>
+                            </li>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                            <li class="flex">No Task Assigned to You</li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h2 class="text-lg leading-6 font-medium text-gray-900">Overview</h2>
                 <div class="mt-2 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
                     <!-- Card -->
                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['label' => 'Daily Queries','stat' => ''.e($dQuery).'']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_daily_queries','label' => 'Daily Queries','stat' => ''.e($dQuery).'']]); ?>
 <?php $component->withName('common.stat-card'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes(['label' => 'Daily Queries','stat' => ''.e($dQuery).'']); ?>
+<?php $component->withAttributes(['can' => 'view_daily_queries','label' => 'Daily Queries','stat' => ''.e($dQuery).'']); ?>
                          <?php $__env->slot('icon', null, []); ?> 
                             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.user-comment','data' => ['class' => 'w-6 h-6 text-gray-400']]); ?>
@@ -122,11 +176,11 @@
 <?php endif; ?>
 
                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['label' => 'New Daily Admission','stat' => ''.e($dStudent).'']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_daily_admission','label' => 'New Daily Admission','stat' => ''.e($dStudent).'']]); ?>
 <?php $component->withName('common.stat-card'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes(['label' => 'New Daily Admission','stat' => ''.e($dStudent).'']); ?>
+<?php $component->withAttributes(['can' => 'view_daily_admission','label' => 'New Daily Admission','stat' => ''.e($dStudent).'']); ?>
                          <?php $__env->slot('icon', null, []); ?> 
                             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.todo-list','data' => ['class' => 'w-6 h-6 text-gray-400']]); ?>
@@ -149,11 +203,11 @@
 <?php endif; ?>
 
                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['label' => 'Daily Expense','stat' => ''.e($dExpense).' Rs']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_daily_expenses','label' => 'Daily Expense','stat' => ''.e($dExpense).' Rs']]); ?>
 <?php $component->withName('common.stat-card'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes(['label' => 'Daily Expense','stat' => ''.e($dExpense).' Rs']); ?>
+<?php $component->withAttributes(['can' => 'view_daily_expenses','label' => 'Daily Expense','stat' => ''.e($dExpense).' Rs']); ?>
                          <?php $__env->slot('icon', null, []); ?> 
                             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.invoice','data' => ['class' => 'w-6 h-6 text-gray-400']]); ?>
@@ -175,11 +229,11 @@
 <?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
 <?php endif; ?>
                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['label' => 'Daily Sale','stat' => ''.e($dSale).' Rs']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_daily_sale','label' => 'Daily Sale','stat' => ''.e($dSale).' Rs']]); ?>
 <?php $component->withName('common.stat-card'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes(['label' => 'Daily Sale','stat' => ''.e($dSale).' Rs']); ?>
+<?php $component->withAttributes(['can' => 'view_daily_sale','label' => 'Daily Sale','stat' => ''.e($dSale).' Rs']); ?>
                          <?php $__env->slot('icon', null, []); ?> 
                             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.money-check','data' => ['class' => 'w-6 h-6 text-gray-400']]); ?>
@@ -202,11 +256,11 @@
 <?php endif; ?>
 
                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['label' => 'Monthly Queries','stat' => ''.e($mQuery).'']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_monthly_queries','label' => 'Monthly Queries','stat' => ''.e($mQuery).'']]); ?>
 <?php $component->withName('common.stat-card'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes(['label' => 'Monthly Queries','stat' => ''.e($mQuery).'']); ?>
+<?php $component->withAttributes(['can' => 'view_monthly_queries','label' => 'Monthly Queries','stat' => ''.e($mQuery).'']); ?>
                          <?php $__env->slot('icon', null, []); ?> 
                             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.user-comment','data' => ['class' => 'w-6 h-6 text-gray-400']]); ?>
@@ -229,11 +283,11 @@
 <?php endif; ?>
 
                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['label' => 'Monthly Admission','stat' => ''.e($mStudent).'']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_monthly_admission','label' => 'Monthly Admission','stat' => ''.e($mStudent).'']]); ?>
 <?php $component->withName('common.stat-card'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes(['label' => 'Monthly Admission','stat' => ''.e($mStudent).'']); ?>
+<?php $component->withAttributes(['can' => 'view_monthly_admission','label' => 'Monthly Admission','stat' => ''.e($mStudent).'']); ?>
                          <?php $__env->slot('icon', null, []); ?> 
                             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.todo-list','data' => ['class' => 'w-6 h-6 text-gray-400']]); ?>
@@ -255,11 +309,11 @@
 <?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
 <?php endif; ?>
                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['label' => 'Monthly Expenses','stat' => ''.e($mExpense).' Rs']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_monthly_expenses','label' => 'Monthly Expenses','stat' => ''.e($mExpense).' Rs']]); ?>
 <?php $component->withName('common.stat-card'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes(['label' => 'Monthly Expenses','stat' => ''.e($mExpense).' Rs']); ?>
+<?php $component->withAttributes(['can' => 'view_monthly_expenses','label' => 'Monthly Expenses','stat' => ''.e($mExpense).' Rs']); ?>
                          <?php $__env->slot('icon', null, []); ?> 
                             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.invoice','data' => ['class' => 'w-6 h-6 text-gray-400']]); ?>
@@ -281,11 +335,11 @@
 <?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
 <?php endif; ?>
                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['label' => 'Monthly Sale','stat' => $mSale]]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_monthly_sale','label' => 'Monthly Sale','stat' => $mSale]]); ?>
 <?php $component->withName('common.stat-card'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes(['label' => 'Monthly Sale','stat' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($mSale)]); ?>
+<?php $component->withAttributes(['can' => 'view_monthly_sale','label' => 'Monthly Sale','stat' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($mSale)]); ?>
                          <?php $__env->slot('icon', null, []); ?> 
                             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.money-check','data' => ['class' => 'w-6 h-6 text-gray-400']]); ?>
@@ -314,24 +368,37 @@
             </h2>
             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-2">
-                    <div class="bg-white p-4 rounded-lg">
-                        <div>
-                            <?php echo $chart1->renderHtml(); ?>
+                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('query_show')): ?>
+                        <div class="bg-white p-4 rounded-lg">
+                            <div>
+                                <?php echo $chart1->renderHtml(); ?>
 
+                            </div>
                         </div>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg">
-                        <div>
-                            <?php echo $chart2->renderHtml(); ?>
+                    <?php endif; ?>
+                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('student_show')): ?>
+                        <div class="bg-white p-4 rounded-lg">
+                            <div>
+                                <?php echo $chart2->renderHtml(); ?>
 
+                            </div>
                         </div>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg">
-                        <div>
-                            <?php echo $chart3->renderHtml(); ?>
+                    <?php endif; ?>
+                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('expense_show')): ?>
+                        <div class="bg-white p-4 rounded-lg">
+                            <div>
+                                <?php echo $chart3->renderHtml(); ?>
 
+                            </div>
                         </div>
-                    </div>
+                    <?php endif; ?>
+                    
+                    
+                    
+                    
+                    
+                    
+                    
                 </div>
             </div>
 
@@ -343,20 +410,23 @@
 
             <?php echo $chart3->renderJs(); ?>
 
+            
 
             <div class="max-w-6xl mt-8 mx-auto px-4 sm:px-6 lg:px-8">
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                        <h2 class="text-lg leading-6 font-medium text-gray-900 ">
-                            Recent Queries
-                        </h2>
-                        <!-- Activity list (smallest breakpoint only) -->
-                        <div class="shadow sm:hidden">
-                            <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
-                                <?php $__empty_1 = true; $__currentLoopData = $rQueries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $query): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                                    <li>
-                                        <a href="<?php echo e(route('admin.queries.show',$query->id)); ?>" class="block px-4 py-4
+                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('query_show')): ?>
+
+                        <div>
+                            <h2 class="text-lg leading-6 font-medium text-gray-900 ">
+                                Recent Queries
+                            </h2>
+                            <!-- Activity list (smallest breakpoint only) -->
+                            <div class="shadow sm:hidden">
+                                <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
+                                    <?php $__empty_1 = true; $__currentLoopData = $rQueries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $query): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                        <li>
+                                            <a href="<?php echo e(route('admin.queries.show',$query->id)); ?>" class="block px-4 py-4
                                     bg-white
                                     hover:bg-gray-50">
                     <span class="flex items-center space-x-4">
@@ -388,85 +458,88 @@
         clip-rule="evenodd"></path>
 </svg>
                     </span>
-                                        </a>
-                                    </li>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                                    <li>
-                                        No Query in System
-                                    </li>
-                                <?php endif; ?>
-                            </ul>
-                        </div>
-                        <!-- Activity table (small breakpoint and up) -->
-                        <div class="hidden sm:block">
-                            <div class="">
-                                <div class="flex flex-col mt-2">
-                                    <div
-                                        class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
-                                        <table class="min-w-full divide-y divide-gray-200">
-                                            <thead>
-                                            <tr>
-                                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Name
-                                                </th>
-                                                <th class=" px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
-                                                    Course
-                                                </th>
-                                                <th class="px-6 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Added By
-                                                </th>
-                                            </tr>
-                                            </thead>
-                                            <tbody class="bg-white divide-y divide-gray-200">
-                                            <?php $__empty_1 = true; $__currentLoopData = $rQueries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $query): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                                                <tr class="bg-white">
-                                                    <td class=" w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                        <div class="flex flex-col">
+                                            </a>
+                                        </li>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                        <li>
+                                            No Query in System
+                                        </li>
+                                    <?php endif; ?>
+                                </ul>
+                            </div>
+                            <!-- Activity table (small breakpoint and up) -->
+                            <div class="hidden sm:block">
+                                <div class="">
+                                    <div class="flex flex-col mt-2">
+                                        <div
+                                            class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
+                                            <table class="min-w-full divide-y divide-gray-200">
+                                                <thead>
+                                                <tr>
+                                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Name
+                                                    </th>
+                                                    <th class=" px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
+                                                        Course
+                                                    </th>
+                                                    <th class="px-6 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Added By
+                                                    </th>
+                                                </tr>
+                                                </thead>
+                                                <tbody class="bg-white divide-y divide-gray-200">
+                                                <?php $__empty_1 = true; $__currentLoopData = $rQueries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $query): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                                    <tr class="bg-white">
+                                                        <td class=" w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                            <div class="flex flex-col">
                                                         <span>
                                                             <?php echo e($query->name); ?>
 
                                                         </span>
-                                                            <span class="text-xs">
+                                                                <span class="text-xs">
                                                         <?php echo e($query->mobile); ?>
 
                                                         </span>
-                                                        </div>
+                                                            </div>
 
-                                                    </td>
-                                                    <td class="hidden px-6 py-4 whitespace-nowrap text-sm text-gray-500 md:block">
-                                                        <?php echo e($query->course->title); ?>
+                                                        </td>
+                                                        <td class="hidden px-6 py-4 whitespace-nowrap text-sm text-gray-500 md:block">
+                                                            <?php echo e($query->course->title); ?>
 
-                                                    </td>
-                                                    <td class="max-w-0 px-6 py-4 text-right whitespace-nowrap text-xs truncate
+                                                        </td>
+                                                        <td class="max-w-0 px-6 py-4 text-right whitespace-nowrap text-xs truncate
                                                 text-gray-500">
-                                                        <?php echo e($query->entry_by); ?>
+                                                            <?php echo e($query->entry_by); ?>
 
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                                                <tr>
-                                                    <td></td>
-                                                </tr>
-                                            <?php endif; ?>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                                    <tr>
+                                                        <td></td>
+                                                    </tr>
+                                                <?php endif; ?>
 
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
 
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div>
-                        <h2 class="  text-lg leading-6 font-medium text-gray-900">
-                            Recent Admissions
-                        </h2>
-                        <!-- Activity list (smallest breakpoint only) -->
-                        <div class="shadow sm:hidden">
-                            <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
-                                <?php $__empty_1 = true; $__currentLoopData = $rAdmissions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $admission): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                                    <li>
-                                        <a href="<?php echo e(route('admin.queries.show',$query->id)); ?>" class="block px-4 py-4
+                    <?php endif; ?>
+                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('student_show')): ?>
+
+                        <div>
+                            <h2 class="  text-lg leading-6 font-medium text-gray-900">
+                                Recent Admissions
+                            </h2>
+                            <!-- Activity list (smallest breakpoint only) -->
+                            <div class="shadow sm:hidden">
+                                <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
+                                    <?php $__empty_1 = true; $__currentLoopData = $rAdmissions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $admission): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                        <li>
+                                            <a href="<?php echo e(route('admin.queries.show',$query->id)); ?>" class="block px-4 py-4
                                     bg-white
                                     hover:bg-gray-50">
                     <span class="flex items-center space-x-4">
@@ -498,90 +571,92 @@
         clip-rule="evenodd"></path>
 </svg>
                     </span>
-                                        </a>
-                                    </li>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                                    <li>
-                                        No Query in System
-                                    </li>
-                                <?php endif; ?>
-                            </ul>
-                        </div>
-                        <!-- Activity table (small breakpoint and up) -->
-                        <div class="hidden sm:block">
-                            <div class="">
-                                <div class="flex flex-col mt-2">
-                                    <div
-                                        class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
-                                        <table class="min-w-full divide-y divide-gray-200">
-                                            <thead>
-                                            <tr>
-                                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Name
-                                                </th>
-                                                <th class=" px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
-                                                    Course
-                                                </th>
-                                                <th class="px-6 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Added By
-                                                </th>
-                                            </tr>
-                                            </thead>
-                                            <tbody class="bg-white divide-y divide-gray-200">
-                                            <?php $__empty_1 = true; $__currentLoopData = $rAdmissions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $admission): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                                                <tr class="bg-white">
-                                                    <td class=" w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                        <div class="flex flex-col">
+                                            </a>
+                                        </li>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                        <li>
+                                            No Query in System
+                                        </li>
+                                    <?php endif; ?>
+                                </ul>
+                            </div>
+                            <!-- Activity table (small breakpoint and up) -->
+                            <div class="hidden sm:block">
+                                <div class="">
+                                    <div class="flex flex-col mt-2">
+                                        <div
+                                            class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
+                                            <table class="min-w-full divide-y divide-gray-200">
+                                                <thead>
+                                                <tr>
+                                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Name
+                                                    </th>
+                                                    <th class=" px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
+                                                        Course
+                                                    </th>
+                                                    <th class="px-6 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Added By
+                                                    </th>
+                                                </tr>
+                                                </thead>
+                                                <tbody class="bg-white divide-y divide-gray-200">
+                                                <?php $__empty_1 = true; $__currentLoopData = $rAdmissions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $admission): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                                    <tr class="bg-white">
+                                                        <td class=" w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                            <div class="flex flex-col">
                                                         <span>
                                                             <?php echo e($admission->name); ?>
 
                                                         </span>
-                                                            <span class="text-xs">
+                                                                <span class="text-xs">
                                                         <?php echo e($admission->mobile); ?>
 
                                                         </span>
-                                                        </div>
+                                                            </div>
 
-                                                    </td>
-                                                    <td class="hidden px-6 py-4 whitespace-nowrap text-sm text-gray-500 md:block">
-                                                        <?php echo e($query->course->title); ?>
+                                                        </td>
+                                                        <td class="hidden px-6 py-4 whitespace-nowrap text-sm text-gray-500 md:block">
+                                                            <?php echo e($query->course->title); ?>
 
-                                                    </td>
-                                                    <td class="max-w-0 px-6 py-4 text-right whitespace-nowrap text-xs truncate
+                                                        </td>
+                                                        <td class="max-w-0 px-6 py-4 text-right whitespace-nowrap text-xs truncate
                                                 text-gray-500">
-                                                        <?php echo e($query->entry_by); ?>
+                                                            <?php echo e($query->entry_by); ?>
 
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                                                <tr>
-                                                    <td colspan="3">
-                                                        <div class="p-2 text-gray-500 text-center">
-                                                        No Student in the System
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            <?php endif; ?>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                                    <tr>
+                                                        <td colspan="3">
+                                                            <div class="p-2 text-gray-500 text-center">
+                                                                No Student in the System
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                <?php endif; ?>
 
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
 
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    <?php endif; ?>
+                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('expense_show')): ?>
 
-                    <div>
-                        <h2 class="  text-lg leading-6 font-medium text-gray-900">
-                            Recent Expenses
-                        </h2>
-                        <!-- Activity list (smallest breakpoint only) -->
-                        <div class="shadow sm:hidden">
-                            <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
-                                <?php $__empty_1 = true; $__currentLoopData = $rExpenses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $expense): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                                    <li>
-                                        <a href="<?php echo e(route('admin.queries.show',$expense->id)); ?>" class="block px-4 py-4
+                        <div>
+                            <h2 class="  text-lg leading-6 font-medium text-gray-900">
+                                Recent Expenses
+                            </h2>
+                            <!-- Activity list (smallest breakpoint only) -->
+                            <div class="shadow sm:hidden">
+                                <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
+                                    <?php $__empty_1 = true; $__currentLoopData = $rExpenses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $expense): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                        <li>
+                                            <a href="<?php echo e(route('admin.queries.show',$expense->id)); ?>" class="block px-4 py-4
                                     bg-white
                                     hover:bg-gray-50">
                     <span class="flex items-center space-x-4">
@@ -613,85 +688,87 @@
         clip-rule="evenodd"></path>
 </svg>
                     </span>
-                                        </a>
-                                    </li>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                                    <li>
-                                        No Expense in System
-                                    </li>
-                                <?php endif; ?>
-                            </ul>
-                        </div>
-                        <!-- Activity table (small breakpoint and up) -->
-                        <div class="hidden sm:block">
-                            <div class="">
-                                <div class="flex flex-col mt-2">
-                                    <div
-                                        class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
-                                        <table class="min-w-full divide-y divide-gray-200">
-                                            <thead>
-                                            <tr>
-                                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Vendor
-                                                </th>
-                                                <th class=" px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
-                                                    Amount
-                                                </th>
-                                                <th class=" px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
-                                                    Paid Status
-                                                </th>
-                                                <th class="px-6 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Due Date
-                                                </th>
-                                            </tr>
-                                            </thead>
-                                            <tbody class="bg-white divide-y divide-gray-200">
-                                            <?php $__empty_1 = true; $__currentLoopData = $rExpenses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $expense): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                                                <tr class="bg-white">
-                                                    <td class=" w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                        <div class="flex flex-col">
+                                            </a>
+                                        </li>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                        <li>
+                                            No Expense in System
+                                        </li>
+                                    <?php endif; ?>
+                                </ul>
+                            </div>
+                            <!-- Activity table (small breakpoint and up) -->
+                            <div class="hidden sm:block">
+                                <div class="">
+                                    <div class="flex flex-col mt-2">
+                                        <div
+                                            class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
+                                            <table class="min-w-full divide-y divide-gray-200">
+                                                <thead>
+                                                <tr>
+                                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Vendor
+                                                    </th>
+                                                    <th class=" px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
+                                                        Amount
+                                                    </th>
+                                                    <th class=" px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
+                                                        Paid Status
+                                                    </th>
+                                                    <th class="px-6 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Due Date
+                                                    </th>
+                                                </tr>
+                                                </thead>
+                                                <tbody class="bg-white divide-y divide-gray-200">
+                                                <?php $__empty_1 = true; $__currentLoopData = $rExpenses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $expense): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                                    <tr class="bg-white">
+                                                        <td class=" w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                            <div class="flex flex-col">
                                                         <span>
                                                             <?php echo e($expense->vendor->name); ?>
 
                                                         </span>
-                                                            <span class="text-xs">
+                                                                <span class="text-xs">
                                                         <?php echo e($expense->vendor->mobile); ?>
 
                                                         </span>
-                                                        </div>
+                                                            </div>
 
-                                                    </td>
-                                                    <td class=" px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        <?php echo e($expense->amount); ?> Rs
-                                                    </td>
-                                                    <td class=" px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        <?php echo e($expense->is_paid_human); ?>
+                                                        </td>
+                                                        <td class=" px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            <?php echo e($expense->amount); ?> Rs
+                                                        </td>
+                                                        <td class=" px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            <?php echo e($expense->is_paid_human); ?>
 
-                                                    </td>
-                                                    <td class=" px-6 py-4 text-right whitespace-nowrap text-xs
+                                                        </td>
+                                                        <td class=" px-6 py-4 text-right whitespace-nowrap text-xs
                                                 text-gray-500">
-                                                        <?php if(!$expense->is_paid): ?>
-                                                        <?php echo e(Carbon\Carbon::parse($expense->due_date)->diffForHumans()); ?>
+                                                            <?php if(!$expense->is_paid): ?>
+                                                                <?php echo e(Carbon\Carbon::parse($expense->due_date)->diffForHumans()); ?>
 
-                                                        <?php else: ?>
-                                                             Paid
-                                                        <?php endif; ?>
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                                                <tr>
-                                                    <td></td>
-                                                </tr>
-                                            <?php endif; ?>
+                                                            <?php else: ?>
+                                                                Paid
+                                                            <?php endif; ?>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                                    <tr>
+                                                        <td></td>
+                                                    </tr>
+                                                <?php endif; ?>
 
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
 
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    <?php endif; ?>
+
                 </div>
             </div>
 

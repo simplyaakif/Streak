@@ -4,7 +4,9 @@
     'icon'=>'',
     'route'=>'',
     'sublabel'=>'',
-    'route_label'=>'View All'
+    'route_label'=>'View All',
+    'can'=>''
+
 ]); ?>
 <?php foreach (array_filter(([
     'label'=>'',
@@ -12,7 +14,9 @@
     'icon'=>'',
     'route'=>'',
     'sublabel'=>'',
-    'route_label'=>'View All'
+    'route_label'=>'View All',
+    'can'=>''
+
 ]), 'is_string', ARRAY_FILTER_USE_KEY) as $__key => $__value) {
     $$__key = $$__key ?? $__value;
 } ?>
@@ -21,7 +25,7 @@
     if (array_key_exists($__key, $__defined_vars)) unset($$__key);
 } ?>
 <?php unset($__defined_vars); ?>
-
+<?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check($can)): ?>
 <div class="bg-white overflow-hidden shadow rounded-lg">
     <div class="p-5">
         <div class="flex items-center">
@@ -58,4 +62,5 @@
         </div>
     </div>
 </div>
+<?php endif; ?>
 <?php /**PATH E:\Aakif Work\Systems Developments\streakz\resources\views/components/common/stat-card.blade.php ENDPATH**/ ?>
