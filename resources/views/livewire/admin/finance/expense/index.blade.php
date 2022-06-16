@@ -125,17 +125,17 @@
                     <x-common.table.cell>{{$expense->paid_by}}</x-common.table.cell>
                     <x-common.table.cell>
                         <div class="flex space-x-2 items-center">
-                            @can('expense_show')
-                                <a href="{{route('admin.queries.show',$expense->id)}}">
-                                    <x-icons.eye class="w-6 h-6  text-cyan-700"/>
-                                </a>
-                            @endcan
+{{--                            @can('expense_show')--}}
+{{--                                <a href="{{route('admin.queries.show',$expense->id)}}">--}}
+{{--                                    <x-icons.eye class="w-6 h-6  text-cyan-700"/>--}}
+{{--                                </a>--}}
+{{--                            @endcan--}}
 
-                            @can('expense_edit')
-                                <a href="#" wire:click.prevent="edit({{$expense->id}})">
-                                    <x-icons.edit class="w-5 h-5  text-blue-700"/>
-                                </a>
-                            @endcan
+{{--                            @can('expense_edit')--}}
+{{--                                <a href="#" wire:click.prevent="edit({{$expense->id}})">--}}
+{{--                                    <x-icons.edit class="w-5 h-5  text-blue-700"/>--}}
+{{--                                </a>--}}
+{{--                            @endcan--}}
 
                             @can('expense_delete')
                                 <a href="#" wire:click.prevent="delete({{$expense->id}})">

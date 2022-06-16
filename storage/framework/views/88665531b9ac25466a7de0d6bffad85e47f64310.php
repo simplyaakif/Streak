@@ -7,7 +7,7 @@
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php $component->withAttributes(['wire:model' => 'showEditModal']); ?>
-             <?php $__env->slot('title', null, []); ?> Create a new Expense <?php $__env->endSlot(); ?>
+             <?php $__env->slot('title', null, []); ?> Create an Expense <?php $__env->endSlot(); ?>
              <?php $__env->slot('content', null, []); ?> 
                 <div class="grid sm:grid-cols-2 gap-2">
                     <div>
