@@ -2,7 +2,7 @@
 
     <div>
         <x-modal.dialog wire:model="showEditModal">
-            <x-slot name="title">Create a new Expense</x-slot>
+            <x-slot name="title">Create an Expense</x-slot>
             <x-slot name="content">
                 <div class="grid sm:grid-cols-2 gap-2">
                     <div>
@@ -138,7 +138,7 @@
                             @endcan
 
                             @can('expense_delete')
-                                <a href="#" wire:click.prevent="deleteQuery({{$expense->id}})">
+                                <a href="#" wire:click.prevent="delete({{$expense->id}})">
                                     <x-icons.trash class="w-5 h-5  text-red-700"/>
                                 </a>
                             @endcan

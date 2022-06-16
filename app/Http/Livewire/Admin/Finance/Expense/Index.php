@@ -63,11 +63,12 @@
             ];
         }
 
-//        public function delete($id)
-//        {
-//            $model = Expense::findOrFail($id);
-//            $model->delete();
-//        }
+        public function delete($id)
+        {
+            $model = Expense::findOrFail($id);
+            $model->delete();
+            $this->redirectRoute('admin.expenses.index');
+        }
 
         public function makeBlankExpense()
         {
@@ -147,7 +148,7 @@
         public function render()
         {
             return view('livewire.admin.finance.expense.index', [
-                'expenses' => Expense::paginate(50)
+                'expenses' => Expense::latest()->paginate(50)
             ]);
         }
     }

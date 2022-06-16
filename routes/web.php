@@ -39,6 +39,7 @@ use App\Http\Controllers\Student\StudentController as SC;
 
 Route::impersonate();
 
+
 Route::redirect('/', '/login');
 
 Route::get('/wip',[HomeController::class,'wip']);
