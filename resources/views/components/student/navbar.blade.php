@@ -17,10 +17,10 @@
                     <div class="flex space-x-4">
                         <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
                         <x-student.nb-md-item route="{{route('student.dashboard')}}">Dashboard</x-student.nb-md-item>
-                        <x-student.nb-md-item route="{{route('student.courses')}}">My Courses</x-student.nb-md-item>
-                        <x-student.nb-md-item route="{{route('student.issues')}}">Support Tickets</x-student.nb-md-item>
-                        <x-student.nb-md-item route="{{route('student.discussions')}}">Discussions
-                        </x-student.nb-md-item>
+{{--                        <x-student.nb-md-item route="{{route('student.courses')}}">My Courses</x-student.nb-md-item>--}}
+                        <x-student.nb-md-item route="{{route('student.issues')}}">Request Support</x-student.nb-md-item>
+{{--                        <x-student.nb-md-item route="{{route('student.discussions')}}">Discussions--}}
+{{--                        </x-student.nb-md-item>--}}
                         <x-student.nb-md-item route="{{route('student.institute_calendar')}}">
                             Institute Calendar</x-student.nb-md-item>
                     </div>
@@ -28,24 +28,24 @@
             </div>
             <div class="hidden sm:ml-6 sm:block">
                 <div class="flex items-center">
-                    <a href="{{route('chatify')}}">
+{{--                    <a href="{{route('chatify')}}">--}}
 
-                    <button type="button" class="bg-cyan-700 mr-4 relative p-1 rounded-full text-cyan-100
-                    hover:text-white
-                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
-                        <span class="sr-only">View notifications</span>
-                        <!-- Heroicon name: outline/bell -->
-                        @if(count(Auth::user()->chat_message()))
-                            <span class="absolute right-0 top-0 bg-white flex justify-center items-center text-cyan-700
-                            rounded-full
-                text-xs w-4 h-4">
-                    {{count(Auth::user()->chat_message())}}
-                </span>
-                        @else
-                        @endif
-                        <x-icons.message class="w-6 h-6 text-white"/>
-                    </button>
-                    </a>
+{{--                    <button type="button" class="bg-cyan-700 mr-4 relative p-1 rounded-full text-cyan-100--}}
+{{--                    hover:text-white--}}
+{{--                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">--}}
+{{--                        <span class="sr-only">View notifications</span>--}}
+{{--                        <!-- Heroicon name: outline/bell -->--}}
+{{--                        @if(count(Auth::user()->chat_message()))--}}
+{{--                            <span class="absolute right-0 top-0 bg-white flex justify-center items-center text-cyan-700--}}
+{{--                            rounded-full--}}
+{{--                text-xs w-4 h-4">--}}
+{{--                    {{count(Auth::user()->chat_message())}}--}}
+{{--                </span>--}}
+{{--                        @else--}}
+{{--                        @endif--}}
+{{--                        <x-icons.message class="w-6 h-6 text-white"/>--}}
+{{--                    </button>--}}
+{{--                    </a>--}}
 
                     <button type="button" class="bg-cyan-700 p-1 rounded-full text-cyan-100 hover:text-white
                     focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
