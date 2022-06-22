@@ -31,6 +31,7 @@ use App\Http\Controllers\Auth\UserProfileController;
     use App\Http\Controllers\Student\IssuesController;
     use App\Http\Controllers\VendorsController;
     use App\Models\Issue;
+    use App\Models\OnlineRegistration;
     use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -43,6 +44,10 @@ Route::impersonate();
 Route::redirect('/', '/login');
 
 Route::get('/wip',[HomeController::class,'wip']);
+
+Route::get('/online-register',function (){
+    return view('guest.online-registration');
+});
 
 Auth::routes(['register' => false]);
 

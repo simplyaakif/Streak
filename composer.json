@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.0.2",
+        "ext-curl": "*",
         "asantibanez/livewire-calendar": "^2.1",
         "bugsnag/bugsnag-laravel": "^2.21",
         "calebporzio/awesome-helpers": "^2.5",
@@ -16,6 +17,8 @@
         "doctrine/dbal": "^3.3",
         "dompdf/dompdf": "^1.0",
         "fideloper/proxy": "^4.4",
+        "filament/forms": "^2.0",
+        "filament/tables": "^2.0",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "imanghafoori/laravel-masterpass": "^2.0",
@@ -32,8 +35,7 @@
         "rappasoft/laravel-livewire-tables": "^1.20",
         "spatie/laravel-medialibrary": "^9.4",
         "staudenmeir/eloquent-has-many-deep": "^1.7",
-        "wire-elements/spotlight": "^1.0",
-      "ext-curl": "*"
+        "wire-elements/spotlight": "^1.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",
