@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('content'); ?>
     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.page-header','data' => []]); ?>
@@ -47,11 +45,11 @@
                 <div class="mt-2 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
                     <?php $__currentLoopData = $accounts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $account): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['label' => ''.e($account->title).'','stat' => ''.e($account->amount).' Rs','sublabel' => ''.e($account->account_number).'']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'recovery_show','label' => ''.e($account->title).'','stat' => ''.e($account->amount).' Rs','sublabel' => ''.e($account->account_number).'']]); ?>
 <?php $component->withName('common.stat-card'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes(['label' => ''.e($account->title).'','stat' => ''.e($account->amount).' Rs','sublabel' => ''.e($account->account_number).'']); ?>
+<?php $component->withAttributes(['can' => 'recovery_show','label' => ''.e($account->title).'','stat' => ''.e($account->amount).' Rs','sublabel' => ''.e($account->account_number).'']); ?>
                              <?php $__env->slot('icon', null, []); ?> 
                                 <?php if($account->type==='cash'): ?>
                                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>

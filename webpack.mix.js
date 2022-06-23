@@ -16,10 +16,16 @@ const tailwindcss = require('tailwindcss')
 //         require("tailwindcss")
 //     ]);
 
-mix.js('resources/js/app.js', 'public/js')
-mix.css('resources/css/student.css','public/css',{},[
-    tailwindcss('./tailwind-student.config.js')
-])
+mix.js('resources/js/filament.js', 'public/js')
+mix.postCss("resources/css/student.css", "public/css", [
+    tailwindcss('./tailwind-student.config.js'),
+]);
+
+// mix.css('resources/css/student.css','public/css',{},[
+//     tailwindcss('./tailwind-student.config.js')
+// ])
 
 
 mix.disableSuccessNotifications();
+mix.disableNotifications()
+

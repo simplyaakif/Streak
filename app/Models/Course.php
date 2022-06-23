@@ -54,6 +54,13 @@ class Course extends Model implements HasMedia
         return $this->hasMany(CourseVariation::class);
     }
 
+    public function onlineRegistrations()
+    {
+        return $this->belongsToMany(OnlineRegistration::class);
+    }
+
+
+
     public function registerMediaConversions(Media $media = null): void
     {
         $thumbnailWidth  = 50;

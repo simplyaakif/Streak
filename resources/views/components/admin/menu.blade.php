@@ -40,6 +40,12 @@
                 label="Create Query" route="{{route('admin.queries.create')}}"/>
         </x-admin.sidebar-dd-nav-item>
 
+        <x-admin.sidebar-nv-item
+{{--            can="online_registration_access"--}}
+            label="Online Registration" route="{{route('admin.online-registration.index')}}">
+            <x-icons.arrow-in-box class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
+        </x-admin.sidebar-nv-item>
+
         <x-admin.sidebar-dd-nav-item
             can="student_management_access"
             label="Student Management" route="{{route('admin.students.index')}}">

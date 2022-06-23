@@ -14,24 +14,24 @@
             <div>
                 <h2 class="text-lg leading-6 font-medium text-gray-900">Overview</h2>
                 <div class="mt-2 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
-                    <x-common.stat-card label="Daily Queries" stat="{{$dQuery}}">
+                    <x-common.stat-card can="query_show" label="Daily Queries" stat="{{$dQuery}}">
                         <x-slot name="icon">
                             <x-icons.user-comment class="w-6 h-6 text-gray-400"/>
                         </x-slot>
                     </x-common.stat-card>
-                    <x-common.stat-card label="Weekly Queries" stat="{{$wQuery}}">
-                        <x-slot name="icon">
-                            <x-icons.user-comment class="w-6 h-6 text-gray-400"/>
-
-                        </x-slot>
-                    </x-common.stat-card>
-                    <x-common.stat-card label="Montly Queries" stat="{{$mQuery}}">
+                    <x-common.stat-card can="query_show" label="Weekly Queries" stat="{{$wQuery}}">
                         <x-slot name="icon">
                             <x-icons.user-comment class="w-6 h-6 text-gray-400"/>
 
                         </x-slot>
                     </x-common.stat-card>
-                    <x-common.stat-card label="Last Month Queries" stat="{{$pMquery}}">
+                    <x-common.stat-card can="query_show" label="Montly Queries" stat="{{$mQuery}}">
+                        <x-slot name="icon">
+                            <x-icons.user-comment class="w-6 h-6 text-gray-400"/>
+
+                        </x-slot>
+                    </x-common.stat-card>
+                    <x-common.stat-card can="query_show" label="Last Month Queries" stat="{{$pMquery}}">
                         <x-slot name="icon">
                             <x-icons.user-comment class="w-6 h-6 text-gray-400"/>
 

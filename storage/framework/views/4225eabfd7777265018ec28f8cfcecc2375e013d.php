@@ -1,4 +1,4 @@
-<div class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
+<div <?php echo e($attributes); ?> class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
     <table class="min-w-full divide-y divide-cool-gray-200">
         <thead>
             <tr>

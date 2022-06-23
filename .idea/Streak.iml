@@ -172,6 +172,13 @@
       <excludeFolder url="file://$MODULE_DIR$/storage/framework" />
       <excludeFolder url="file://$MODULE_DIR$/storage/media-library" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/_laravel_idea" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/danharrin/date-format-converter" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/akaunting/laravel-money" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/filament/support" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/filament/tables" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/filament/forms" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/blade-ui-kit/blade-heroicons" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/blade-ui-kit/blade-icons" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
