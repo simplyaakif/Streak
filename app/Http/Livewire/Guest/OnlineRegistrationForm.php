@@ -37,10 +37,12 @@
                 TextInput::make('name')
                 ->required(),
                 TextInput::make('father_name')->label('Father Name')->required(),
+
                 MultiSelect::make('courses')
                     ->options(Course::pluck('title','id'))
                     ->helperText('Enter the course or courses you are applying for')
                     ->required(),
+
                 Select::make('country')
                     ->options([
                         'Pakistan',
