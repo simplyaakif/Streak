@@ -62,7 +62,7 @@
             $response = curl_exec($ch);
             curl_close($ch);
 
-            echo $response ;
+//            return $response ;
             app('log')->info(json_encode($response));
         }
     }

@@ -3501,6 +3501,9 @@ select{
 .w-52{
   width: 13rem;
 }
+.w-96{
+  width: 24rem;
+}
 .min-w-0{
   min-width: 0px;
 }
@@ -4349,6 +4352,9 @@ select{
 .p-3{
   padding: 0.75rem;
 }
+.p-20{
+  padding: 5rem;
+}
 .py-4{
   padding-top: 1rem;
   padding-bottom: 1rem;
@@ -4432,6 +4438,14 @@ select{
 .px-1\.5{
   padding-left: 0.375rem;
   padding-right: 0.375rem;
+}
+.py-20{
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+.px-20{
+  padding-left: 5rem;
+  padding-right: 5rem;
 }
 .pt-8{
   padding-top: 2rem;
