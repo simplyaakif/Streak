@@ -9,7 +9,7 @@
 
         public function index()
         {
-            //
+            return view('admin.online-registration.index');
         }
 
         public function create()

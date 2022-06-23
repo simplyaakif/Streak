@@ -26,6 +26,7 @@ use App\Http\Controllers\Auth\UserProfileController;
     use App\Http\Controllers\EmployeesController;
     use App\Http\Controllers\ExpensesController;
     use App\Http\Controllers\IncomesController;
+    use App\Http\Controllers\OnlineRegistrationsController;
     use App\Http\Controllers\RecoveriesController;
     use App\Http\Controllers\SmsController;
     use App\Http\Controllers\Student\IssuesController;
@@ -47,7 +48,7 @@ Route::get('/wip',[HomeController::class,'wip']);
 
 Route::get('/online-register',function (){
     return view('guest.online-registration');
-});
+})->name('online-register');
 
 Auth::routes(['register' => false]);
 
@@ -153,13 +154,17 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','st
 // Sms Hub
     Route::resource('sms',SmsController::class,['except' => ['store','update','destroy','create']]);
 
-
+//Online Registration
+    Route::resource('online-registration',OnlineRegistrationsController::class,
+                    ['except' => ['create']]);
 
 
 
     Route::get('stream/start-online-class/{batch}',[StreamingController::class,'startOnlineClass'])->name('stream.start-online-class');
     Route::get('stream/online-class/{batch}',[StreamingController::class,'index'])->name('stream.class');
     Route::get('stream/rtm-token',[StreamingController::class, 'rtm_token'])->name('stream.rtc-token');
+
+
 
 });
 
