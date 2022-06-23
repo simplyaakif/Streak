@@ -14,22 +14,22 @@
                             <h2 class="text-lg leading-6 font-medium text-gray-900">Overview</h2>
                             <div class="mt-2 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
                                 <!-- Card -->
-                                <x-common.stat-card label="Previous Pending" :stat="$previous">
+                                <x-common.stat-card can="query_show" label="Previous Pending" :stat="$previous">
                                     <x-slot name="icon">
                                         <x-icons.user-comment class="w-6 h-6 text-gray-400"/>
                                     </x-slot>
                                 </x-common.stat-card>
-                                <x-common.stat-card label="Today Follow Ups" :stat="$todays">
+                                <x-common.stat-card can="query_show" label="Today Follow Ups" :stat="$todays">
                                     <x-slot name="icon">
                                         <x-icons.user-comment class="w-6 h-6 text-gray-400"/>
                                     </x-slot>
                                 </x-common.stat-card>
-                                <x-common.stat-card label="Tomorrow Follow Ups" :stat="$tomorrows">
+                                <x-common.stat-card can="query_show" label="Tomorrow Follow Ups" :stat="$tomorrows">
                                     <x-slot name="icon">
                                         <x-icons.user-comment class="w-6 h-6 text-gray-400"/>
                                     </x-slot>
                                 </x-common.stat-card>
-                                <x-common.stat-card label="Future Follow Ups" :stat="$future">
+                                <x-common.stat-card can="query_show" label="Future Follow Ups" :stat="$future">
                                     <x-slot name="icon">
                                         <x-icons.user-comment class="w-6 h-6 text-gray-400"/>
                                     </x-slot>
