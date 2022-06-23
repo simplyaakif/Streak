@@ -8,23 +8,23 @@
         <div>
             <h2 class="text-lg leading-6 font-medium text-gray-900">Overview</h2>
             <div class="mt-2 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
-                <x-common.stat-card label="Daily Admissions" stat="{{$dStudent}}">
+                <x-common.stat-card can="student_show" label="Daily Admissions" stat="{{$dStudent}}">
                     <x-slot name="icon">
                         <x-icons.users class="w-6 h-6 text-gray-400"/>
                     </x-slot>
                 </x-common.stat-card>
-                <x-common.stat-card label="Weekly Admission" stat="{{$wStudent}}">
+                <x-common.stat-card can="student_show" label="Weekly Admission" stat="{{$wStudent}}">
                     <x-slot name="icon">
                         <x-icons.users class="w-6 h-6 text-gray-400"/>
                     </x-slot>
                 </x-common.stat-card>
-                <x-common.stat-card label="Montly Admissions" stat="{{$mStudent}}">
+                <x-common.stat-card can="student_show" label="Montly Admissions" stat="{{$mStudent}}">
                     <x-slot name="icon">
                         <x-icons.users class="w-6 h-6 text-gray-400"/>
 
                     </x-slot>
                 </x-common.stat-card>
-                <x-common.stat-card label="Last Month Admissions" stat="{{$pMstudent}}">
+                <x-common.stat-card can="student_show" label="Last Month Admissions" stat="{{$pMstudent}}">
                     <x-slot name="icon">
                         <x-icons.users class="w-6 h-6 text-gray-400"/>
 

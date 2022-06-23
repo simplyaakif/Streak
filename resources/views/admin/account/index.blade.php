@@ -20,7 +20,9 @@
                 <h2 class="text-lg leading-6 font-medium text-gray-900">Overview</h2>
                 <div class="mt-2 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
                     @foreach($accounts as $account)
-                        <x-common.stat-card label="{{$account->title}}" stat="{{$account->amount}} Rs"
+                        <x-common.stat-card
+                            can="recovery_show"
+                            label="{{$account->title}}" stat="{{$account->amount}} Rs"
                                             sublabel="{{$account->account_number}}">
                             <x-slot name="icon">
                                 @if($account->type==='cash')

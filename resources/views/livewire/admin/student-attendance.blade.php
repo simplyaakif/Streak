@@ -65,13 +65,13 @@
     </div>
 
     <form wire:submit.prevent="submit">
-        <x-modal.dialog maxWidth="3xl" wire:model="showModal">
+        <x-modal.dialog  maxWidth="3xl" wire:model="showModal">
             <x-slot name="title">
                 <span class="text-cyan-700 font-medium">{{$batch->title}}</span>
                 <span class="text-base text-gray-400">Student Attendance</span>
             </x-slot>
             <x-slot name="content">
-                <x-common.table>
+                <x-common.table style="max-height: 400px;overflow: auto">
                     <x-slot name="head">
                         <x-common.table.heading>Sr #</x-common.table.heading>
                         <x-common.table.heading>Name</x-common.table.heading>
@@ -99,6 +99,7 @@
                                 <x-common.table.cell>{{now()->format('d-m-Y')}}</x-common.table.cell>
                             </x-common.table.row>
                         @endforeach
+
                     </x-slot>
                 </x-common.table>
             </x-slot>
