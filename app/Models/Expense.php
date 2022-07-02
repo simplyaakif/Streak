@@ -10,6 +10,9 @@
 
         use HasFactory;
         protected $guarded = [];
+        protected $casts=[
+            'is_paid'=>'boolean',
+        ];
         public const types
             = [
                 '0' => 'Rent',
@@ -54,8 +57,11 @@
             return $this->due_date? Carbon::parse($this->due_date)->format('d-M-Y'):null;
         }
 
-//        public function getPaidByHumanAttribute()
-//        {
-//            return $this->paid_by? Carbon::parse($this->paid_by)->format('d-M-Y'):null;
-//        }
+        public function user()
+        {
+            return $this->belongsTo(User::class,'paid_by');
+        }
+
+
+
     }

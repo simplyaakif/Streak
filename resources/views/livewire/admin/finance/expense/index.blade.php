@@ -99,32 +99,35 @@
     </div>
 
     {{--    Table--}}
-    <x-common.table>
-        <x-slot name="head">
-            <x-common.table.heading>#</x-common.table.heading>
-            <x-common.table.heading>Vendor</x-common.table.heading>
-            <x-common.table.heading>Amount</x-common.table.heading>
-            <x-common.table.heading>Is Paid?</x-common.table.heading>
-            <x-common.table.heading>Due Date</x-common.table.heading>
-            <x-common.table.heading>Paid On</x-common.table.heading>
-            <x-common.table.heading>Paid To</x-common.table.heading>
-            <x-common.table.heading>Paid By</x-common.table.heading>
-            <x-common.table.heading>Actions</x-common.table.heading>
-        </x-slot>
-        <x-slot name="body">
-            @forelse($expenses as $expense)
-                <x-common.table.row wire:loading.class.delay="opacity-50">
-                    <x-common.table.cell>{{$expenses->firstItem() + $loop->index}}</x-common.table.cell>
+    <div>
+        {{ $this->table }}
+    </div>
+{{--    <x-common.table>--}}
+{{--        <x-slot name="head">--}}
+{{--            <x-common.table.heading>#</x-common.table.heading>--}}
+{{--            <x-common.table.heading>Vendor</x-common.table.heading>--}}
+{{--            <x-common.table.heading>Amount</x-common.table.heading>--}}
+{{--            <x-common.table.heading>Is Paid?</x-common.table.heading>--}}
+{{--            <x-common.table.heading>Due Date</x-common.table.heading>--}}
+{{--            <x-common.table.heading>Paid On</x-common.table.heading>--}}
+{{--            <x-common.table.heading>Paid To</x-common.table.heading>--}}
+{{--            <x-common.table.heading>Paid By</x-common.table.heading>--}}
+{{--            <x-common.table.heading>Actions</x-common.table.heading>--}}
+{{--        </x-slot>--}}
+{{--        <x-slot name="body">--}}
+{{--            @forelse($expenses as $expense)--}}
+{{--                <x-common.table.row wire:loading.class.delay="opacity-50">--}}
+{{--                    <x-common.table.cell>{{$expenses->firstItem() + $loop->index}}</x-common.table.cell>--}}
 
-                    <x-common.table.cell>{{$expense->vendor->name}}</x-common.table.cell>
-                    <x-common.table.cell>{{$expense->amount}} Rs</x-common.table.cell>
-                    <x-common.table.cell>{{$expense->is_paid_human}}</x-common.table.cell>
-                    <x-common.table.cell>{{$expense->due_date_human}}</x-common.table.cell>
-                    <x-common.table.cell>{{$expense->paid_on_human}}</x-common.table.cell>
-                    <x-common.table.cell>{{$expense->paid_to}}</x-common.table.cell>
-                    <x-common.table.cell>{{$expense->paid_by}}</x-common.table.cell>
-                    <x-common.table.cell>
-                        <div class="flex space-x-2 items-center">
+{{--                    <x-common.table.cell>{{$expense->vendor->name}}</x-common.table.cell>--}}
+{{--                    <x-common.table.cell>{{$expense->amount}} Rs</x-common.table.cell>--}}
+{{--                    <x-common.table.cell>{{$expense->is_paid_human}}</x-common.table.cell>--}}
+{{--                    <x-common.table.cell>{{$expense->due_date_human}}</x-common.table.cell>--}}
+{{--                    <x-common.table.cell>{{$expense->paid_on_human}}</x-common.table.cell>--}}
+{{--                    <x-common.table.cell>{{$expense->paid_to}}</x-common.table.cell>--}}
+{{--                    <x-common.table.cell>{{$expense->paid_by}}</x-common.table.cell>--}}
+{{--                    <x-common.table.cell>--}}
+{{--                        <div class="flex space-x-2 items-center">--}}
 {{--                            @can('expense_show')--}}
 {{--                                <a href="{{route('admin.queries.show',$expense->id)}}">--}}
 {{--                                    <x-icons.eye class="w-6 h-6  text-cyan-700"/>--}}
@@ -137,26 +140,26 @@
 {{--                                </a>--}}
 {{--                            @endcan--}}
 
-                            @can('expense_delete')
-                                <a href="#" wire:click.prevent="delete({{$expense->id}})">
-                                    <x-icons.trash class="w-5 h-5  text-red-700"/>
-                                </a>
-                            @endcan
-                        </div>
-                    </x-common.table.cell>
-                </x-common.table.row>
-            @empty
-                <x-common.table.row wire:loading.class.delay="opacity-50">
-                    <x-common.table.cell colspan="9">
-                        <div class="py-10 flex justify-center items-center text-gray-300 text-xl">
-                            No Expense Found...
-                        </div>
-                    </x-common.table.cell>
-                </x-common.table.row>
-            @endforelse
-        </x-slot>
-    </x-common.table>
+{{--                            @can('expense_delete')--}}
+{{--                                <a href="#" wire:click.prevent="delete({{$expense->id}})">--}}
+{{--                                    <x-icons.trash class="w-5 h-5  text-red-700"/>--}}
+{{--                                </a>--}}
+{{--                            @endcan--}}
+{{--                        </div>--}}
+{{--                    </x-common.table.cell>--}}
+{{--                </x-common.table.row>--}}
+{{--            @empty--}}
+{{--                <x-common.table.row wire:loading.class.delay="opacity-50">--}}
+{{--                    <x-common.table.cell colspan="9">--}}
+{{--                        <div class="py-10 flex justify-center items-center text-gray-300 text-xl">--}}
+{{--                            No Expense Found...--}}
+{{--                        </div>--}}
+{{--                    </x-common.table.cell>--}}
+{{--                </x-common.table.row>--}}
+{{--            @endforelse--}}
+{{--        </x-slot>--}}
+{{--    </x-common.table>--}}
     <div>
-        {{$expenses->links()}}
+{{--        {{$expenses->links()}}--}}
     </div>
 </div>
