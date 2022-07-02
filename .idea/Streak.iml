@@ -179,6 +179,9 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/filament/forms" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/blade-ui-kit/blade-heroicons" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/blade-ui-kit/blade-icons" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/webbingbrasil/filament-advancedfilter" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/filament/filament" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/danharrin/livewire-rate-limiting" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -21,7 +21,7 @@
                 'type' => Expense::types[$this->faker->numberBetween(0,5)],
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
-                'paid_on' => $this->faker->dateTimeBetween('-10 months','now'),
+                'due_date' => $this->faker->dateTimeBetween('-10 months','now'),
             ];
         }
     }

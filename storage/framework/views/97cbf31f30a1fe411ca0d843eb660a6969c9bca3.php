@@ -20,7 +20,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;700&display=swap" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     <script src="<?php echo e(asset('js/components.js')); ?>"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -32,6 +32,9 @@
     <?php echo \Livewire\Livewire::styles(); ?>
 
     <?php echo $__env->yieldPushContent('styles'); ?>
+    <?php echo \Livewire\Livewire::scripts(); ?>
+
+    <script src="<?php echo e(mix('js/filament.js')); ?>" defer></script>
 </head>
 
 <body class="text-blueGray-800 antialiased">
@@ -105,20 +108,19 @@
 </form>
 <script type="text/javascript" src="<?php echo e(asset('js/app.js')); ?>"></script>
 <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
-<?php echo \Livewire\Livewire::scripts(); ?>
 
 <?php
 if (! isset($_instance)) {
     $html = \Livewire\Livewire::mount('livewire-ui-spotlight')->html();
-} elseif ($_instance->childHasBeenRendered('GWA3k4O')) {
-    $componentId = $_instance->getRenderedChildComponentId('GWA3k4O');
-    $componentTag = $_instance->getRenderedChildComponentTagName('GWA3k4O');
+} elseif ($_instance->childHasBeenRendered('qCGFdCu')) {
+    $componentId = $_instance->getRenderedChildComponentId('qCGFdCu');
+    $componentTag = $_instance->getRenderedChildComponentTagName('qCGFdCu');
     $html = \Livewire\Livewire::dummyMount($componentId, $componentTag);
-    $_instance->preserveRenderedChild('GWA3k4O');
+    $_instance->preserveRenderedChild('qCGFdCu');
 } else {
     $response = \Livewire\Livewire::mount('livewire-ui-spotlight');
     $html = $response->html();
-    $_instance->logRenderedChild('GWA3k4O', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
+    $_instance->logRenderedChild('qCGFdCu', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
 }
 echo $html;
 ?>
