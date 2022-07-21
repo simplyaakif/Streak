@@ -3,6 +3,7 @@
   <component name="LaravelIdeaPersonalSettings">
     <option name="generationStringOptionValues">
       <map>
+        <entry key="createDatabaseMigration.create" value="" />
         <entry key="createEvent.private" value="" />
         <entry key="createEvent.shouldBroadcast" value="1" />
         <entry key="createFeatureTest.refreshDatabase" value="1" />

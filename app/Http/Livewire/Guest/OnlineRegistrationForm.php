@@ -3,6 +3,7 @@
     namespace App\Http\Livewire\Guest;
 
     use App\Channels\SmsChannel;
+    use App\Models\Campus;
     use App\Models\Course;
     use App\Models\OnlineRegistration;
     use Filament\Forms\Components\FileUpload;
@@ -41,6 +42,16 @@
                 MultiSelect::make('courses')
                     ->options(Course::pluck('title','id'))
                     ->helperText('Enter the course or courses you are applying for')
+                    ->required(),
+
+                Select::make('campus')
+                    ->options(Campus::pluck('name','id'))
+                    ->helperText('Enter the campus you are applying for')
+                    ->required(),
+
+                Select::make('mode_of_learning')
+                    ->options(['In Campus','Online'])
+                    ->helperText('Enter the learning type you are applying for')
                     ->required(),
 
                 Select::make('country')
