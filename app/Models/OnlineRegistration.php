@@ -7,10 +7,17 @@
 
     class OnlineRegistration extends Model {
         use HasFactory;
-        protected $fillable = ['name','father_name','pak_cnic','pakistan_mobile','whatsapp_mobile','passport_number','address','email'];
+//        protected $guarded=[];
+        protected $fillable = ['name','father_name','pak_cnic','pakistan_mobile','whatsapp_mobile','passport_number','address','email','mode_of_learning','campus_id'];
 
         public function courses()
         {
             return $this->belongsToMany(Course::class);
         }
+
+        public function campus()
+        {
+            return $this->belongsTo(Campus::class);
+        }
+
     }
