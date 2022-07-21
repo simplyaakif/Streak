@@ -31,6 +31,9 @@
         public $pak_cnic;
 
 
+        public $mode_of_learning;
+        public $campus_id;
+
 
         function getFormSchema(): array
         {
@@ -44,13 +47,17 @@
                     ->helperText('Enter the course or courses you are applying for')
                     ->required(),
 
-                Select::make('campus')
+                Select::make('campus_id')
+                    ->label('Campus')
                     ->options(Campus::pluck('name','id'))
                     ->helperText('Enter the campus you are applying for')
                     ->required(),
 
                 Select::make('mode_of_learning')
-                    ->options(['In Campus','Online'])
+                    ->options([
+                        'In Campus'=>'In Campus',
+                        'Online'=>'Online'
+                              ])
                     ->helperText('Enter the learning type you are applying for')
                     ->required(),
 
@@ -84,8 +91,8 @@
 
         public function register():void
         {
+//            dd($this->form->getState());
             $registration = OnlineRegistration::create($this->form->getState());
-//            dd($this->form->getState()['pakistan_mobile']);
             $registration->courses()->attach($this->form->getState()['courses']);
 //            $this->form->model($registration)->saveRelationships();
 
