@@ -14,6 +14,11 @@
             return $this->belongsTo(Student::class);
         }
 
+        public function getCarbonPaidOnAttribute()
+        {
+            return $this->attributes['paid_on'] ? Carbon::parse($this->attributes['paid_on']) : null;
+        }
+
         public function course()
         {
             return $this->belongsTo(Course::class);

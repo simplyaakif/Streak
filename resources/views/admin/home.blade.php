@@ -186,35 +186,42 @@
                 Recent activity
             </h2>
             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-2">
+                <div class="grid grid-cols-1 md:grid-cols-6 gap-5 mt-2">
                     @can('query_show')
-                        <div class="bg-white p-4 rounded-lg">
+                        <div class="bg-white p-4 rounded-lg col-span-2">
                             <div>
                                 {!! $chart1->renderHtml() !!}
                             </div>
                         </div>
                     @endcan
                     @can('student_show')
-                        <div class="bg-white p-4 rounded-lg">
+                        <div class="bg-white p-4 rounded-lg col-span-2">
                             <div>
                                 {!! $chart2->renderHtml() !!}
                             </div>
                         </div>
                     @endcan
                     @can('expense_show')
-                        <div class="bg-white p-4 rounded-lg">
+                        <div class="bg-white p-4 rounded-lg col-span-2">
                             <div>
                                 {!! $chart3->renderHtml() !!}
                             </div>
                         </div>
                     @endcan
-                    {{--                    @can('recovery_show')--}}
-                    {{--                        <div class="bg-white p-4 rounded-lg">--}}
-                    {{--                            <div>--}}
-                    {{--                                {!! $chart4->renderHtml() !!}--}}
-                    {{--                            </div>--}}
-                    {{--                        </div>--}}
-                    {{--                    @endcan--}}
+                    @can('recovery_show')
+                        <div class="bg-white p-4 rounded-lg col-span-3">
+                            <div>
+                                {!! $chart4->renderHtml() !!}
+                            </div>
+                        </div>
+                    @endcan
+                    @can('view_monthly_sale')
+                        <div class="bg-white p-4 rounded-lg col-span-3">
+                            <div>
+                                {!! $chart5->renderHtml() !!}
+                            </div>
+                        </div>
+                    @endcan
                 </div>
             </div>
 
@@ -222,7 +229,8 @@
             {!! $chart1->renderJs() !!}
             {!! $chart2->renderJs() !!}
             {!! $chart3->renderJs() !!}
-            {{--            {!! $chart4->renderJs() !!}--}}
+            {!! $chart4->renderJs() !!}
+            {!! $chart5->renderJs() !!}
 
             <div class="max-w-6xl mt-8 mx-auto px-4 sm:px-6 lg:px-8">
 
