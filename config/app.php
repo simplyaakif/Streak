@@ -167,6 +167,7 @@ return [
          */
          Barryvdh\Debugbar\ServiceProvider::class,
         Lab404\Impersonate\ImpersonateServiceProvider::class,
+        Asantibanez\LivewireCalendar\LivewireCalendarServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -229,6 +230,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
 
+        "LivewireCalendar" => Asantibanez\LivewireCalendar\LivewireCalendarFacade::class,
 
     ],
 
