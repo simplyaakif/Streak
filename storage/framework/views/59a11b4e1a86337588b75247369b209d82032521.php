@@ -1,4 +1,3 @@
-
 <?php $__env->startSection('content'); ?>
     <main class="flex-1 relative pb-8 z-0 overflow-y-auto">
         <!-- Page header -->
@@ -368,9 +367,9 @@
                 Recent activity
             </h2>
             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-2">
+                <div class="grid grid-cols-1 md:grid-cols-6 gap-5 mt-2">
                     <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('query_show')): ?>
-                        <div class="bg-white p-4 rounded-lg">
+                        <div class="bg-white p-4 rounded-lg col-span-2">
                             <div>
                                 <?php echo $chart1->renderHtml(); ?>
 
@@ -378,7 +377,7 @@
                         </div>
                     <?php endif; ?>
                     <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('student_show')): ?>
-                        <div class="bg-white p-4 rounded-lg">
+                        <div class="bg-white p-4 rounded-lg col-span-2">
                             <div>
                                 <?php echo $chart2->renderHtml(); ?>
 
@@ -386,20 +385,29 @@
                         </div>
                     <?php endif; ?>
                     <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('expense_show')): ?>
-                        <div class="bg-white p-4 rounded-lg">
+                        <div class="bg-white p-4 rounded-lg col-span-2">
                             <div>
                                 <?php echo $chart3->renderHtml(); ?>
 
                             </div>
                         </div>
                     <?php endif; ?>
-                    
-                    
-                    
-                    
-                    
-                    
-                    
+                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('recovery_show')): ?>
+                        <div class="bg-white p-4 rounded-lg col-span-3">
+                            <div>
+                                <?php echo $chart4->renderHtml(); ?>
+
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('view_monthly_sale')): ?>
+                        <div class="bg-white p-4 rounded-lg col-span-3">
+                            <div>
+                                <?php echo $chart5->renderHtml(); ?>
+
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -411,7 +419,10 @@
 
             <?php echo $chart3->renderJs(); ?>
 
-            
+            <?php echo $chart4->renderJs(); ?>
+
+            <?php echo $chart5->renderJs(); ?>
+
 
             <div class="max-w-6xl mt-8 mx-auto px-4 sm:px-6 lg:px-8">
 

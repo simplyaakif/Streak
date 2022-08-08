@@ -18,5 +18,6 @@
         <option name="modelsDatabaseMetaSource" value="migrations" />
       </LaravelHelperCodeSettings>
     </option>
+    <option name="lastContentRoot" value="$PROJECT_DIR$" />
   </component>
 </project>

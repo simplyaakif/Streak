@@ -8,7 +8,6 @@
     use App\Models\Student;
     use App\Models\Task;
     use LaravelDaily\LaravelCharts\Classes\LaravelChart;
-    use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 
     class HomeController {
 
@@ -48,60 +47,91 @@
 
 
             $query_chart_options = [
-                'chart_title' => 'Query by Day',
+                'chart_title' => 'Daily Query',
                 'report_type' => 'group_by_date',
                 'model' => 'App\Models\Query',
                 'group_by_field' => 'created_at',
                 'group_by_period' => 'day',
-                'chart_type' => 'bar',
-                'chart_color'=>'0,200,200'
+                'chart_type' => 'line',
+                'chart_color'=>'0,200,200',
+                'filter_field'=>'created_at',
+                'filter_period' => 'month', // show only transactions for last 30 days
             ];
 
             $admission_chart_options = [
-                'chart_title' => 'Student by Day',
+                'chart_title' => 'Daily Admission',
                 'report_type' => 'group_by_date',
                 'model' => 'App\Models\Student',
                 'group_by_field' => 'created_at',
                 'group_by_period' => 'day',
-                'chart_type' => 'bar',
-                'chart_color'=>'0,200,0'
+                'chart_type' => 'line',
+                'chart_color'=>'0,200,0',
+                'filter_field'=>'created_at',
+                'filter_period' => 'month', // show only transactions for last 30 days
             ];
 
             $expense_chart_options = [
-                'chart_title' => 'Expense by Day',
+                'chart_title' => 'Daily Expense',
                 'report_type' => 'group_by_date',
                 'model' => 'App\Models\Expense',
                 'group_by_field' => 'created_at',
                 'group_by_period' => 'day',
-                'chart_type' => 'bar',
-                'chart_color'=>'200,0,0'
+                'chart_type' => 'line',
+                'chart_color'=>'200,0,0',
+                'filter_field'=>'created_at',
+                'filter_period' => 'month', // show only transactions for last 30 days
             ];
 
             $sale_chart_options = [
-                'chart_title' => 'Sale by Day',
+                'chart_title' => 'Daily Sale',
                 'report_type' => 'group_by_date',
                 'model' => 'App\Models\Recovery',
-                'group_by_field' => 'created_at',
+                'group_by_field' => 'carbon_paid_on',
+                'group_by_period' => 'day',
                 'aggregate_function' => 'sum',
                 'aggregate_field' => 'amount',
                 'where_raw'=>'is_paid=1',
-                'group_by_period' => 'day',
-                'chart_type' => 'bar',
-                'chart_color'=>'0,255,0'
+                'chart_type' => 'line',
+                'chart_color'=>'0,0,0',
+                'date_format'=>'d-M-Y',
+
+                'filter_field'=>'paid_on',
+                'filter_period' => 'month', // show only transactions for last 30 days
+            ];
+
+            $year_sale_chart_options = [
+                'chart_title' => 'Monthly Sale',
+                'report_type' => 'group_by_date',
+                'model' => 'App\Models\Recovery',
+                'group_by_field' => 'carbon_paid_on',
+                'group_by_period' => 'month',
+
+                'aggregate_function' => 'sum',
+                'aggregate_field' => 'amount',
+                'where_raw'=>'is_paid=1',
+
+                'chart_type' => 'line',
+                'chart_color'=>'0,255,0',
+                'date_format'=>'M-Y',
+
+                'filter_field' => 'paid_on', // show only transactions for last 30 days
+                'filter_period' => 'year', // show only transactions for this week
             ];
 
             $chart1 = new LaravelChart($query_chart_options);
             $chart2 = new LaravelChart($admission_chart_options);
             $chart3 = new LaravelChart($expense_chart_options);
             $chart4 = new LaravelChart($sale_chart_options);
-//            dd('workign');
+            $chart5 = new LaravelChart($year_sale_chart_options);
+
+//            dd($chart4);
 
             return view('admin.home', compact([
                                                   'dQuery','dStudent',
                                                   'mQuery','mStudent',
                                                   'dExpense','mExpense',
                                                   'dSale','mSale',
-                                                  'chart1','chart2','chart3','chart4',
+                                                  'chart1','chart2','chart3','chart4','chart5',
                                                   'rAdmissions','rQueries','rExpenses',
                                                   'user_tasks'
                                               ]));

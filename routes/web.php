@@ -50,6 +50,10 @@ Route::get('/online-register',function (){
     return view('guest.online-registration');
 })->name('online-register');
 
+Route::get('/online-information',function (){
+    return view('guest.online-information');
+})->name('online-information');
+
 Auth::routes(['register' => false]);
 
 
