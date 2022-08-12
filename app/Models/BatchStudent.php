@@ -8,7 +8,7 @@
     class BatchStudent extends Model {
 
         protected $table = 'batch_student';
-        const STATUS = [
+        public const STATUS = [
             0=>'Cancelled',
             1=>'Active',
             2=>'Completed',
@@ -24,6 +24,14 @@
         {
             return $this->belongsTo(Batch::class);
         }
+
+        public function recoveries()
+        {
+            return $this->belongsToMany(Recovery::class);
+        }
+
+
+
 
         public function course()
         {

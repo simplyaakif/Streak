@@ -1,3 +1,4 @@
+
 <?php $__env->startSection('content'); ?>
     <main class="flex-1 relative pb-8 z-0 overflow-y-auto">
         <!-- Page header -->
@@ -109,10 +110,13 @@
                                                 onclick = "if (! confirm('Did you Actually Completed?')) { return false; }"
                                                    href="<?php echo e(route('admin.task_done',$task->id)); ?>">
                                                 <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.add','data' => ['class' => 'w-6 h-6']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.add','data' => ['class' => 'w-6 h-6']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('icons.add'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['class' => 'w-6 h-6']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -149,17 +153,23 @@
                 <div class="mt-2 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
                     <!-- Card -->
                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_daily_queries','label' => 'Daily Queries','stat' => ''.e($dQuery).'']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_daily_queries','label' => 'Daily Queries','stat' => ''.e($dQuery).'']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('common.stat-card'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['can' => 'view_daily_queries','label' => 'Daily Queries','stat' => ''.e($dQuery).'']); ?>
                          <?php $__env->slot('icon', null, []); ?> 
                             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.user-comment','data' => ['class' => 'w-6 h-6 text-gray-400']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.user-comment','data' => ['class' => 'w-6 h-6 text-gray-400']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('icons.user-comment'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['class' => 'w-6 h-6 text-gray-400']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -176,17 +186,23 @@
 <?php endif; ?>
 
                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_daily_admission','label' => 'New Daily Admission','stat' => ''.e($dStudent).'']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_daily_admission','label' => 'New Daily Admission','stat' => ''.e($dStudent).'']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('common.stat-card'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['can' => 'view_daily_admission','label' => 'New Daily Admission','stat' => ''.e($dStudent).'']); ?>
                          <?php $__env->slot('icon', null, []); ?> 
                             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.todo-list','data' => ['class' => 'w-6 h-6 text-gray-400']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.todo-list','data' => ['class' => 'w-6 h-6 text-gray-400']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('icons.todo-list'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['class' => 'w-6 h-6 text-gray-400']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -203,17 +219,23 @@
 <?php endif; ?>
 
                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_daily_expenses','label' => 'Daily Expense','stat' => ''.e($dExpense).' Rs']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_daily_expenses','label' => 'Daily Expense','stat' => ''.e($dExpense).' Rs']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('common.stat-card'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['can' => 'view_daily_expenses','label' => 'Daily Expense','stat' => ''.e($dExpense).' Rs']); ?>
                          <?php $__env->slot('icon', null, []); ?> 
                             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.invoice','data' => ['class' => 'w-6 h-6 text-gray-400']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.invoice','data' => ['class' => 'w-6 h-6 text-gray-400']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('icons.invoice'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['class' => 'w-6 h-6 text-gray-400']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -229,17 +251,23 @@
 <?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
 <?php endif; ?>
                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_daily_sale','label' => 'Daily Sale','stat' => ''.e($dSale).' Rs']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_daily_sale','label' => 'Daily Sale','stat' => ''.e($dSale).' Rs']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('common.stat-card'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['can' => 'view_daily_sale','label' => 'Daily Sale','stat' => ''.e($dSale).' Rs']); ?>
                          <?php $__env->slot('icon', null, []); ?> 
                             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.money-check','data' => ['class' => 'w-6 h-6 text-gray-400']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.money-check','data' => ['class' => 'w-6 h-6 text-gray-400']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('icons.money-check'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['class' => 'w-6 h-6 text-gray-400']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -256,17 +284,23 @@
 <?php endif; ?>
 
                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_monthly_queries','label' => 'Monthly Queries','stat' => ''.e($mQuery).'']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_monthly_queries','label' => 'Monthly Queries','stat' => ''.e($mQuery).'']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('common.stat-card'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['can' => 'view_monthly_queries','label' => 'Monthly Queries','stat' => ''.e($mQuery).'']); ?>
                          <?php $__env->slot('icon', null, []); ?> 
                             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.user-comment','data' => ['class' => 'w-6 h-6 text-gray-400']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.user-comment','data' => ['class' => 'w-6 h-6 text-gray-400']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('icons.user-comment'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['class' => 'w-6 h-6 text-gray-400']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -283,17 +317,23 @@
 <?php endif; ?>
 
                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_monthly_admission','label' => 'Monthly Admission','stat' => ''.e($mStudent).'']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_monthly_admission','label' => 'Monthly Admission','stat' => ''.e($mStudent).'']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('common.stat-card'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['can' => 'view_monthly_admission','label' => 'Monthly Admission','stat' => ''.e($mStudent).'']); ?>
                          <?php $__env->slot('icon', null, []); ?> 
                             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.todo-list','data' => ['class' => 'w-6 h-6 text-gray-400']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.todo-list','data' => ['class' => 'w-6 h-6 text-gray-400']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('icons.todo-list'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['class' => 'w-6 h-6 text-gray-400']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -309,17 +349,23 @@
 <?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
 <?php endif; ?>
                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_monthly_expenses','label' => 'Monthly Expenses','stat' => ''.e($mExpense).' Rs']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_monthly_expenses','label' => 'Monthly Expenses','stat' => ''.e($mExpense).' Rs']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('common.stat-card'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['can' => 'view_monthly_expenses','label' => 'Monthly Expenses','stat' => ''.e($mExpense).' Rs']); ?>
                          <?php $__env->slot('icon', null, []); ?> 
                             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.invoice','data' => ['class' => 'w-6 h-6 text-gray-400']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.invoice','data' => ['class' => 'w-6 h-6 text-gray-400']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('icons.invoice'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['class' => 'w-6 h-6 text-gray-400']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -335,17 +381,23 @@
 <?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
 <?php endif; ?>
                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_monthly_sale','label' => 'Monthly Sale','stat' => $mSale]]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.common.stat-card','data' => ['can' => 'view_monthly_sale','label' => 'Monthly Sale','stat' => $mSale]] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('common.stat-card'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['can' => 'view_monthly_sale','label' => 'Monthly Sale','stat' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($mSale)]); ?>
                          <?php $__env->slot('icon', null, []); ?> 
                             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.money-check','data' => ['class' => 'w-6 h-6 text-gray-400']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.money-check','data' => ['class' => 'w-6 h-6 text-gray-400']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('icons.money-check'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['class' => 'w-6 h-6 text-gray-400']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -444,10 +496,13 @@
                     <span class="flex items-center space-x-4">
                       <span class="flex-1 flex space-x-2 truncate">
                           <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.user-comment','data' => ['class' => 'flex-shrink-0 h-5 w-5 text-gray-400']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.user-comment','data' => ['class' => 'flex-shrink-0 h-5 w-5 text-gray-400']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('icons.user-comment'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['class' => 'flex-shrink-0 h-5 w-5 text-gray-400']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -557,10 +612,13 @@
                     <span class="flex items-center space-x-4">
                       <span class="flex-1 flex space-x-2 truncate">
                           <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.user-comment','data' => ['class' => 'flex-shrink-0 h-5 w-5 text-gray-400']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.user-comment','data' => ['class' => 'flex-shrink-0 h-5 w-5 text-gray-400']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('icons.user-comment'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['class' => 'flex-shrink-0 h-5 w-5 text-gray-400']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -674,10 +732,13 @@
                     <span class="flex items-center space-x-4">
                       <span class="flex-1 flex space-x-2 truncate">
                           <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.user-comment','data' => ['class' => 'flex-shrink-0 h-5 w-5 text-gray-400']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.user-comment','data' => ['class' => 'flex-shrink-0 h-5 w-5 text-gray-400']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('icons.user-comment'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
 <?php $component->withAttributes(['class' => 'flex-shrink-0 h-5 w-5 text-gray-400']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>

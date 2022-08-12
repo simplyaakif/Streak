@@ -2,45 +2,8 @@
     <div class="mb-4">
         <x-button.primary wire:click="$set('showModal',true)">Create Employee</x-button.primary>
     </div>
-    <x-common.table>
-        <x-slot name="head">
-            <x-common.table.heading>Sr #</x-common.table.heading>
-            <x-common.table.heading>Dp</x-common.table.heading>
-            <x-common.table.heading>Name</x-common.table.heading>
-            <x-common.table.heading>Gender</x-common.table.heading>
-            <x-common.table.heading>Designation</x-common.table.heading>
-            <x-common.table.heading>Actions</x-common.table.heading>
-        </x-slot>
-        <x-slot name="body">
-            @forelse($employees as $employee)
-                <x-common.table.row>
-                    <x-common.table.cell>{{$loop->iteration}}</x-common.table.cell>
-                    <x-common.table.cell>
+    {{$this->table}}
 
-                    </x-common.table.cell>
-                    <x-common.table.cell>
-                        {{$employee->name}} <br>
-                        <small class="text-gray-400">
-                            {{$employee->father_name}}
-                        </small>
-                    </x-common.table.cell>
-                    <x-common.table.cell>{{ucfirst($employee->gender)}}</x-common.table.cell>
-                    <x-common.table.cell>{{$employee->designation}}</x-common.table.cell>
-                    <x-common.table.cell>
-
-                    </x-common.table.cell>
-                </x-common.table.row>
-            @empty
-                <x-common.table.row>
-                    <x-common.table.cell colspan=""> No data found</x-common.table.cell>
-                </x-common.table.row>
-            @endforelse
-        </x-slot>
-    </x-common.table>
-
-    <div class="mt-2">
-        {{$employees->links()}}
-    </div>
 
     <div>
         <form wire:submit.prevent="submit">

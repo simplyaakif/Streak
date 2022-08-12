@@ -25,7 +25,7 @@
                                 <div>
                                 <span class="bg-cyan-600 text-white rounded-full text-base flex justify-center
                                 items-center w-8 h-8">
-                                {{count($batch->students)}}
+                                {{count($batch->activeStudents)}}
                                 </span>
 
                                 </div>

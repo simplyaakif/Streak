@@ -36,13 +36,13 @@ class StudentController extends Controller
 
     public function classrooms()
     {
-        $batches = Batch::with('students')->get();
+        $batches = Batch::with('activeStudents')->get();
         return view('admin.student.classrooms',compact('batches'));
     }
 
     public function classroom(Batch $batch)
     {
-        $batch->load('students');
+        $batch->load('activeStudents');
         return view('admin.student.classroom',compact('batch'));
     }
 

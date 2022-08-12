@@ -169,6 +169,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','st
     Route::get('stream/rtm-token',[StreamingController::class, 'rtm_token'])->name('stream.rtc-token');
 
 
+    Route::get('useful-links',function (){
+    return view('admin.links.useful');
+    })->name('useful-links');
+
 
 });
 

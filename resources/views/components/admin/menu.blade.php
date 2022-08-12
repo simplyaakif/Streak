@@ -191,6 +191,10 @@
             <x-admin.sidebar-dd-nav-subitem label="Sms Center" :route="route('admin.sms.index')"/>
         </x-admin.sidebar-dd-nav-item>
 
+        <x-admin.sidebar-nv-item
+            label="Useful Links" route="{{route('admin.useful-links')}}">
+            <x-icons.add class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
+        </x-admin.sidebar-nv-item>
     </div>
 
     <div class="mt-6 pt-6">
