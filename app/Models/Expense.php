@@ -63,5 +63,15 @@
         }
 
 
+        public function pay_now()
+        {
+            if($this->is_paid ==0 ){
+                $this->is_paid = 1;
+                $this->save();
+                return "Paid Successfully";
+            }
+                return "Already Paid";
+        }
+
 
     }

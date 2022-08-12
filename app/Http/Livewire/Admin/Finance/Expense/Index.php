@@ -152,7 +152,10 @@
         protected function getTableActions(): array
         {
             return [
-                Action::make('delete')->action(fn(Expense $record): string => $record->delete())->color('danger')->requiresConfirmation()
+                Action::make('delete')->action(fn(Expense $record): string => $record->delete())->color('danger')
+                    ->requiresConfirmation(),
+                Action::make('pay_now')->action(fn(Expense $record): string => $record->pay_now())->color('primary')
+                    ->requiresConfirmation()
             ];
         }
 
