@@ -29,19 +29,6 @@
             </form>
         </div>
         <div class="ml-4 flex items-center md:ml-6">
-{{--            <a href="{{route('chatify')}}" type="button" class="bg-white p-1 relative rounded-full text-gray-400--}}
-{{--            hover:text-gray-500 inline-block mr-2--}}
-{{--            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">--}}
-{{--                <span class="sr-only">View notifications</span>--}}
-{{--                @if(count(Auth::user()->chat_message()))--}}
-{{--                <span class="absolute right-0 top-0 bg-cyan-700 flex justify-center items-center text-white rounded-full--}}
-{{--                text-xs w-4 h-4">--}}
-{{--                    {{count(Auth::user()->chat_message())}}--}}
-{{--                </span>--}}
-{{--                @else--}}
-{{--                @endif--}}
-{{--                <x-icons.message class="h-6 w-6 text-gray-400"/>--}}
-{{--            </a>--}}
             <button type="button" class="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
                 <span class="sr-only">View notifications</span>
                 <svg class="h-6 w-6" x-description="Heroicon name: outline/bell" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">

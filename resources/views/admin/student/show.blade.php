@@ -164,26 +164,11 @@
                                 </dd>
                             </div>
 
-                            <div class="sm:col-span-2">
-                                <dt class="text-sm font-medium text-gray-500">
-                                    About
-                                </dt>
-                                <dd class="mt-1 max-w-prose text-sm text-gray-900 space-y-5">
 
-                                    <p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit
-                                        dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean
-                                        posuere aliquam.</p>
-                                    <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris
-                                        amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum,
-                                        cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget
-                                        quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus
-                                        suspendisse.</p>
-
-                                </dd>
-                            </div>
                         </dl>
                     </x-tab-details>
                     <x-tab-details tab="sessions">
+{{--                        <livewire:admin.student.update-or-create :student="$student"/>--}}
                         @foreach($student->batches as $batch)
                             <div class="">
                                 <div class="bg-white shadow overflow-hidden sm:rounded-lg">
@@ -262,6 +247,12 @@
                                 </div>
 
                             </div>
+                        @php
+                            $batchStudent = App\Models\BatchStudent::where('batch_id',$batch->id)
+                        ->where('student_id',$student->id)->first()
+                        @endphp
+{{--                            <livewire:admin.student.update-or-create-batch-student-recovery--}}
+{{--                                :batch-student="$batchStudent"/>--}}
                         @endforeach
                     </x-tab-details>
 

@@ -18,9 +18,8 @@
 
         public function create()
         {
-
-            return view('admin.employees.create');
-            //
+            $employee = Employee::make();
+            return view('admin.employees.createOrUpdate',compact('employee'));
         }
 
         public function store(Request $request)
@@ -35,7 +34,8 @@
 
         public function edit(Employee $employee)
         {
-            //
+
+            return view('admin.employees.createOrUpdate',compact('employee'));
         }
 
         public function update(Request $request, Employee $employee)

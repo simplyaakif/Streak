@@ -88,6 +88,14 @@ class Batch extends Model implements HasMedia
                                                                'batch_status')->withTimestamps();
     }
 
+    public function activeStudents()
+    {
+        return $this->belongsToMany(Student::class)->withPivot('session_start_date','session_end_date',
+                                                               'batch_status')
+            ->where('batch_status',1)
+            ->withTimestamps();
+    }
+
     public function getBatchContentAttribute()
     {
         return $this->getMedia('batch_batch_content')->map(function ($item) {
@@ -123,5 +131,15 @@ class Batch extends Model implements HasMedia
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public function recoveries()
+    {
+        return $this->hasMany(Recovery::class);
+    }
+
+    public function batchStudent()
+    {
+        return $this->belongsToOne(BatchStudent::class);
     }
 }
