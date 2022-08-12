@@ -41,7 +41,7 @@
         </x-admin.sidebar-dd-nav-item>
 
         <x-admin.sidebar-nv-item
-{{--            can="online_registration_access"--}}
+            can="online_registration_access"
             label="Online Registration" route="{{route('admin.online-registration.index')}}">
             <x-icons.arrow-in-box class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"/>
         </x-admin.sidebar-nv-item>
@@ -67,12 +67,12 @@
                 route="{{route('admin.students.create')}}"/>
 
             <x-admin.sidebar-dd-nav-subitem
-                can=""
+                can="card_create"
                 label="Generate Student Card"
                 route=""/>
 
             <x-admin.sidebar-dd-nav-subitem
-                can=""
+                can="certificate_create"
                 label="Generate Certificate"
                 :route="route('admin.certificates.index')"/>
 

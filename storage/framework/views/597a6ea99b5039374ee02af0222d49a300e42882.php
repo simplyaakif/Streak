@@ -135,14 +135,14 @@
 <?php endif; ?>
 
         <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.admin.sidebar-nv-item','data' => ['label' => 'Online Registration','route' => ''.e(route('admin.online-registration.index')).'']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.admin.sidebar-nv-item','data' => ['can' => 'online_registration_access','label' => 'Online Registration','route' => ''.e(route('admin.online-registration.index')).'']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('admin.sidebar-nv-item'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['label' => 'Online Registration','route' => ''.e(route('admin.online-registration.index')).'']); ?>
+<?php $component->withAttributes(['can' => 'online_registration_access','label' => 'Online Registration','route' => ''.e(route('admin.online-registration.index')).'']); ?>
             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.icons.arrow-in-box','data' => ['class' => 'mr-3 flex-shrink-0 h-6 w-6 text-cyan-200']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('icons.arrow-in-box'); ?>
@@ -253,14 +253,14 @@
 <?php endif; ?>
 
             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.admin.sidebar-dd-nav-subitem','data' => ['can' => '','label' => 'Generate Student Card','route' => '']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.admin.sidebar-dd-nav-subitem','data' => ['can' => 'card_create','label' => 'Generate Student Card','route' => '']] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('admin.sidebar-dd-nav-subitem'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['can' => '','label' => 'Generate Student Card','route' => '']); ?>
+<?php $component->withAttributes(['can' => 'card_create','label' => 'Generate Student Card','route' => '']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
@@ -269,14 +269,14 @@
 <?php endif; ?>
 
             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.admin.sidebar-dd-nav-subitem','data' => ['can' => '','label' => 'Generate Certificate','route' => route('admin.certificates.index')]] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.admin.sidebar-dd-nav-subitem','data' => ['can' => 'certificate_create','label' => 'Generate Certificate','route' => route('admin.certificates.index')]] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('admin.sidebar-dd-nav-subitem'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['can' => '','label' => 'Generate Certificate','route' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('admin.certificates.index'))]); ?>
+<?php $component->withAttributes(['can' => 'certificate_create','label' => 'Generate Certificate','route' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('admin.certificates.index'))]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
