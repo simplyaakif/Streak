@@ -85,6 +85,7 @@
                 TextColumn::make('vendor.name')->label('Expense Type'),
                 TextColumn::make('amount')->label('Expense Amount'),
                 BooleanColumn::make('is_paid')->label('Paid')->trueColor('primary')->falseColor('danger'),
+                TextColumn::make('created_at')->label('Created At')->date('d-m-Y'),
                 TextColumn::make('due_date')->label('Due Date')->date('d-m-Y'),
                 TextColumn::make('paid_on')->label('Paid On')->date('d-m-Y'),
                 TextColumn::make('paid_to')->label('Paid To'),
