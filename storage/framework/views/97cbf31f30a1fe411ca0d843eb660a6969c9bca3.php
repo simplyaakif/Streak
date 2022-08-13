@@ -11,10 +11,10 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
     <meta http-equiv="Pragma" content="no-cache"/>
     <meta http-equiv="Expires" content="0"/>
-
-
-
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;700&display=swap" rel="stylesheet">
 
 
 
@@ -34,15 +34,15 @@
     <?php
 if (! isset($_instance)) {
     $html = \Livewire\Livewire::mount('notifications')->html();
-} elseif ($_instance->childHasBeenRendered('AdDnj16')) {
-    $componentId = $_instance->getRenderedChildComponentId('AdDnj16');
-    $componentTag = $_instance->getRenderedChildComponentTagName('AdDnj16');
+} elseif ($_instance->childHasBeenRendered('guVW8WX')) {
+    $componentId = $_instance->getRenderedChildComponentId('guVW8WX');
+    $componentTag = $_instance->getRenderedChildComponentTagName('guVW8WX');
     $html = \Livewire\Livewire::dummyMount($componentId, $componentTag);
-    $_instance->preserveRenderedChild('AdDnj16');
+    $_instance->preserveRenderedChild('guVW8WX');
 } else {
     $response = \Livewire\Livewire::mount('notifications');
     $html = $response->html();
-    $_instance->logRenderedChild('AdDnj16', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
+    $_instance->logRenderedChild('guVW8WX', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
 }
 echo $html;
 ?>
@@ -133,15 +133,15 @@ echo $html;
 <?php
 if (! isset($_instance)) {
     $html = \Livewire\Livewire::mount('livewire-ui-spotlight')->html();
-} elseif ($_instance->childHasBeenRendered('5ZTFmeC')) {
-    $componentId = $_instance->getRenderedChildComponentId('5ZTFmeC');
-    $componentTag = $_instance->getRenderedChildComponentTagName('5ZTFmeC');
+} elseif ($_instance->childHasBeenRendered('c1KLFf1')) {
+    $componentId = $_instance->getRenderedChildComponentId('c1KLFf1');
+    $componentTag = $_instance->getRenderedChildComponentTagName('c1KLFf1');
     $html = \Livewire\Livewire::dummyMount($componentId, $componentTag);
-    $_instance->preserveRenderedChild('5ZTFmeC');
+    $_instance->preserveRenderedChild('c1KLFf1');
 } else {
     $response = \Livewire\Livewire::mount('livewire-ui-spotlight');
     $html = $response->html();
-    $_instance->logRenderedChild('5ZTFmeC', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
+    $_instance->logRenderedChild('c1KLFf1', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
 }
 echo $html;
 ?>
