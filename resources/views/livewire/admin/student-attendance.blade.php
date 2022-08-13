@@ -79,7 +79,7 @@
                         <x-common.table.heading>Date</x-common.table.heading>
                     </x-slot>
                     <x-slot name="body">
-                        @foreach($batch->students as $student)
+                        @foreach($batch->activeStudents as $student)
                             <x-common.table.row>
                                 <x-common.table.cell>{{$loop->iteration}}</x-common.table.cell>
                                 <x-common.table.cell>{{$student->name}}</x-common.table.cell>
