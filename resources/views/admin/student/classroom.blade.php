@@ -23,7 +23,7 @@
             <x-slot name="details">
                 <x-tab-details tab="students">
                     <ul role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                        @forelse($batch->students as $student)
+                        @forelse($batch->activeStudents as $student)
                             <li class="col-span-1 flex flex-col text-center bg-white rounded-lg shadow divide-y divide-gray-200">
                                 <div class="flex-1 flex flex-col p-8">
                                     <a href="{{route('admin.students.show',$student->id)}}">

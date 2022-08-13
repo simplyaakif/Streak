@@ -24,7 +24,7 @@
         public function mount()
         {
             $this->datetime = now();
-            $this->batch->load('students');
+            $this->batch->load('activeStudents');
 
 //            $this->attendanceRecords = SAttendance::
 //            select('id', 'student_id', 'attendance_status', 'batch_id', DB::raw('DATE(datetime) as date'))->get()->groupBy('date')->toArray();
