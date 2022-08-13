@@ -29,5 +29,8 @@
         "resolve-url-loader": "^3.1.2",
         "select2": "^4.0.13",
         "tailwindcss": "^3.1.4"
+    },
+    "dependencies": {
+        "@alpinejs/focus": "^3.10.3"
     }
 }
