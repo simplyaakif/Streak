@@ -7,6 +7,7 @@ use \DateTimeInterface;
 use App\Support\HasAdvancedFilter;
 use Carbon\Carbon;
 use DB;
+use Filament\Models\Contracts\FilamentUser;
 use Hash;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,7 +17,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Lab404\Impersonate\Models\Impersonate;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     use HasFactory;
     use HasAdvancedFilter;
@@ -118,4 +119,9 @@ class User extends Authenticatable
             ->where('seen',0)->get();
     }
 
+
+    public function canAccessFilament(): bool
+    {
+        return $this->is_super ? true:false;
+    }
 }

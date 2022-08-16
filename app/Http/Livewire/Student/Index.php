@@ -2,97 +2,64 @@
 
 namespace App\Http\Livewire\Student;
 
-use App\Http\Livewire\WithConfirmation;
-use App\Http\Livewire\WithSorting;
 use App\Models\Student;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Gate;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
-use Livewire\WithPagination;
 
-class Index extends Component
+class Index extends Component implements HasTable
 {
-    use WithPagination;
-    use WithSorting;
-    use WithConfirmation;
+    use InteractsWithTable;
 
-    public int $perPage;
-
-    public array $orderable;
-
-    public string $search = '';
-
-    public array $selected = [];
-
-    public array $paginationOptions;
-
-    protected $queryString = [
-        'search' => [
-            'except' => '',
-        ],
-        'sortBy' => [
-            'except' => 'id',
-        ],
-        'sortDirection' => [
-            'except' => 'desc',
-        ],
-    ];
-
-    public function getSelectedCountProperty()
+    protected function getTableQuery(): Builder
     {
-        return count($this->selected);
+        return Student::query();
+    }
+    protected function getTableColumns(): array
+    {
+        return [
+
+            ImageColumn::make('dp'),
+          TextColumn::make('name'),
+          TextColumn::make('father_name'),
+          TextColumn::make('gender'),
+          TextColumn::make('mobile'),
+        ];
     }
 
-    public function updatingSearch()
+    protected function getTableActions(): array
     {
-        $this->resetPage();
-    }
+        return[
+            Action::make('edit')
+            ->label('Edit')
+            ->form([
+                    TextInput::make('name'),
+                   ])
+            ->action(function(){
 
-    public function updatingPerPage()
-    {
-        $this->resetPage();
+            }),
+            Action::make('delete')
+                ->label('Delete')
+                ->color('danger')
+                ->icon('heroicon-o-trash')
+                ->action(function (Student $record){
+                    dd($record);
+                })
+                ->requiresConfirmation(),
+        ];
     }
-
-    public function resetSelected()
+    protected function getTableBulkActions(): array
     {
-        $this->selected = [];
-    }
-
-    public function mount()
-    {
-        $this->sortBy            = 'id';
-        $this->sortDirection     = 'desc';
-        $this->perPage           = 100;
-        $this->paginationOptions = config('project.pagination.options');
-        $this->orderable         = (new Student())->orderable;
+        return [ ];
     }
 
     public function render()
     {
-        $query = Student::with(['user'])->advancedFilter([
-            's'               => $this->search ?: null,
-            'order_column'    => $this->sortBy,
-            'order_direction' => $this->sortDirection,
-        ]);
-
-        $students = $query->paginate($this->perPage);
-
-        return view('livewire.student.index', compact('query', 'students', 'students'));
-    }
-
-    public function deleteSelected()
-    {
-        abort_if(Gate::denies('student_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        Student::whereIn('id', $this->selected)->delete();
-
-        $this->resetSelected();
-    }
-
-    public function delete(Student $student)
-    {
-        abort_if(Gate::denies('student_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        $student->delete();
+        return view('livewire.student.index');
     }
 }
