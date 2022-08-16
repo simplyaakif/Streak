@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Filament\Facades\Filament;
+use Filament\Navigation\NavigationGroup;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,5 +29,22 @@ class AppServiceProvider extends ServiceProvider
         Builder::macro('search', function ($field, $string) {
             return $string ? $this->where($field, 'like', '%'.$string.'%') : $this;
         });
+
+        Filament::serving(function () {
+            Filament::registerNavigationGroups([
+                                                   NavigationGroup::make()
+                                                       ->label('Query Management')
+                                                       ->icon('heroicon-s-shopping-cart'),
+                                                   NavigationGroup::make()
+                                                       ->label('Students Management')
+                                                       ->icon('heroicon-s-pencil'),
+                                                   NavigationGroup::make()
+                                                       ->label('Academic Management')
+                                                       ->icon('heroicon-s-cog')
+                                                       ->collapsed(),
+                                               ]);
+        });
+
+
     }
 }

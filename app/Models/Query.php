@@ -245,4 +245,12 @@
         {
             return $date->format('Y-m-d H:i:s');
         }
+
+
+        public function getCourseTagsAttribute()
+        {
+            $courses =  $this->belongsToMany(Course::class)->pluck('title');
+            return $courses;
+
+        }
     }

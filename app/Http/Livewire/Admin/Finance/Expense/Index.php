@@ -8,6 +8,7 @@
     use App\Models\Vendor;
     use Auth;
     use Filament\Forms\Components\DatePicker;
+    use Filament\Forms\Components\TextInput;
     use Filament\Tables\Actions\Action;
     use Filament\Tables\Actions\BulkAction;
     use Filament\Tables\Columns\BooleanColumn;
@@ -154,8 +155,15 @@
             return [
                 Action::make('delete')->action(fn(Expense $record): string => $record->delete())->color('danger')
                     ->requiresConfirmation(),
+                Action::make('edit')
+                ->form([
+                        TextInput::make('amount'),
+                       ])
+                ->action(function (){
+
+                }),
                 Action::make('pay_now')->action(fn(Expense $record): string => $record->pay_now())->color('primary')
-                    ->requiresConfirmation()
+                    ->requiresConfirmation(),
             ];
         }
 
