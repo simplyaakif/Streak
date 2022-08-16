@@ -17,7 +17,7 @@ class BatchStudentResource extends Resource
 {
     protected static ?string $model = BatchStudent::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
     protected static ?string $navigationLabel ='Admissions';
     protected static ?string $navigationGroup ='Students Management';
 
@@ -38,8 +38,8 @@ class BatchStudentResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('student.name'),
-                Tables\Columns\TextColumn::make('batch.title'),
+                Tables\Columns\TextColumn::make('student.name')->searchable(),
+                Tables\Columns\TextColumn::make('batch.title')->searchable(),
                 Tables\Columns\TextColumn::make('session_start_date')
                     ->date(),
                 Tables\Columns\TextColumn::make('session_end_date')

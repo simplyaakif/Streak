@@ -17,7 +17,7 @@ class CourseResource extends Resource
 {
     protected static ?string $model = Course::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-book-open';
 
     protected static ?string $navigationGroup = 'Academic Management';
 
@@ -25,15 +25,11 @@ class CourseResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('title')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('description')
-                    ->maxLength(255),
+                Forms\Components\TextInput::make('title'),
+                Forms\Components\TextInput::make('description'),
                 Forms\Components\TextInput::make('price')
-                    ->numeric()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('duration')
-                    ->maxLength(255),
+                    ->numeric(),
+                Forms\Components\TextInput::make('duration'),
             ]);
     }
 
@@ -41,7 +37,7 @@ class CourseResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title'),
+                Tables\Columns\TextColumn::make('title')->searchable(),
                 Tables\Columns\TextColumn::make('price'),
                 Tables\Columns\TextColumn::make('duration'),
                 Tables\Columns\TextColumn::make('created_at')

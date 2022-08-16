@@ -18,29 +18,23 @@ class QueryResource extends Resource
 {
     protected static ?string $model = Query::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-user-add';
     protected static ?string $navigationGroup='Query Management';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Textarea::make('name')
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('mobile')
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('email')
-                    ->maxLength(255),
+                Forms\Components\Textarea::make('name'),
+                Forms\Components\Textarea::make('mobile'),
+                Forms\Components\Textarea::make('email'),
                 Forms\Components\Textarea::make('address'),
                 Forms\Components\TextInput::make('staff_user_id'),
                 Forms\Components\Textarea::make('remarks')
                     ->maxLength(65535),
-                Forms\Components\Textarea::make('telephone')
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('p_timings')
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('reference')
-                    ->maxLength(255),
+                Forms\Components\Textarea::make('telephone'),
+                Forms\Components\Textarea::make('p_timings'),
+                Forms\Components\Textarea::make('reference'),
                 Forms\Components\TextInput::make('contact_type'),
             ]);
     }
@@ -49,7 +43,7 @@ class QueryResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
+                TextColumn::make('name')->searchable(),
                 TextColumn::make('mobile'),
                 TextColumn::make('entry_by'),
                 Tables\Columns\TagsColumn::make('course_tags'),
