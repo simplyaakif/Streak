@@ -17,7 +17,7 @@ class StudentResource extends Resource
 {
     protected static ?string $model = Student::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $navigationGroup ='Students Management';
 
@@ -25,21 +25,14 @@ class StudentResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Textarea::make('name')
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('father_name')
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('gender')
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('nationality')
-                    ->maxLength(255),
+                Forms\Components\Textarea::make('name'),
+                Forms\Components\Textarea::make('father_name'),
+                Forms\Components\Textarea::make('gender'),
+                Forms\Components\Textarea::make('nationality'),
                 Forms\Components\DatePicker::make('date_of_birth'),
-                Forms\Components\Textarea::make('cnic_passport')
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('mobile')
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('email')
-                    ->maxLength(255),
+                Forms\Components\Textarea::make('cnic_passport'),
+                Forms\Components\Textarea::make('mobile'),
+                Forms\Components\Textarea::make('email'),
             ]);
     }
 
@@ -47,7 +40,7 @@ class StudentResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextColumn::make('name')->searchable(),
                 Tables\Columns\TextColumn::make('mobile'),
                 Tables\Columns\TextColumn::make('father_name'),
                 Tables\Columns\TextColumn::make('gender')

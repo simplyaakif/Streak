@@ -42,6 +42,10 @@ class AppServiceProvider extends ServiceProvider
                                                        ->label('Academic Management')
                                                        ->icon('heroicon-s-cog')
                                                        ->collapsed(),
+
+                                                   NavigationGroup::make()
+                                                       ->label('Users Management')
+                                                       ->icon('heroicon-o-user-group'),
                                                ]);
         });
 

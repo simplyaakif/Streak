@@ -17,7 +17,7 @@ class BatchResource extends Resource
 {
     protected static ?string $model = Batch::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-inbox';
     protected static ?int $navigationSort =5;
 
     protected static ?string $navigationGroup = 'Academic Management';
@@ -26,11 +26,9 @@ class BatchResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('title')
-                    ->maxLength(255),
+                Forms\Components\TextInput::make('title'),
                 Forms\Components\TextInput::make('limit')->numeric(),
-                Forms\Components\TextInput::make('session_duration')
-                    ->maxLength(255),
+                Forms\Components\TextInput::make('session_duration'),
                 Forms\Components\TextInput::make('description'),
                 Forms\Components\Select::make('course')
                 ->relationship('course','title'),
@@ -42,7 +40,7 @@ class BatchResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title'),
+                Tables\Columns\TextColumn::make('title')->searchable(),
                 Tables\Columns\TextColumn::make('course.title'),
                 Tables\Columns\TextColumn::make('limit'),
                 Tables\Columns\TextColumn::make('time'),
