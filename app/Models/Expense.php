@@ -2,6 +2,7 @@
 
     namespace App\Models;
 
+    use Auth;
     use Carbon\Carbon;
     use Illuminate\Database\Eloquent\Factories\HasFactory;
     use Illuminate\Database\Eloquent\Model;
@@ -66,6 +67,8 @@
         public function pay_now()
         {
             if($this->is_paid ==0 ){
+                $this->paid_on = now();
+                $this->paid_by = Auth::id();
                 $this->is_paid = 1;
                 $this->save();
                 return "Paid Successfully";
