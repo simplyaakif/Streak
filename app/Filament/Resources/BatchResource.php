@@ -30,7 +30,7 @@ class BatchResource extends Resource
                 Forms\Components\TextInput::make('limit')->numeric(),
                 Forms\Components\TextInput::make('session_duration'),
                 Forms\Components\TextInput::make('description'),
-                Forms\Components\Select::make('course')
+                Forms\Components\Select::make('course_id')
                 ->relationship('course','title'),
                 Forms\Components\TimePicker::make('time')->withoutSeconds(),
             ]);
