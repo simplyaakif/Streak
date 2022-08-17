@@ -31,6 +31,7 @@
         {
             return[
                 TextColumn::make('batch.title'),
+                TextColumn::make('student.name'),
                 TextColumn::make('attendance_status'),
                 TextColumn::make('day')->label('Day'),
                 TextColumn::make('datetime')->dateTime('h:i d-M-Y')->label('Date'),
