@@ -55,7 +55,7 @@
 
                 Select::make('mode_of_learning')
                     ->options([
-                        'In Campus'=>'In Campus',
+                        'In Campus'=>'On-Campus',
                         'Online'=>'Online'
                               ])
                     ->helperText('Enter the learning type you are applying for')

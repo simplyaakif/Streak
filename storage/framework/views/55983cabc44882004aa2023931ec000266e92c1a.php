@@ -1,3 +1,10 @@
+<?php foreach($attributes->onlyProps([
+    'sortable' => null,
+    'direction' => null,
+    'multiColumn' => null,
+]) as $__key => $__value) {
+    $$__key = $$__key ?? $__value;
+} ?>
 <?php $attributes = $attributes->exceptProps([
     'sortable' => null,
     'direction' => null,

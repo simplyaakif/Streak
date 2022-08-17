@@ -74,103 +74,23 @@
                     <x-tab tab="profile">Student Details</x-tab>
                     <x-tab tab="sessions">Sessions</x-tab>
                     <x-tab tab="user_account">User Account</x-tab>
-                    <x-tab tab="guardian">Guardian</x-tab>
+{{--                    <x-tab tab="guardian">Guardian</x-tab>--}}
                     <x-tab tab="attendance">Attendance</x-tab>
-                    <x-tab tab="sms">SMS Records</x-tab>
-                    <x-tab tab="email">Email Records</x-tab>
+{{--                    <x-tab tab="sms">SMS Records</x-tab>--}}
+{{--                    <x-tab tab="email">Email Records</x-tab>--}}
                 </x-slot>
                 <x-slot name="details">
                     <x-tab-details tab="profile">
-                        <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
-
-                            <div class="sm:col-span-1">
-                                <dt class="text-sm font-medium text-gray-500">
-                                    Father Name
-                                </dt>
-                                <dd class="mt-1 text-sm text-gray-900">
-                                    {{$student->father_name}}
-                                </dd>
-                            </div>
-
-                            <div class="sm:col-span-1">
-                                <dt class="text-sm font-medium text-gray-500">
-                                    Mobile
-                                </dt>
-                                <dd class="mt-1 text-sm text-gray-900">
-                                    {{$student->mobile}}
-                                </dd>
-                            </div>
-
-                            <div class="sm:col-span-1">
-                                <dt class="text-sm font-medium text-gray-500">
-                                    Email
-                                </dt>
-                                <dd class="mt-1 text-sm text-gray-900">
-                                    {{$student->email}}
-                                </dd>
-                            </div>
-
-                            <div class="sm:col-span-1">
-                                <dt class="text-sm font-medium text-gray-500">
-                                    Telephone
-                                </dt>
-                                <dd class="mt-1 text-sm text-gray-900">
-                                    {{$student->telephone}}
-                                </dd>
-                            </div>
-
-                            <div class="sm:col-span-1">
-                                <dt class="text-sm font-medium text-gray-500">
-                                    Gender
-                                </dt>
-                                <dd class="mt-1 text-sm text-gray-900">
-                                    {{$student->gender}}
-                                </dd>
-                            </div>
-
-                            <div class="sm:col-span-1">
-                                <dt class="text-sm font-medium text-gray-500">
-                                    Nationality
-                                </dt>
-                                <dd class="mt-1 text-sm text-gray-900">
-                                    {{$student->nationality}}
-                                </dd>
-                            </div>
-
-                            <div class="sm:col-span-1">
-                                <dt class="text-sm font-medium text-gray-500">
-                                    CNIC/Passport Number
-                                </dt>
-                                <dd class="mt-1 text-sm text-gray-900">
-                                    {{$student->cnic_passport}}
-                                </dd>
-                            </div>
-
-                            <div class="sm:col-span-1">
-                                <dt class="text-sm font-medium text-gray-500">
-                                    Salary
-                                </dt>
-                                <dd class="mt-1 text-sm text-gray-900">
-                                    $145,000
-                                </dd>
-                            </div>
-
-                            <div class="sm:col-span-1">
-                                <dt class="text-sm font-medium text-gray-500">
-                                    Birthday
-                                </dt>
-                                <dd class="mt-1 text-sm text-gray-900">
-                                    {{$student->date_of_birth}}
-                                </dd>
-                            </div>
-
-
-                        </dl>
+                        <livewire:admin.filament.student.student-edit
+                        :student_id="$student->id"/>
                     </x-tab-details>
                     <x-tab-details tab="sessions">
 {{--                        <livewire:admin.student.update-or-create :student="$student"/>--}}
+                        <livewire:admin.filament.student.batch.batch-index
+                            :student_id="$student->id"
+                        />
                         @foreach($student->batches as $batch)
-                            <div class="">
+                            <div class="mt-10">
                                 <div class="bg-white shadow overflow-hidden sm:rounded-lg">
                                     <div class="px-4 py-5 sm:px-6">
                                         <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -180,37 +100,7 @@
                                             {{$batch->duration}}
                                         </p>
                                     </div>
-                                    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
-                                        <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
-                                            <div class="sm:col-span-1">
-                                                <dt class="text-sm font-medium text-gray-500">
-                                                    Start Date
-                                                </dt>
-                                                <dd class="mt-1 text-sm text-gray-900">
-                                                    {{    Carbon\Carbon::parse($batch->pivot->session_start_date)
-                                                    ->format('d M Y')  }}
-                                                </dd>
-                                            </div>
-                                            <div class="sm:col-span-1">
-                                                <dt class="text-sm font-medium text-gray-500">
-                                                    End Date
-                                                </dt>
-                                                <dd class="mt-1 text-sm text-gray-900">
-                                                    {{    Carbon\Carbon::parse($batch->pivot->session_end_date)
-                                                    ->format('d M Y')  }}
-                                                </dd>
-                                            </div>
-                                            <div class="sm:col-span-1">
-                                                <dt class="text-sm font-medium text-gray-500">
-                                                    Status
-                                                </dt>
-                                                <dd class="mt-1 text-sm text-gray-900">
-                                                    {{    App\Models\BatchStudent::STATUS[$batch->pivot->batch_status]
-                                                      }}
-                                                </dd>
-                                            </div>
-                                        </dl>
-                                    </div>
+
                                     <div class="bg-gray-100 px-4 py-5 sm:px-6">
 {{--                                        {{json_encode($batch)}}--}}
                                         @php
@@ -257,14 +147,18 @@
                     </x-tab-details>
 
                     <x-tab-details tab="user_account">
-
+                        <livewire:admin.filament.student.user-edit
+                            :student_id="$student->id"
+                            :user_id="$student->user_id"/>
                     </x-tab-details>
                     <x-tab-details tab="guardian">
                         <x-common.empty-state title="No guardian" subtitle="Add a guardian to this student" label="Add
                 Guardian"/>
                     </x-tab-details>
                     <x-tab-details tab="attendance">
-
+                        <livewire:admin.filament.student.attendance-show
+                            :student_id="$student->id"
+                            />
                     </x-tab-details>
                 </x-slot>
             </x-tabs>

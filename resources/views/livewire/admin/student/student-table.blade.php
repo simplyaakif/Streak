@@ -28,6 +28,8 @@
         </div>
 
     </div>
+    <div class="container">
+
     <x-common.table class="max-w-full ">
         <x-slot name="head">
             <x-common.table.heading>
@@ -54,11 +56,13 @@
                         {{$students->firstItem() + $loop->iteration - 1}}
                     </x-common.table.cell>
                     <x-common.table.cell class="w-2">
-                        <div class="w-12">
+                        <div class="w-12 rounded-full">
                             @php $admission = App\Models\Student::findOrFail($student->student_id)@endphp
                             @forelse($admission->dp as $key => $entry)
-                                <a class="link-photo" href="{{ $entry['url'] }}">
-                                    <img src="{{ $entry['thumbnail'] }}" alt="{{ $entry['name'] }}"
+                                <a  href="{{ $entry['url'] }}">
+                                    <img class="h-10 w-10 rounded-full"
+                                         src="{{ $entry['url'] }}" alt="{{ $entry['name']
+                                     }}"
                                          title="{{ $entry['name'] }}">
                                 </a>
                             @empty
@@ -144,4 +148,6 @@
     <div>
         {{$students->links()}}
     </div>
+    </div>
+
 </div>

@@ -17,8 +17,8 @@
                 <x-tab tab="students">Students</x-tab>
                 <x-tab tab="attendance">Attendance Records</x-tab>
                 <x-tab tab="lesson_planner">Class Work</x-tab>
-                <x-tab tab="class_tasks">Home Tasks</x-tab>
-                <x-tab tab="class_exams">Class Examination Results</x-tab>
+{{--                <x-tab tab="class_tasks">Home Tasks</x-tab>--}}
+{{--                <x-tab tab="class_exams">Class Examination Results</x-tab>--}}
             </x-slot>
             <x-slot name="details">
                 <x-tab-details tab="students">

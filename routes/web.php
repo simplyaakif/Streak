@@ -30,6 +30,7 @@ use App\Http\Controllers\Auth\UserProfileController;
     use App\Http\Controllers\RecoveriesController;
     use App\Http\Controllers\SmsController;
     use App\Http\Controllers\Student\IssuesController;
+    use App\Http\Controllers\StudentAttendancesController;
     use App\Http\Controllers\VendorsController;
     use App\Models\Issue;
     use App\Models\OnlineRegistration;
@@ -88,6 +89,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','st
     Route::resource('queries', QueryController::class, ['except' => ['store', 'update', 'destroy']]);
 
 
+//    Attendance
+    Route::get('student-attendances',[StudentAttendancesController::class,'index'])->name('student-attendances');
     // Course
     Route::post('courses/media', [CourseController::class, 'storeMedia'])->name('courses.storeMedia');
     Route::resource('courses', CourseController::class, ['except' => ['store', 'update', 'destroy']]);

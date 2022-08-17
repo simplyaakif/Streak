@@ -15,6 +15,11 @@
             3=>'Frozen',
         ];
 
+        public function getStatusAttribute()
+        {
+            return static::STATUS[$this->batch_status] ?? null;
+        }
+
         public function student()
         {
             return $this->belongsTo(Student::class);

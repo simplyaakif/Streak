@@ -100,6 +100,9 @@
                 can="batch_access"
                 label="Manage Batches"
                 route="{{route('admin.batches.index')}}"/>
+            <x-admin.sidebar-dd-nav-subitem
+                label="Batch Attendances"
+                route="{{route('admin.student-attendances')}}"/>
         </x-admin.sidebar-dd-nav-item>
 
         <x-admin.sidebar-dd-nav-item

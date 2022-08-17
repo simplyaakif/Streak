@@ -9,7 +9,7 @@
 
         public function index()
         {
-            //
+            return view('admin.attendance.index');
         }
 
         public function create()

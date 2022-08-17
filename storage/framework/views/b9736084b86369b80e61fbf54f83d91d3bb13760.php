@@ -1,3 +1,10 @@
+<?php foreach($attributes->onlyProps([
+    'options'=>[],
+    'is_skip_select'=>false,
+    'error'=>'',
+]) as $__key => $__value) {
+    $$__key = $$__key ?? $__value;
+} ?>
 <?php $attributes = $attributes->exceptProps([
     'options'=>[],
     'is_skip_select'=>false,

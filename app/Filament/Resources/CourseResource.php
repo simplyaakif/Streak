@@ -69,4 +69,8 @@ class CourseResource extends Resource
             'edit' => Pages\EditCourse::route('/{record}/edit'),
         ];
     }
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }
