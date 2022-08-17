@@ -1,3 +1,10 @@
+<?php foreach($attributes->onlyProps([
+    'route'=>'#',
+    'can'=>'',
+    'label'=>''
+]) as $__key => $__value) {
+    $$__key = $$__key ?? $__value;
+} ?>
 <?php $attributes = $attributes->exceptProps([
     'route'=>'#',
     'can'=>'',

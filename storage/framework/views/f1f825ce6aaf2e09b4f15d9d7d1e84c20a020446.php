@@ -1,3 +1,8 @@
+<?php foreach($attributes->onlyProps([
+    'bold'=>false,
+]) as $__key => $__value) {
+    $$__key = $$__key ?? $__value;
+} ?>
 <?php $attributes = $attributes->exceptProps([
     'bold'=>false,
 ]); ?>

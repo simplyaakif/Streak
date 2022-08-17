@@ -74,4 +74,8 @@ class BatchResource extends Resource
             'edit' => Pages\EditBatch::route('/{record}/edit'),
         ];
     }
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

@@ -75,4 +75,8 @@ class BatchStudentResource extends Resource
             'edit' => Pages\EditBatchStudent::route('/{record}/edit'),
         ];
     }
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

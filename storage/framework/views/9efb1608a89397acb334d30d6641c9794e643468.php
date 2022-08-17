@@ -1,3 +1,9 @@
+<?php foreach($attributes->onlyProps([
+    'title'=>'',
+    'subtitle'=>'',
+]) as $__key => $__value) {
+    $$__key = $$__key ?? $__value;
+} ?>
 <?php $attributes = $attributes->exceptProps([
     'title'=>'',
     'subtitle'=>'',

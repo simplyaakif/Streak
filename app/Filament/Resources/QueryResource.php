@@ -78,4 +78,8 @@ class QueryResource extends Resource
             'edit' => Pages\EditQuery::route('/{record}/edit'),
         ];
     }
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

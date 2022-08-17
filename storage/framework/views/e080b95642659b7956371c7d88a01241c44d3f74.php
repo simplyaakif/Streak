@@ -1,3 +1,10 @@
+<?php foreach($attributes->onlyProps([
+    'label'=>'',
+    'icon'=>'',
+    'can'=>'',
+]) as $__key => $__value) {
+    $$__key = $$__key ?? $__value;
+} ?>
 <?php $attributes = $attributes->exceptProps([
     'label'=>'',
     'icon'=>'',
