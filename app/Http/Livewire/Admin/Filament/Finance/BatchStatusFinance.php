@@ -2,6 +2,7 @@
 
     namespace App\Http\Livewire\Admin\Filament\Finance;
 
+    use App\Models\Batch;
     use Filament\Tables\Columns\TextColumn;
         use Filament\Tables\Concerns\InteractsWithTable;
         use Filament\Tables\Contracts\HasTable;
@@ -25,7 +26,7 @@
             }
             protected function getTableQuery(): Builder|Relation
             {
-                return ::query();
+                return Batch::query();
             }
 
             public function render()
