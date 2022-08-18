@@ -1,3 +1,4 @@
+
 <?php $__env->startSection('content'); ?>
 <div class="row">
     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
@@ -50,15 +51,15 @@
         <?php
 if (! isset($_instance)) {
     $html = \Livewire\Livewire::mount('admin.student.student-table')->html();
-} elseif ($_instance->childHasBeenRendered('qzNDJUT')) {
-    $componentId = $_instance->getRenderedChildComponentId('qzNDJUT');
-    $componentTag = $_instance->getRenderedChildComponentTagName('qzNDJUT');
+} elseif ($_instance->childHasBeenRendered('WvvTlkf')) {
+    $componentId = $_instance->getRenderedChildComponentId('WvvTlkf');
+    $componentTag = $_instance->getRenderedChildComponentTagName('WvvTlkf');
     $html = \Livewire\Livewire::dummyMount($componentId, $componentTag);
-    $_instance->preserveRenderedChild('qzNDJUT');
+    $_instance->preserveRenderedChild('WvvTlkf');
 } else {
     $response = \Livewire\Livewire::mount('admin.student.student-table');
     $html = $response->html();
-    $_instance->logRenderedChild('qzNDJUT', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
+    $_instance->logRenderedChild('WvvTlkf', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
 }
 echo $html;
 ?>

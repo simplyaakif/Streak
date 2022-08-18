@@ -9,7 +9,29 @@
 
         public function index()
         {
-            return view('admin.recovery.index');
+            $amount_due_today = Recovery::where('due_date',now()->toDate())
+                ->where('is_paid',0)
+                ->sum('amount');
+            $amount_due_month = Recovery::whereBetween('due_date',[
+                now()->startOfMonth()->toDate(),
+                now()->endOfMonth()->toDate(),
+                ])
+                ->where('is_paid',0)
+                ->sum('amount');
+
+            $amount_due_pending = Recovery::where('due_date','<',now()->toDate())
+                ->where('is_paid',0)
+                ->sum('amount');
+
+            $amount_due_future = Recovery::where('due_date','>',now()->addMonth()->startOfMonth()->toDate())
+                ->where('is_paid',0)
+                ->sum('amount');
+
+
+            return view('admin.recovery.index',compact('amount_due_today','amount_due_month',
+            'amount_due_pending',
+            'amount_due_future'
+            ));
         }
 
         public function recovery()

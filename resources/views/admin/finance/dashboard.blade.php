@@ -18,5 +18,24 @@
             @empty
             @endforelse
         </div>
+        <div class="my-8">
+            <x-common.table>
+                <x-slot name="head">
+                <x-common.table.heading>Batch</x-common.table.heading>
+                <x-common.table.heading>Number Of Recoveries Received</x-common.table.heading>
+                <x-common.table.heading>Total Contribution of Batch</x-common.table.heading>
+                </x-slot>
+                <x-slot name="body">
+                    @forelse($batchFinanceStatus as $key=>$row)
+                        <x-common.table.row>
+                            <x-common.table.cell>{{$row['title']}}</x-common.table.cell>
+                            <x-common.table.cell>{{$row['count']}}</x-common.table.cell>
+                            <x-common.table.cell>{{$row['total']}} Rs</x-common.table.cell>
+                        </x-common.table.row>
+                    @empty
+                    @endforelse
+                </x-slot>
+            </x-common.table>
+        </div>
     </x-common.layout-subpage>
 @endsection
