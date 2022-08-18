@@ -129,9 +129,9 @@
                 can="finance_access"
                 :route="route('admin.finance.dashboard')"
                 label="Finance Status"/>
-            <x-admin.sidebar-dd-nav-subitem label="Received" :route="route('admin.recovery.index')"/>
-            <x-admin.sidebar-dd-nav-subitem label="Upcoming/Pending"
-                                            :route="route('admin.recovery.received')"/>
+            <x-admin.sidebar-dd-nav-subitem label="Recoveries" :route="route('admin.recovery.index')"/>
+{{--            <x-admin.sidebar-dd-nav-subitem label="Upcoming/Pending"--}}
+{{--                                            :route="route('admin.recovery.received')"/>--}}
             <x-admin.sidebar-dd-nav-subitem
                 can="income_access"
                 label="Incomes"

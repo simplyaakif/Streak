@@ -4,14 +4,36 @@
 
     use Carbon\Carbon;
     use Illuminate\Database\Eloquent\Model;
+    use Spatie\MediaLibrary\HasMedia;
+    use Spatie\MediaLibrary\InteractsWithMedia;
 
-    class Recovery extends Model {
-
+    class Recovery extends Model implements HasMedia {
+        use InteractsWithMedia;
         protected $guarded = [];
 
         public function student()
         {
             return $this->belongsTo(Student::class);
+        }
+
+        public function batch_student()
+        {
+            return $this->belongsTo(BatchStudent::class);
+        }
+
+
+        public function getStudentDpAttribute()
+        {
+            $student = Student::find($this->student_id);
+            return $student->getMedia('student_dp')->map(function ($item) {
+                $media = $item->toArray();
+                $media['url'] = $item->getUrl();
+                $media['thumbnail'] = $item->getUrl('thumbnail');
+                $media['preview_thumbnail'] = $item->getUrl('preview_thumbnail');
+
+
+                return $media;
+            });
         }
 
         public function getCarbonPaidOnAttribute()

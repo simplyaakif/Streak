@@ -5,7 +5,7 @@
     'route'=>'',
     'sublabel'=>'',
     'route_label'=>'View All',
-    'can'=>''
+    'can'=>'',
 
 ])
 @can($can)

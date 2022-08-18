@@ -46,6 +46,11 @@ class AppServiceProvider extends ServiceProvider
                                                        ->collapsed(),
 
                                                    NavigationGroup::make()
+                                                       ->label('Finance Management')
+                                                       ->icon('heroicon-s-cash')
+                                                       ->collapsed(),
+
+                                                   NavigationGroup::make()
                                                        ->label('Users Management')
                                                        ->icon('heroicon-o-user-group'),
                                                ]);
