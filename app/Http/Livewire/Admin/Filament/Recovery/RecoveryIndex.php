@@ -138,6 +138,7 @@
                           $record->account_id = $data['account_id'];
                           $record->slip_number = $data['slip_number'];
                           $record->paid_on = $data['paid_on'];
+                          $record->save();
                       })
                       ->visible(fn (Recovery $record): bool =>  !$record->is_paid),
                 ];
