@@ -64,19 +64,7 @@
     <?php if($isClickDisabled): ?>
         <?php echo e($slot); ?>
 
-    <?php elseif($action || ($recordAction && $url === null)): ?>
-        <button
-            wire:click="<?php echo e($action ? "callTableColumnAction('{$name}', " : "{$recordAction}("); ?>'<?php echo e($this->getTableRecordKey($record)); ?>')"
-            wire:target="<?php echo e($action ? "callTableColumnAction('{$name}', " : "{$recordAction}("); ?>'<?php echo e($this->getTableRecordKey($record)); ?>')"
-            wire:loading.attr="disabled"
-            wire:loading.class.delay="opacity-70 cursor-wait"
-            type="button"
-            class="block text-left"
-        >
-            <?php echo e($slot); ?>
-
-        </button>
-    <?php elseif($url || $recordUrl): ?>
+    <?php elseif($url || ($recordUrl && $action === null)): ?>
         <a
             href="<?php echo e($url ?: $recordUrl); ?>"
             <?php echo e($shouldOpenUrlInNewTab ? 'target="_blank"' : null); ?>
@@ -86,6 +74,32 @@
             <?php echo e($slot); ?>
 
         </a>
+    <?php elseif($action || $recordAction): ?>
+        <?php
+            if ($action) {
+                $wireClickAction = "callTableColumnAction('{$name}', '%s')";
+            } else {
+                if ($this->getCachedTableAction($recordAction)) {
+                    $wireClickAction = "mountTableAction('{$recordAction}', '%s')";
+                } else {
+                    $wireClickAction = "{$recordAction}('%s')";
+                }
+            }
+
+            $wireClickAction = sprintf($wireClickAction, $this->getTableRecordKey($record));
+        ?>
+
+        <button
+            wire:click="<?php echo e($wireClickAction); ?>"
+            wire:target="<?php echo e($wireClickAction); ?>"
+            wire:loading.attr="disabled"
+            wire:loading.class="opacity-70 cursor-wait"
+            type="button"
+            class="block text-left w-full"
+        >
+            <?php echo e($slot); ?>
+
+        </button>
     <?php else: ?>
         <?php echo e($slot); ?>
 
