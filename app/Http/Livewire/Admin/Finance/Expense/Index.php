@@ -3,12 +3,18 @@
     namespace App\Http\Livewire\Admin\Finance\Expense;
 
     use App\Models\Account;
+    use App\Models\Employee;
     use App\Models\Expense;
+    use App\Models\Recovery;
     use App\Models\User;
     use App\Models\Vendor;
     use Auth;
+    use Filament\Forms\ComponentContainer;
     use Filament\Forms\Components\DatePicker;
+    use Filament\Forms\Components\Grid;
+    use Filament\Forms\Components\Select;
     use Filament\Forms\Components\TextInput;
+    use Filament\Forms\Components\Toggle;
     use Filament\Tables\Actions\Action;
     use Filament\Tables\Actions\BulkAction;
     use Filament\Tables\Columns\BooleanColumn;
@@ -90,7 +96,7 @@
                 TextColumn::make('due_date')->label('Due Date')->date('d-m-Y'),
                 TextColumn::make('paid_on')->label('Paid On')->date('d-m-Y'),
                 TextColumn::make('paid_to')->label('Paid To'),
-                TextColumn::make('user.name')->label('Paid By'),
+                TextColumn::make('employee.name')->label('Paid By'),
 
 
             ];
@@ -153,16 +159,40 @@
         protected function getTableActions(): array
         {
             return [
-                Action::make('delete')->action(fn(Expense $record): string => $record->delete())->color('danger')
-                    ->requiresConfirmation(),
-                Action::make('edit')
-                ->form([
-                        TextInput::make('amount'),
-                       ])
-                ->action(function (){
-
-                }),
                 Action::make('pay_now')->action(fn(Expense $record): string => $record->pay_now())->color('primary')
+                    ->requiresConfirmation(),
+
+                Action::make('edit')
+                    ->mountUsing(fn (ComponentContainer $form, Expense $record) => $form->fill([
+                            'amount' => $record->amount,
+                            'is_paid' => $record->is_paid,
+                            'due_date' => $record->due_date,
+                            'paid_on' => $record->paid_on,
+                            'paid_to' => $record->paid_to,
+                            'paid_by' => $record->paid_by,
+                                                                                                ]))
+                ->form([
+                    Grid::make()
+                    ->schema([
+                        TextInput::make('amount')->required(),
+                        DatePicker::make('due_date')->required(),
+                        DatePicker::make('paid_on'),
+                        TextInput::make('paid_to'),
+                        Select::make('paid_by')
+                        ->options(Employee::where('is_active',1)->get()->pluck('name','id')),
+                        Toggle::make('is_paid'),
+                             ])
+                       ])
+                ->action(function (Expense $record, $data){
+                    $record->amount = $data['amount'];
+                    $record->is_paid = $data['is_paid'];
+                    $record->due_date = $data['due_date'];
+                    $record->paid_on = $data['paid_on'];
+                    $record->paid_to = $data['paid_to'];
+                    $record->paid_by = $data['paid_by'];
+                    $record->save();
+                }),
+                Action::make('delete')->action(fn(Expense $record): string => $record->delete())->color('danger')
                     ->requiresConfirmation(),
             ];
         }

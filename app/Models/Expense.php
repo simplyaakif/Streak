@@ -58,9 +58,9 @@
             return $this->due_date? Carbon::parse($this->due_date)->format('d-M-Y'):null;
         }
 
-        public function user()
+        public function employee()
         {
-            return $this->belongsTo(User::class,'paid_by');
+            return $this->belongsTo(Employee::class,'paid_by');
         }
 
 
@@ -68,7 +68,7 @@
         {
             if($this->is_paid ==0 ){
                 $this->paid_on = now();
-                $this->paid_by = Auth::id();
+                $this->paid_by = Auth::user()->employee->id;
                 $this->is_paid = 1;
                 $this->save();
                 return "Paid Successfully";

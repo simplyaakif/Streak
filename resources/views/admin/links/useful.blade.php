@@ -7,6 +7,22 @@
     <x-common.page-body>
 
         <div>
+            <h2 class="font-bold text-xl border-b border-gray-200 mt-4">Evaluation</h2>
+            <ul>
+                <li>
+                    <a href="https://evaluation.ace.org.pk">Evaluation</a>
+                </li>
+            </ul>
+        </div>
+        <div>
+            <h2 class="font-bold text-xl border-b border-gray-200 mt-4">IELTS Book Listening Audios</h2>
+            <ul>
+                <li>
+                    <a href="https://misc.appsoulz.com/ielts/">IELTS Book</a>
+                </li>
+            </ul>
+        </div>
+        <div>
             <h2 class="font-bold text-xl border-b border-gray-200 mt-4">IELTS Mock Listening Audios</h2>
             <ul>
                 <li>
