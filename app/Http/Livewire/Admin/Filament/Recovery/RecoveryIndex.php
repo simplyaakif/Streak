@@ -35,7 +35,7 @@
             protected function getTableColumns(): array
             {
                 return [
-                    TextColumn::make('student.name'),
+                    TextColumn::make('student.name')->searchable(),
                     TextColumn::make('batch.title')->label('Batch'),
                     TextColumn::make('batch_student.status')->label('Status'),
                     TextColumn::make('amount')->suffix(' Rs'),
