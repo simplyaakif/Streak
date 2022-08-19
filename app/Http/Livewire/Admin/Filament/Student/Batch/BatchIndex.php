@@ -2,6 +2,7 @@
 
     namespace App\Http\Livewire\Admin\Filament\Student\Batch;
 
+    use App\Models\Batch;
     use App\Models\BatchStudent;
     use App\Models\Student;
     use Filament\Forms\ComponentContainer;
@@ -37,18 +38,22 @@
                         'session_start_date'=>$record->session_start_date,
                         'session_end_date'=>$record->session_end_date,
                         'batch_status'=>$record->batch_status,
+                        'batch_id'=>$record->batch_id,
                     ]))
                     ->form([
                         Card::make()
                     ->schema([
-                    DatePicker::make('session_start_date'),
-                    DatePicker::make('session_end_date'),
-                    Select::make('batch_status')
-                    ->options(BatchStudent::STATUS)
+                        Select::make('batch_id')
+                        ->options(Batch::all()->pluck('title','id')),
+                        DatePicker::make('session_start_date'),
+                        DatePicker::make('session_end_date'),
+                        Select::make('batch_status')
+                        ->options(BatchStudent::STATUS)
                              ])->columns(2),
                            ])
                 ->action(function(BatchStudent $record, $data){
                     $record->batch_status = $data['batch_status'];
+                    $record->batch_id = $data['batch_id'];
                     $record->session_start_date = $data['session_start_date'];
                     $record->session_end_date = $data['session_end_date'];
                     $record->save();

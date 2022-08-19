@@ -1,13 +1,3 @@
-<?php if (! $__env->hasRenderedOnce('4af2ade2-3247-4a46-9ee8-5209ebd0f691')): $__env->markAsRenderedOnce('4af2ade2-3247-4a46-9ee8-5209ebd0f691'); ?>
-    <?php $__env->startPush('scripts'); ?>
-        <?php
-            $locale = strtolower(str_replace('_', '-', app()->getLocale()));
-        ?>
-
-        <script defer src="//unpkg.com/dayjs@1.10.4/locale/<?php echo e($locale); ?>.js" onload="dayjs.updateLocale('<?php echo e($locale); ?>')"></script>
-    <?php $__env->stopPush(); ?>
-<?php endif; ?>
-
 <?php if (isset($component)) { $__componentOriginal3bf0a20793be3eca9a779778cf74145887b021b9 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Illuminate\View\DynamicComponent::class, ['component' => $getFieldWrapperView()] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('dynamic-component'); ?>
@@ -21,33 +11,10 @@
         x-data="dateTimePickerFormComponent({
             displayFormat: '<?php echo e(convert_date_format($getDisplayFormat())->to('day.js')); ?>',
             firstDayOfWeek: <?php echo e($getFirstDayOfWeek()); ?>,
-            isAutofocused: <?php
-    if (is_object($isAutofocused()) || is_array($isAutofocused())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($isAutofocused()))."'))";
-    } elseif (is_string($isAutofocused())) {
-        echo "'".str_replace("'", "\'", $isAutofocused())."'";
-    } else {
-        echo json_encode($isAutofocused());
-    }
-?>,
-            isDisabled: <?php
-    if (is_object($isDisabled()) || is_array($isDisabled())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($isDisabled()))."'))";
-    } elseif (is_string($isDisabled())) {
-        echo "'".str_replace("'", "\'", $isDisabled())."'";
-    } else {
-        echo json_encode($isDisabled());
-    }
-?>,
-            shouldCloseOnDateSelection: <?php
-    if (is_object($shouldCloseOnDateSelection()) || is_array($shouldCloseOnDateSelection())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($shouldCloseOnDateSelection()))."'))";
-    } elseif (is_string($shouldCloseOnDateSelection())) {
-        echo "'".str_replace("'", "\'", $shouldCloseOnDateSelection())."'";
-    } else {
-        echo json_encode($shouldCloseOnDateSelection());
-    }
-?>,
+            isAutofocused: <?php echo \Illuminate\Support\Js::from($isAutofocused())->toHtml() ?>,
+            isDisabled: <?php echo \Illuminate\Support\Js::from($isDisabled())->toHtml() ?>,
+            locale: <?php echo \Illuminate\Support\Js::from(app()->getLocale())->toHtml() ?>,
+            shouldCloseOnDateSelection: <?php echo \Illuminate\Support\Js::from($shouldCloseOnDateSelection())->toHtml() ?>,
             state: $wire.<?php echo e($applyStateBindingModifiers('entangle(\'' . $getStatePath() . '\')')); ?>,
         })"
         <?php echo e($attributes->merge($getExtraAttributes())->class(['relative filament-forms-date-time-picker-component'])); ?>

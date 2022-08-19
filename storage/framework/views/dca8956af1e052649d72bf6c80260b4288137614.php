@@ -1,14 +1,17 @@
 <?php foreach($attributes->onlyProps([
+    'recordAction' => null,
     'recordUrl' => null,
     'striped' => false,
 ]) as $__key => $__value) {
     $$__key = $$__key ?? $__value;
 } ?>
 <?php $attributes = $attributes->exceptProps([
+    'recordAction' => null,
     'recordUrl' => null,
     'striped' => false,
 ]); ?>
 <?php foreach (array_filter(([
+    'recordAction' => null,
     'recordUrl' => null,
     'striped' => false,
 ]), 'is_string', ARRAY_FILTER_USE_KEY) as $__key => $__value) {
@@ -23,8 +26,8 @@
 <tr
     <?php echo e($attributes->class([
         'filament-tables-row',
-        'hover:bg-gray-50' => $recordUrl,
-        'dark:hover:bg-gray-500/10' => $recordUrl && config('tables.dark_mode'),
+        'hover:bg-gray-50' => $recordUrl || $recordAction,
+        'dark:hover:bg-gray-500/10' => ($recordUrl || $recordAction) && config('tables.dark_mode'),
         'even:bg-gray-100' => $striped,
         'dark:even:bg-gray-900' => $striped && config('tables.dark_mode'),
     ])); ?>

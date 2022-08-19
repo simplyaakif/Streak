@@ -87,167 +87,31 @@
             <?php else: ?>
                 <div
                     x-data="selectFormComponent({
-                        isHtmlAllowed: <?php
-    if (is_object($isHtmlAllowed()) || is_array($isHtmlAllowed())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($isHtmlAllowed()))."'))";
-    } elseif (is_string($isHtmlAllowed())) {
-        echo "'".str_replace("'", "\'", $isHtmlAllowed())."'";
-    } else {
-        echo json_encode($isHtmlAllowed());
-    }
-?>,
+                        isHtmlAllowed: <?php echo \Illuminate\Support\Js::from($isHtmlAllowed())->toHtml() ?>,
                         getOptionLabelUsing: async () => {
-                            return await $wire.getSelectOptionLabel(<?php
-    if (is_object($getStatePath()) || is_array($getStatePath())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($getStatePath()))."'))";
-    } elseif (is_string($getStatePath())) {
-        echo "'".str_replace("'", "\'", $getStatePath())."'";
-    } else {
-        echo json_encode($getStatePath());
-    }
-?>)
+                            return await $wire.getSelectOptionLabel(<?php echo \Illuminate\Support\Js::from($getStatePath())->toHtml() ?>)
                         },
                         getOptionLabelsUsing: async () => {
-                            return await $wire.getSelectOptionLabels(<?php
-    if (is_object($getStatePath()) || is_array($getStatePath())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($getStatePath()))."'))";
-    } elseif (is_string($getStatePath())) {
-        echo "'".str_replace("'", "\'", $getStatePath())."'";
-    } else {
-        echo json_encode($getStatePath());
-    }
-?>)
+                            return await $wire.getSelectOptionLabels(<?php echo \Illuminate\Support\Js::from($getStatePath())->toHtml() ?>)
                         },
                         getOptionsUsing: async () => {
-                            return await $wire.getSelectOptions(<?php
-    if (is_object($getStatePath()) || is_array($getStatePath())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($getStatePath()))."'))";
-    } elseif (is_string($getStatePath())) {
-        echo "'".str_replace("'", "\'", $getStatePath())."'";
-    } else {
-        echo json_encode($getStatePath());
-    }
-?>)
+                            return await $wire.getSelectOptions(<?php echo \Illuminate\Support\Js::from($getStatePath())->toHtml() ?>)
                         },
                         getSearchResultsUsing: async (search) => {
-                            return await $wire.getSelectSearchResults(<?php
-    if (is_object($getStatePath()) || is_array($getStatePath())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($getStatePath()))."'))";
-    } elseif (is_string($getStatePath())) {
-        echo "'".str_replace("'", "\'", $getStatePath())."'";
-    } else {
-        echo json_encode($getStatePath());
-    }
-?>, search)
+                            return await $wire.getSelectSearchResults(<?php echo \Illuminate\Support\Js::from($getStatePath())->toHtml() ?>, search)
                         },
-                        isAutofocused: <?php
-    if (is_object($isAutofocused()) || is_array($isAutofocused())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($isAutofocused()))."'))";
-    } elseif (is_string($isAutofocused())) {
-        echo "'".str_replace("'", "\'", $isAutofocused())."'";
-    } else {
-        echo json_encode($isAutofocused());
-    }
-?>,
-                        isMultiple: <?php
-    if (is_object($isMultiple()) || is_array($isMultiple())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($isMultiple()))."'))";
-    } elseif (is_string($isMultiple())) {
-        echo "'".str_replace("'", "\'", $isMultiple())."'";
-    } else {
-        echo json_encode($isMultiple());
-    }
-?>,
-                        hasDynamicOptions: <?php
-    if (is_object($hasDynamicOptions()) || is_array($hasDynamicOptions())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($hasDynamicOptions()))."'))";
-    } elseif (is_string($hasDynamicOptions())) {
-        echo "'".str_replace("'", "\'", $hasDynamicOptions())."'";
-    } else {
-        echo json_encode($hasDynamicOptions());
-    }
-?>,
-                        hasDynamicSearchResults: <?php
-    if (is_object($hasDynamicSearchResults()) || is_array($hasDynamicSearchResults())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($hasDynamicSearchResults()))."'))";
-    } elseif (is_string($hasDynamicSearchResults())) {
-        echo "'".str_replace("'", "\'", $hasDynamicSearchResults())."'";
-    } else {
-        echo json_encode($hasDynamicSearchResults());
-    }
-?>,
-                        loadingMessage: <?php
-    if (is_object($getLoadingMessage()) || is_array($getLoadingMessage())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($getLoadingMessage()))."'))";
-    } elseif (is_string($getLoadingMessage())) {
-        echo "'".str_replace("'", "\'", $getLoadingMessage())."'";
-    } else {
-        echo json_encode($getLoadingMessage());
-    }
-?>,
-                        maxItems: <?php
-    if (is_object($getMaxItems()) || is_array($getMaxItems())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($getMaxItems()))."'))";
-    } elseif (is_string($getMaxItems())) {
-        echo "'".str_replace("'", "\'", $getMaxItems())."'";
-    } else {
-        echo json_encode($getMaxItems());
-    }
-?>,
-                        noSearchResultsMessage: <?php
-    if (is_object($getNoSearchResultsMessage()) || is_array($getNoSearchResultsMessage())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($getNoSearchResultsMessage()))."'))";
-    } elseif (is_string($getNoSearchResultsMessage())) {
-        echo "'".str_replace("'", "\'", $getNoSearchResultsMessage())."'";
-    } else {
-        echo json_encode($getNoSearchResultsMessage());
-    }
-?>,
-                        options: <?php
-    if (is_object($getOptions()) || is_array($getOptions())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($getOptions()))."'))";
-    } elseif (is_string($getOptions())) {
-        echo "'".str_replace("'", "\'", $getOptions())."'";
-    } else {
-        echo json_encode($getOptions());
-    }
-?>,
-                        optionsLimit: <?php
-    if (is_object($getOptionsLimit()) || is_array($getOptionsLimit())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($getOptionsLimit()))."'))";
-    } elseif (is_string($getOptionsLimit())) {
-        echo "'".str_replace("'", "\'", $getOptionsLimit())."'";
-    } else {
-        echo json_encode($getOptionsLimit());
-    }
-?>,
-                        placeholder: <?php
-    if (is_object($getPlaceholder()) || is_array($getPlaceholder())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($getPlaceholder()))."'))";
-    } elseif (is_string($getPlaceholder())) {
-        echo "'".str_replace("'", "\'", $getPlaceholder())."'";
-    } else {
-        echo json_encode($getPlaceholder());
-    }
-?>,
-                        searchingMessage: <?php
-    if (is_object($getSearchingMessage()) || is_array($getSearchingMessage())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($getSearchingMessage()))."'))";
-    } elseif (is_string($getSearchingMessage())) {
-        echo "'".str_replace("'", "\'", $getSearchingMessage())."'";
-    } else {
-        echo json_encode($getSearchingMessage());
-    }
-?>,
-                        searchPrompt: <?php
-    if (is_object($getSearchPrompt()) || is_array($getSearchPrompt())) {
-        echo "JSON.parse(atob('".base64_encode(json_encode($getSearchPrompt()))."'))";
-    } elseif (is_string($getSearchPrompt())) {
-        echo "'".str_replace("'", "\'", $getSearchPrompt())."'";
-    } else {
-        echo json_encode($getSearchPrompt());
-    }
-?>,
+                        isAutofocused: <?php echo \Illuminate\Support\Js::from($isAutofocused())->toHtml() ?>,
+                        isMultiple: <?php echo \Illuminate\Support\Js::from($isMultiple())->toHtml() ?>,
+                        hasDynamicOptions: <?php echo \Illuminate\Support\Js::from($hasDynamicOptions())->toHtml() ?>,
+                        hasDynamicSearchResults: <?php echo \Illuminate\Support\Js::from($hasDynamicSearchResults())->toHtml() ?>,
+                        loadingMessage: <?php echo \Illuminate\Support\Js::from($getLoadingMessage())->toHtml() ?>,
+                        maxItems: <?php echo \Illuminate\Support\Js::from($getMaxItems())->toHtml() ?>,
+                        noSearchResultsMessage: <?php echo \Illuminate\Support\Js::from($getNoSearchResultsMessage())->toHtml() ?>,
+                        options: <?php echo \Illuminate\Support\Js::from($getOptions())->toHtml() ?>,
+                        optionsLimit: <?php echo \Illuminate\Support\Js::from($getOptionsLimit())->toHtml() ?>,
+                        placeholder: <?php echo \Illuminate\Support\Js::from($getPlaceholder())->toHtml() ?>,
+                        searchingMessage: <?php echo \Illuminate\Support\Js::from($getSearchingMessage())->toHtml() ?>,
+                        searchPrompt: <?php echo \Illuminate\Support\Js::from($getSearchPrompt())->toHtml() ?>,
                         state: $wire.<?php echo e($applyStateBindingModifiers('entangle(\'' . $getStatePath() . '\')')); ?>,
                     })"
                     wire:ignore
