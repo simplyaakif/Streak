@@ -2,14 +2,20 @@
 
     namespace App\Http\Livewire\Admin\Filament\Student;
 
+    use App\Models\Batch;
+    use App\Models\BatchStudent;
+    use App\Models\Recovery;
     use App\Models\Student;
     use Filament\Forms\ComponentContainer;
     use Filament\Forms\Components\Card;
     use Filament\Forms\Components\DatePicker;
     use Filament\Forms\Components\FileUpload;
+    use Filament\Forms\Components\Grid;
+    use Filament\Forms\Components\Repeater;
     use Filament\Forms\Components\Select;
     use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
     use Filament\Forms\Components\TextInput;
+    use Filament\Notifications\Notification;
     use Filament\Tables\Actions\Action;
     use Filament\Tables\Columns\ImageColumn;
     use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
@@ -94,7 +100,61 @@
                     $record->nationality = $data['nationality'];
                     $record->cnic_passport = $data['cnic_passport'];
                     $record->save();
+                    Notification::make()
+                        ->title('Student Edited Successfully')
+                        ->success()
+                        ->send();
                 }),
+                Action::make('add_batch')->label('Add Batch')
+                ->form([
+                    Grid::make()
+                    ->schema([
+                        Select::make('batch_id')
+                            ->label('Batch')
+                        ->options(Batch::all()->pluck('title','id'))
+                        ->required()
+                        ->columnSpan(2),
+                    DatePicker::make('session_start_date')
+                    ->required(),
+                    DatePicker::make('session_end_date')
+                    ->required(),
+                        Repeater::make('recoveries')
+                            ->label('Installments/Recoveries')
+                        ->schema([
+                                     TextInput::make('amount')->required(),
+                                     DatePicker::make('due_date')->required(),
+                                 ])
+                            ->columnSpan(2)
+                            ->columns(2)
+                            ->minItems(1),
+                             ]),
+
+                ])
+                ->action(function (Student $record, $data){
+                    $batch_student = BatchStudent::create([
+                        'student_id' => $record->id,
+                        'batch_id' => $data['batch_id'],
+                        'session_start_date' => $data['session_start_date'],
+                        'session_end_date' => $data['session_end_date'],
+                        'batch_status' => 1,
+                                                          ]);
+                    $recoveries = $data['recoveries'];
+                    foreach($recoveries as $recovery) {
+                        Recovery::create([
+                            'batch_student_id' => $batch_student->id,
+                            'batch_id' => $data['batch_id'],
+                            'student_id' => $record->id,
+                            'amount' => $recovery['amount'],
+                            'due_date' => $recovery['due_date'],
+                            'is_paid' => 0,
+                            'course_id' => $batch_student->batch->course_id,
+                                         ]);
+                    }
+                    Notification::make()
+                        ->title('Batch Added Successfully')
+                        ->success()
+                        ->send();
+                })
             ];
         }
 
