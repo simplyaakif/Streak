@@ -1,4 +1,3 @@
-
 <?php $__env->startSection('content'); ?>
     <div class="row">
         <article>
@@ -154,15 +153,15 @@
                         <?php
 if (! isset($_instance)) {
     $html = \Livewire\Livewire::mount('admin.filament.student.student-edit', ['studentId' => $student->id,'student_id' => $student->id])->html();
-} elseif ($_instance->childHasBeenRendered('tXvtqQ9')) {
-    $componentId = $_instance->getRenderedChildComponentId('tXvtqQ9');
-    $componentTag = $_instance->getRenderedChildComponentTagName('tXvtqQ9');
+} elseif ($_instance->childHasBeenRendered('aVFKEaJ')) {
+    $componentId = $_instance->getRenderedChildComponentId('aVFKEaJ');
+    $componentTag = $_instance->getRenderedChildComponentTagName('aVFKEaJ');
     $html = \Livewire\Livewire::dummyMount($componentId, $componentTag);
-    $_instance->preserveRenderedChild('tXvtqQ9');
+    $_instance->preserveRenderedChild('aVFKEaJ');
 } else {
     $response = \Livewire\Livewire::mount('admin.filament.student.student-edit', ['studentId' => $student->id,'student_id' => $student->id]);
     $html = $response->html();
-    $_instance->logRenderedChild('tXvtqQ9', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
+    $_instance->logRenderedChild('aVFKEaJ', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
 }
 echo $html;
 ?>
@@ -181,19 +180,18 @@ echo $html;
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['tab' => 'sessions']); ?>
-
                         <?php
 if (! isset($_instance)) {
     $html = \Livewire\Livewire::mount('admin.filament.student.batch.batch-index', ['studentId' => $student->id,'student_id' => $student->id])->html();
-} elseif ($_instance->childHasBeenRendered('c31OOt2')) {
-    $componentId = $_instance->getRenderedChildComponentId('c31OOt2');
-    $componentTag = $_instance->getRenderedChildComponentTagName('c31OOt2');
+} elseif ($_instance->childHasBeenRendered('SSD4Q7H')) {
+    $componentId = $_instance->getRenderedChildComponentId('SSD4Q7H');
+    $componentTag = $_instance->getRenderedChildComponentTagName('SSD4Q7H');
     $html = \Livewire\Livewire::dummyMount($componentId, $componentTag);
-    $_instance->preserveRenderedChild('c31OOt2');
+    $_instance->preserveRenderedChild('SSD4Q7H');
 } else {
     $response = \Livewire\Livewire::mount('admin.filament.student.batch.batch-index', ['studentId' => $student->id,'student_id' => $student->id]);
     $html = $response->html();
-    $_instance->logRenderedChild('c31OOt2', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
+    $_instance->logRenderedChild('SSD4Q7H', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
 }
 echo $html;
 ?>
@@ -212,10 +210,9 @@ echo $html;
                                     </div>
 
                                     <div class="bg-gray-100 px-4 py-5 sm:px-6">
-
                                         <?php
-                                        $recoveries = App\Models\Recovery::where('batch_id',$batch->id)
-                                                      ->where('student_id',$student->id)->get()
+                                        $recoveries = App\Models\Recovery::where('batch_student_id',$batch->pivot->id)
+                                                      ->get()
                                         ?>
                                         <h3 class="text-xl font-bold">Fee Schedule</h3>
                                         <div>
@@ -247,12 +244,6 @@ echo $html;
                                 </div>
 
                             </div>
-                        <?php
-                            $batchStudent = App\Models\BatchStudent::where('batch_id',$batch->id)
-                        ->where('student_id',$student->id)->first()
-                        ?>
-
-
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                      <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -273,15 +264,15 @@ echo $html;
                         <?php
 if (! isset($_instance)) {
     $html = \Livewire\Livewire::mount('admin.filament.student.user-edit', ['studentId' => $student->id,'userId' => $student->user_id,'student_id' => $student->id,'user_id' => $student->user_id])->html();
-} elseif ($_instance->childHasBeenRendered('Zr3q7bA')) {
-    $componentId = $_instance->getRenderedChildComponentId('Zr3q7bA');
-    $componentTag = $_instance->getRenderedChildComponentTagName('Zr3q7bA');
+} elseif ($_instance->childHasBeenRendered('kvOQxnl')) {
+    $componentId = $_instance->getRenderedChildComponentId('kvOQxnl');
+    $componentTag = $_instance->getRenderedChildComponentTagName('kvOQxnl');
     $html = \Livewire\Livewire::dummyMount($componentId, $componentTag);
-    $_instance->preserveRenderedChild('Zr3q7bA');
+    $_instance->preserveRenderedChild('kvOQxnl');
 } else {
     $response = \Livewire\Livewire::mount('admin.filament.student.user-edit', ['studentId' => $student->id,'userId' => $student->user_id,'student_id' => $student->id,'user_id' => $student->user_id]);
     $html = $response->html();
-    $_instance->logRenderedChild('Zr3q7bA', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
+    $_instance->logRenderedChild('kvOQxnl', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
 }
 echo $html;
 ?>
@@ -335,15 +326,15 @@ echo $html;
                         <?php
 if (! isset($_instance)) {
     $html = \Livewire\Livewire::mount('admin.filament.student.attendance-show', ['studentId' => $student->id,'student_id' => $student->id])->html();
-} elseif ($_instance->childHasBeenRendered('bkSGLjB')) {
-    $componentId = $_instance->getRenderedChildComponentId('bkSGLjB');
-    $componentTag = $_instance->getRenderedChildComponentTagName('bkSGLjB');
+} elseif ($_instance->childHasBeenRendered('77Nxt9c')) {
+    $componentId = $_instance->getRenderedChildComponentId('77Nxt9c');
+    $componentTag = $_instance->getRenderedChildComponentTagName('77Nxt9c');
     $html = \Livewire\Livewire::dummyMount($componentId, $componentTag);
-    $_instance->preserveRenderedChild('bkSGLjB');
+    $_instance->preserveRenderedChild('77Nxt9c');
 } else {
     $response = \Livewire\Livewire::mount('admin.filament.student.attendance-show', ['studentId' => $student->id,'student_id' => $student->id]);
     $html = $response->html();
-    $_instance->logRenderedChild('bkSGLjB', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
+    $_instance->logRenderedChild('77Nxt9c', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
 }
 echo $html;
 ?>

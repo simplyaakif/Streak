@@ -25,10 +25,11 @@
         public $email;
         public $pakistan_mobile;
         public $whatsapp_mobile;
-        public $courses;
+        public $courses=[];
         public $country;
         public $address;
         public $pak_cnic;
+        public $ace_reference;
 
 
         public $mode_of_learning;
@@ -41,12 +42,12 @@
                 TextInput::make('name')
                 ->required(),
                 TextInput::make('father_name')->label('Father Name')->required(),
-
+//
                 MultiSelect::make('courses')
                     ->options(Course::pluck('title','id'))
                     ->helperText('Enter the course or courses you are applying for')
                     ->required(),
-
+//
                 Select::make('campus_id')
                     ->label('Campus')
                     ->options(Campus::pluck('name','id'))
@@ -55,23 +56,30 @@
 
                 Select::make('mode_of_learning')
                     ->options([
-                        'In Campus'=>'On-Campus',
-                        'Online'=>'Online'
+                        'On-Campus',
+                        'Online'
                               ])
                     ->helperText('Enter the learning type you are applying for')
                     ->required(),
 
-                Select::make('country')
+                Select::make('ace_reference')
                     ->options([
-                        'Pakistan',
-                        'Other Than Pakistan',
-                      ]),
+                        'Facebook_Advertisement'=>'Facebook Advertisement',
+                        'Whatsapp'=>'Whatsapp',
+                        'Phone_call' =>'Phone call',
+                        'Website_chat' =>'Website chat',
+                        'Google_search'=>'Google search',
+                        'Physically_Campus_visit'=>'Physically Campus visit',
+                        'Instagram' =>'Instagram',
+                        'Friend/Relative/Reference'=>'Friend/Relative/Reference',
+                    ])
+                    ->helperText('Enter the reference for the Institution'),
+
                 TextInput::make('pakistan_mobile')
                     ->label('Mobile Number (Pakistan Only)')
                     ->helperText("Fill if you have a Pakistan mobile number")
                     ->mask(fn (TextInput\Mask $mask) => $mask->pattern('0000-0000000'))
-                ->minLength(11)
-                ,
+                ->minLength(11),
                 TextInput::make('whatsapp_mobile')
                     ->label('Whatsapp Mobile Number')
                     ->helperText("Fill if you have Whatsapp number"),

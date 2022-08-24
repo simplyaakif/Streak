@@ -4,11 +4,16 @@
 
     use App\Models\Batch;
     use App\Models\BatchStudent;
+    use App\Models\Recovery;
     use App\Models\Student;
     use Filament\Forms\ComponentContainer;
     use Filament\Forms\Components\Card;
     use Filament\Forms\Components\DatePicker;
+    use Filament\Forms\Components\Repeater;
     use Filament\Forms\Components\Select;
+    use Filament\Forms\Components\TextInput;
+    use Filament\Forms\Components\Toggle;
+    use Filament\Notifications\Notification;
     use Filament\Tables\Actions\Action;
     use Filament\Tables\Columns\TextColumn;
     use Filament\Tables\Concerns\InteractsWithTable;
@@ -57,7 +62,66 @@
                     $record->session_start_date = $data['session_start_date'];
                     $record->session_end_date = $data['session_end_date'];
                     $record->save();
-                })
+
+                    Notification::make()
+                        ->title('Batch Edited Successfully')
+                        ->success()
+                        ->send();
+                }),
+                Action::make('edit_recoveries')
+                    ->label('Re-generate Unpaid Recoveries')
+                    ->mountUsing(fn (ComponentContainer $form, BatchStudent $record) => $form->fill([
+        'recoveries'=>Recovery::where('batch_student_id',$record->id)
+        ->where('is_paid','=',0)
+        ->get()->toArray()
+                    ]))
+                    ->form([
+                                         Repeater::make('recoveries')->schema([
+                                                 TextInput::make('amount')->required(),
+                                                 DatePicker::make('due_date')->required(),
+                                                                      ])->columns(2)
+                                            ])
+                    ->action(function(BatchStudent $record, $data){
+                        $data = $data['recoveries'];
+                        $old_recoveries = Recovery::where('batch_student_id',$record->id)
+                            ->where('is_paid','=',0)
+                            ->get();
+                        foreach($old_recoveries as $old_recovery) {
+                            $old_recovery->delete();
+                        }
+                        foreach($data as $row){
+                          $recovery = [
+                              'amount'=>$row['amount'],
+                              'due_date'=>$row['due_date'],
+                              'batch_student_id'=>$record->id,
+                              'batch_id'=>$record->batch_id,
+                              'student_id'=>$record->student_id,
+                              'is_paid'=>false,
+                              'course_id'=>$record->batch->course_id,
+                          ];
+                        Recovery::create($recovery);
+                        }
+                        Notification::make()
+                            ->title('Recoveries Added Successfully')
+                            ->success()
+                            ->send();
+                    }),
+
+
+                Action::make('delete')
+                    ->color('danger')
+                    ->action(function(BatchStudent $record, $data){
+                        $recoveries = Recovery::where('batch_student_id',$record->id)
+                            ->get();
+                        foreach($recoveries as $recovery) {
+                            $recovery->delete();
+                        }
+                        $record->delete();
+                        Notification::make()
+                            ->title('Batch Deleted Successfully')
+                            ->success()
+                            ->send();
+                    }),
             ];
         }
 

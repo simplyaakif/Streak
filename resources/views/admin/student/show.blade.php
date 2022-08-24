@@ -85,7 +85,6 @@
                         :student_id="$student->id"/>
                     </x-tab-details>
                     <x-tab-details tab="sessions">
-{{--                        <livewire:admin.student.update-or-create :student="$student"/>--}}
                         <livewire:admin.filament.student.batch.batch-index
                             :student_id="$student->id"
                         />
@@ -102,10 +101,9 @@
                                     </div>
 
                                     <div class="bg-gray-100 px-4 py-5 sm:px-6">
-{{--                                        {{json_encode($batch)}}--}}
                                         @php
-                                        $recoveries = App\Models\Recovery::where('batch_id',$batch->id)
-                                                      ->where('student_id',$student->id)->get()
+                                        $recoveries = App\Models\Recovery::where('batch_student_id',$batch->pivot->id)
+                                                      ->get()
                                         @endphp
                                         <h3 class="text-xl font-bold">Fee Schedule</h3>
                                         <div>
@@ -137,12 +135,6 @@
                                 </div>
 
                             </div>
-                        @php
-                            $batchStudent = App\Models\BatchStudent::where('batch_id',$batch->id)
-                        ->where('student_id',$student->id)->first()
-                        @endphp
-{{--                            <livewire:admin.student.update-or-create-batch-student-recovery--}}
-{{--                                :batch-student="$batchStudent"/>--}}
                         @endforeach
                     </x-tab-details>
 

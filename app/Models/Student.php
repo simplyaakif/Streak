@@ -98,6 +98,12 @@ class Student extends Model implements HasMedia
 
         return 'https://avatars.dicebear.com/api/initials/' . $this->name . '.svg';
     }
+
+//    public function student_batches()
+//    {
+//        return $this->belongsToMany(BatchStudent::class,'batch_student');
+//    }
+
     public function batches()
     {
         return $this->belongsToMany(Batch::class)->withPivot('id','session_start_date','session_end_date','batch_status')
