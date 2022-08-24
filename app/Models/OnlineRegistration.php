@@ -7,8 +7,11 @@
 
     class OnlineRegistration extends Model {
         use HasFactory;
-//        protected $guarded=[];
-        protected $fillable = ['name','father_name','pak_cnic','pakistan_mobile','whatsapp_mobile','passport_number','address','email','mode_of_learning','campus_id'];
+        protected $guarded=[];
+        protected $fillable = ['name','father_name','pak_cnic','pakistan_mobile','whatsapp_mobile','passport_number','address','email','mode_of_learning','campus_id','ace_reference'];
+//        protected $casts = [
+//            'courses' => 'array',
+//        ];
 
         public function courses()
         {
