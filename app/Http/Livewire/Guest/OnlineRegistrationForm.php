@@ -56,20 +56,20 @@
 
                 Select::make('mode_of_learning')
                     ->options([
-                        'On-Campus',
-                        'Online'
+                                  'On-Campus'=> 'On-Campus',
+                                  'Online'=>'Online'
                               ])
                     ->helperText('Enter the learning type you are applying for')
                     ->required(),
 
                 Select::make('ace_reference')
                     ->options([
-                        'Facebook_Advertisement'=>'Facebook Advertisement',
+                        'Facebook Advertisement'=>'Facebook Advertisement',
                         'Whatsapp'=>'Whatsapp',
-                        'Phone_call' =>'Phone call',
-                        'Website_chat' =>'Website chat',
-                        'Google_search'=>'Google search',
-                        'Physically_Campus_visit'=>'Physically Campus visit',
+                        'Phone Call' =>'Phone call',
+                        'Website Chat' =>'Website chat',
+                        'Google Search'=>'Google search',
+                        'Physically Campus_visit'=>'Physically Campus visit',
                         'Instagram' =>'Instagram',
                         'Friend/Relative/Reference'=>'Friend/Relative/Reference',
                     ])
@@ -99,10 +99,11 @@
 
         public function register():void
         {
-//            dd($this->form->getState());
-            $registration = OnlineRegistration::create($this->form->getState());
-            $registration->courses()->attach($this->form->getState()['courses']);
-//            $this->form->model($registration)->saveRelationships();
+            $courses = $this->form->getState()['courses'];
+            $onlineRegistration = $this->form->getState();
+            unset($onlineRegistration['courses']);
+            $registration = OnlineRegistration::create($onlineRegistration);
+            $registration->courses()->attach($courses);
 
             if($this->form->getState()['pakistan_mobile']){
             $sms = new SmsChannel();

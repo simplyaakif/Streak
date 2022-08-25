@@ -4,6 +4,7 @@
 
     use App\Http\Controllers\Controller;
     use App\Models\Discussion;
+    use App\Models\Lesson;
     use App\Models\Student;
     use App\Models\User;
     use Auth;
@@ -43,5 +44,16 @@
         public function calendar()
         {
             return view('student.InstituteCalendar.index');
+        }
+
+        public function classwork(Lesson $lesson)
+        {
+            return view('student.course.lesson.show',compact('lesson'));
+        }
+
+        public function homework()
+        {
+
+            return view('student.course.lesson.show');
         }
     }

@@ -36,6 +36,14 @@
                             </div>
                             <div
                                 class="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4">
+                                <?php if (can_impersonate($guard = null)) : ?>
+                                <a
+                                    href="<?php echo e(route('impersonate', $student->user_id)); ?>"
+                                    type="button"
+                                        class="inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+                                    <span>Impersonate</span>
+                                </a>
+                                <?php endif; ?>
                                 <button type="button"
                                         class="inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
                                     <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400"
@@ -153,15 +161,15 @@
                         <?php
 if (! isset($_instance)) {
     $html = \Livewire\Livewire::mount('admin.filament.student.student-edit', ['studentId' => $student->id,'student_id' => $student->id])->html();
-} elseif ($_instance->childHasBeenRendered('aVFKEaJ')) {
-    $componentId = $_instance->getRenderedChildComponentId('aVFKEaJ');
-    $componentTag = $_instance->getRenderedChildComponentTagName('aVFKEaJ');
+} elseif ($_instance->childHasBeenRendered('ZDKXflq')) {
+    $componentId = $_instance->getRenderedChildComponentId('ZDKXflq');
+    $componentTag = $_instance->getRenderedChildComponentTagName('ZDKXflq');
     $html = \Livewire\Livewire::dummyMount($componentId, $componentTag);
-    $_instance->preserveRenderedChild('aVFKEaJ');
+    $_instance->preserveRenderedChild('ZDKXflq');
 } else {
     $response = \Livewire\Livewire::mount('admin.filament.student.student-edit', ['studentId' => $student->id,'student_id' => $student->id]);
     $html = $response->html();
-    $_instance->logRenderedChild('aVFKEaJ', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
+    $_instance->logRenderedChild('ZDKXflq', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
 }
 echo $html;
 ?>
@@ -183,15 +191,15 @@ echo $html;
                         <?php
 if (! isset($_instance)) {
     $html = \Livewire\Livewire::mount('admin.filament.student.batch.batch-index', ['studentId' => $student->id,'student_id' => $student->id])->html();
-} elseif ($_instance->childHasBeenRendered('SSD4Q7H')) {
-    $componentId = $_instance->getRenderedChildComponentId('SSD4Q7H');
-    $componentTag = $_instance->getRenderedChildComponentTagName('SSD4Q7H');
+} elseif ($_instance->childHasBeenRendered('frDHHlQ')) {
+    $componentId = $_instance->getRenderedChildComponentId('frDHHlQ');
+    $componentTag = $_instance->getRenderedChildComponentTagName('frDHHlQ');
     $html = \Livewire\Livewire::dummyMount($componentId, $componentTag);
-    $_instance->preserveRenderedChild('SSD4Q7H');
+    $_instance->preserveRenderedChild('frDHHlQ');
 } else {
     $response = \Livewire\Livewire::mount('admin.filament.student.batch.batch-index', ['studentId' => $student->id,'student_id' => $student->id]);
     $html = $response->html();
-    $_instance->logRenderedChild('SSD4Q7H', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
+    $_instance->logRenderedChild('frDHHlQ', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
 }
 echo $html;
 ?>
@@ -264,15 +272,15 @@ echo $html;
                         <?php
 if (! isset($_instance)) {
     $html = \Livewire\Livewire::mount('admin.filament.student.user-edit', ['studentId' => $student->id,'userId' => $student->user_id,'student_id' => $student->id,'user_id' => $student->user_id])->html();
-} elseif ($_instance->childHasBeenRendered('kvOQxnl')) {
-    $componentId = $_instance->getRenderedChildComponentId('kvOQxnl');
-    $componentTag = $_instance->getRenderedChildComponentTagName('kvOQxnl');
+} elseif ($_instance->childHasBeenRendered('t19ebtl')) {
+    $componentId = $_instance->getRenderedChildComponentId('t19ebtl');
+    $componentTag = $_instance->getRenderedChildComponentTagName('t19ebtl');
     $html = \Livewire\Livewire::dummyMount($componentId, $componentTag);
-    $_instance->preserveRenderedChild('kvOQxnl');
+    $_instance->preserveRenderedChild('t19ebtl');
 } else {
     $response = \Livewire\Livewire::mount('admin.filament.student.user-edit', ['studentId' => $student->id,'userId' => $student->user_id,'student_id' => $student->id,'user_id' => $student->user_id]);
     $html = $response->html();
-    $_instance->logRenderedChild('kvOQxnl', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
+    $_instance->logRenderedChild('t19ebtl', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
 }
 echo $html;
 ?>
@@ -326,15 +334,15 @@ echo $html;
                         <?php
 if (! isset($_instance)) {
     $html = \Livewire\Livewire::mount('admin.filament.student.attendance-show', ['studentId' => $student->id,'student_id' => $student->id])->html();
-} elseif ($_instance->childHasBeenRendered('77Nxt9c')) {
-    $componentId = $_instance->getRenderedChildComponentId('77Nxt9c');
-    $componentTag = $_instance->getRenderedChildComponentTagName('77Nxt9c');
+} elseif ($_instance->childHasBeenRendered('fuPS73E')) {
+    $componentId = $_instance->getRenderedChildComponentId('fuPS73E');
+    $componentTag = $_instance->getRenderedChildComponentTagName('fuPS73E');
     $html = \Livewire\Livewire::dummyMount($componentId, $componentTag);
-    $_instance->preserveRenderedChild('77Nxt9c');
+    $_instance->preserveRenderedChild('fuPS73E');
 } else {
     $response = \Livewire\Livewire::mount('admin.filament.student.attendance-show', ['studentId' => $student->id,'student_id' => $student->id]);
     $html = $response->html();
-    $_instance->logRenderedChild('77Nxt9c', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
+    $_instance->logRenderedChild('fuPS73E', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
 }
 echo $html;
 ?>

@@ -62,6 +62,8 @@ Route::group(['prefix' => 'student','middleware' => ['auth','student_guardian']]
     Route::get('/',[SC::class,'index'])->name('student.dashboard');
     Route::get('/courses',[SC::class,'courses'])->name('student.courses');
     Route::get('/course/{id}',[SC::class,'course'])->name('student.course');
+    Route::get('/class-lesson/{lesson}',[SC::class,'classwork'])->name('student.course.class.lesson.show');
+    Route::get('/home-lesson/{id}',[SC::class,'homework'])->name('student.course.home.lesson.show');
     Route::get('/support',[IssuesController::class,'index'])->name('student.issues');
     Route::get('/support/{id}',[IssuesController::class,'show'])->name('student.issue');
     Route::get('/discussions',[DiscussionsController::class,'index'])->name('student.discussions');

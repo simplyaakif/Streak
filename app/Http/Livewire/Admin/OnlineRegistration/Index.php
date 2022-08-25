@@ -35,7 +35,7 @@
                 TextColumn::make('whatsapp_mobile')->label('Whatsapp Number'),
                 TextColumn::make('courses')->view('admin.filament.tables.columns.courses'),
                 TextColumn::make('campus.name')->label('Campus'),
-                TextColumn::make('reference')->label('Reference'),
+                TextColumn::make('ace_reference')->label('Reference'),
                 TextColumn::make('mode_of_learning')->label('Learning Type'),
                 TextColumn::make('created_at')->since(),
             ];
