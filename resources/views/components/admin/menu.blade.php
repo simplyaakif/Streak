@@ -103,6 +103,11 @@
             <x-admin.sidebar-dd-nav-subitem
                 label="Batch Attendances"
                 route="{{route('admin.student-attendances')}}"/>
+            <x-admin.sidebar-dd-nav-subitem
+                can="lesson_access"
+                label="Lesson Planner"
+                route="{{route('admin.lessons.index')}}"/>
+
         </x-admin.sidebar-dd-nav-item>
 
         <x-admin.sidebar-dd-nav-item

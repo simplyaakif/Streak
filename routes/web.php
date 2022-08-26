@@ -26,6 +26,7 @@ use App\Http\Controllers\Auth\UserProfileController;
     use App\Http\Controllers\EmployeesController;
     use App\Http\Controllers\ExpensesController;
     use App\Http\Controllers\IncomesController;
+    use App\Http\Controllers\LessonsController;
     use App\Http\Controllers\OnlineRegistrationsController;
     use App\Http\Controllers\RecoveriesController;
     use App\Http\Controllers\SmsController;
@@ -127,6 +128,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','st
     // Batch
     Route::post('batches/media', [BatchController::class, 'storeMedia'])->name('batches.storeMedia');
     Route::resource('batches', BatchController::class, ['except' => ['store', 'update', 'destroy']]);
+
+    //Lesson Planner
+    Route::resource('lessons',LessonsController::class,['only' =>['index']]);
 
     // Student
     Route::get('students/dashboard',[StudentController::class,'dashboard'])->name('students.dashboard');
