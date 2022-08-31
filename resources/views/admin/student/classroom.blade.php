@@ -17,7 +17,7 @@
                 <x-tab tab="students">Students</x-tab>
                 <x-tab tab="attendance">Attendance Records</x-tab>
                 <x-tab tab="lesson_planner">Class Work</x-tab>
-{{--                <x-tab tab="class_tasks">Home Tasks</x-tab>--}}
+                <x-tab tab="home_tasks">Home Tasks</x-tab>
 {{--                <x-tab tab="class_exams">Class Examination Results</x-tab>--}}
             </x-slot>
             <x-slot name="details">
@@ -81,7 +81,9 @@
                 <x-tab-details tab="lesson_planner">
                     <livewire:admin.class-room.lesson-planner :batch="$batch"/>
                 </x-tab-details>
-                <x-tab-details tab="class_tasks">Class Tasks</x-tab-details>
+                <x-tab-details tab="home_tasks">
+                    <livewire:admin.filament.student.home-task :batch="$batch"/>
+                </x-tab-details>
                 <x-tab-details tab="class_exams">Class Examination</x-tab-details>
             </x-slot>
         </x-tabs>

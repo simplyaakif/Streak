@@ -107,6 +107,10 @@
                 can="lesson_access"
                 label="Lesson Planner"
                 route="{{route('admin.lessons.index')}}"/>
+<x-admin.sidebar-dd-nav-subitem
+                can="home_task_access"
+                label="Home Work"
+                route="{{route('admin.home-task.index')}}"/>
 
         </x-admin.sidebar-dd-nav-item>
 

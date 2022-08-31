@@ -4,9 +4,9 @@
 
     use App\Http\Controllers\Controller;
     use App\Models\Discussion;
+    use App\Models\HomeTask;
     use App\Models\Lesson;
     use App\Models\Student;
-    use App\Models\User;
     use Auth;
 
     class StudentController extends Controller {
@@ -51,9 +51,9 @@
             return view('student.course.lesson.show',compact('lesson'));
         }
 
-        public function homework()
+        public function homework($id)
         {
-
-            return view('student.course.lesson.show');
+            $homework = HomeTask::find($id);
+            return view('student.course.home.show',compact('homework'));
         }
     }

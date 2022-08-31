@@ -8,15 +8,9 @@
         <entry key="createEvent.shouldBroadcast" value="1" />
         <entry key="createFeatureTest.refreshDatabase" value="1" />
         <entry key="createMailable.markdown" value="1" />
-        <entry key="createModel.createController" value="1" />
         <entry key="createModel.createMigration" value="1" />
         <entry key="createNotification.shouldQueue" value="1" />
       </map>
-    </option>
-    <option name="helperCode">
-      <LaravelHelperCodeSettings>
-        <option name="modelsDatabaseMetaSource" value="migrations" />
-      </LaravelHelperCodeSettings>
     </option>
     <option name="lastContentRoot" value="$PROJECT_DIR$" />
   </component>

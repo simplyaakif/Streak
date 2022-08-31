@@ -11,53 +11,11 @@
                 <x-tab tab="batch">Batch</x-tab>
                 <x-tab tab="attendance">Attendance</x-tab>
                 <x-tab tab="class">Class Lessons</x-tab>
-{{--                <x-tab tab="home">Home Work</x-tab>--}}
+                <x-tab tab="home">Home Work</x-tab>
             </x-slot>
             <x-slot name="details">
         <x-tab-details tab="batch">
             <div class="py-8 max-w-3xl mx-auto ">
-{{--                <div class="space-y-6 lg:col-start-1 lg:col-span-2">--}}
-{{--                    <!-- Description list-->--}}
-{{--                    <section aria-labelledby="applicant-information-title">--}}
-{{--                        <div class="bg-white shadow sm:rounded-lg">--}}
-{{--                            <div class="px-4 py-5 sm:px-6">--}}
-{{--                                <h2 id="applicant-information-title" class="text-lg leading-6 font-medium text-gray-900">--}}
-{{--                                    Batch Information--}}
-{{--                                </h2>--}}
-{{--                                <p class="mt-1 max-w-2xl text-sm text-gray-500">--}}
-{{--                                    Course Details & Learning material.--}}
-{{--                                </p>--}}
-{{--                            </div>--}}
-{{--                            <div class="border-t border-gray-200 px-4 py-5 sm:px-6">--}}
-{{--                                <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">--}}
-{{--                                    <div class="sm:col-span-2">--}}
-{{--                                        <dt class="text-sm font-medium text-gray-500">--}}
-{{--                                            About--}}
-{{--                                        </dt>--}}
-{{--                                        <dd class="mt-1 text-sm text-gray-900">--}}
-{{--                                            Work in Progress--}}
-{{--                                        </dd>--}}
-{{--                                    </div>--}}
-{{--                                    <div class="sm:col-span-2">--}}
-{{--                                        <dt class="text-sm font-medium text-gray-500">--}}
-{{--                                            Resources--}}
-{{--                                        </dt>--}}
-{{--                                        <dd class="mt-1 text-sm text-gray-900">--}}
-{{--                                            Work In Progress--}}
-{{--                                        </dd>--}}
-{{--                                    </div>--}}
-{{--                                </dl>--}}
-{{--                            </div>--}}
-{{--                            <div>--}}
-{{--                                <a href="#"--}}
-{{--                                   class="block bg-gray-50 text-sm font-medium text-gray-500 text-center px-4 py-4--}}
-{{--                               hover:text-gray-700 sm:rounded-b-lg">.</a>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </section>--}}
-
-{{--                    <!-- Comments-->--}}
-{{--                </div>--}}
 
                 <section aria-labelledby="timeline-title" class="lg:col-start-3 lg:col-span-1">
                     <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
@@ -122,7 +80,10 @@
             </div>
         </x-tab-details>
         <x-tab-details tab="home">
-
+            <livewire:student.course.home
+                :batch_id="$batch->id"
+                :session_start_date="$batch->pivot->session_start_date"
+                :session_end_date="$batch->pivot->session_end_date"/>
         </x-tab-details>
             </x-slot>
         </x-tabs>

@@ -25,6 +25,7 @@ use App\Http\Controllers\Auth\UserProfileController;
     use App\Http\Controllers\DiscussionsController;
     use App\Http\Controllers\EmployeesController;
     use App\Http\Controllers\ExpensesController;
+    use App\Http\Controllers\HomeTaskController;
     use App\Http\Controllers\IncomesController;
     use App\Http\Controllers\LessonsController;
     use App\Http\Controllers\OnlineRegistrationsController;
@@ -64,7 +65,7 @@ Route::group(['prefix' => 'student','middleware' => ['auth','student_guardian']]
     Route::get('/courses',[SC::class,'courses'])->name('student.courses');
     Route::get('/course/{id}',[SC::class,'course'])->name('student.course');
     Route::get('/class-lesson/{lesson}',[SC::class,'classwork'])->name('student.course.class.lesson.show');
-    Route::get('/home-lesson/{id}',[SC::class,'homework'])->name('student.course.home.lesson.show');
+    Route::get('/homework/{id}',[SC::class,'homework'])->name('student.course.home.lesson.show');
     Route::get('/support',[IssuesController::class,'index'])->name('student.issues');
     Route::get('/support/{id}',[IssuesController::class,'show'])->name('student.issue');
     Route::get('/discussions',[DiscussionsController::class,'index'])->name('student.discussions');
@@ -131,6 +132,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','st
 
     //Lesson Planner
     Route::resource('lessons',LessonsController::class,['only' =>['index']]);
+
+    Route::resource('home-task',HomeTaskController::class,['only' =>['index']]);
 
     // Student
     Route::get('students/dashboard',[StudentController::class,'dashboard'])->name('students.dashboard');
