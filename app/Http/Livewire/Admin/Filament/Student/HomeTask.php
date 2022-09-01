@@ -122,8 +122,8 @@ use Filament\Tables\Columns\TextColumn;
             return [
                 Grid::make(2)
                 ->schema([
-                TextInput::make('title'),
-                DateTimePicker::make('due_date_time')
+                TextInput::make('title')->columnSpan(1),
+                DateTimePicker::make('due_date_time')->columnSpan(1)
                 ->withoutSeconds(),
                 Textarea::make('homework')
                     ->rows(10)
