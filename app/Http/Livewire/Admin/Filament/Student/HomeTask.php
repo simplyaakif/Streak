@@ -146,7 +146,7 @@ use Filament\Tables\Columns\TextColumn;
         }
         protected function getTableQuery(): Builder|Relation
         {
-            return HT::query();
+            return HT::query()->where('batch_id',$this->batch->id);
         }
 
         public function render()
