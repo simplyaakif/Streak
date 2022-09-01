@@ -34,15 +34,15 @@
     <?php
 if (! isset($_instance)) {
     $html = \Livewire\Livewire::mount('notifications')->html();
-} elseif ($_instance->childHasBeenRendered('aPMSBOl')) {
-    $componentId = $_instance->getRenderedChildComponentId('aPMSBOl');
-    $componentTag = $_instance->getRenderedChildComponentTagName('aPMSBOl');
+} elseif ($_instance->childHasBeenRendered('k7ClETI')) {
+    $componentId = $_instance->getRenderedChildComponentId('k7ClETI');
+    $componentTag = $_instance->getRenderedChildComponentTagName('k7ClETI');
     $html = \Livewire\Livewire::dummyMount($componentId, $componentTag);
-    $_instance->preserveRenderedChild('aPMSBOl');
+    $_instance->preserveRenderedChild('k7ClETI');
 } else {
     $response = \Livewire\Livewire::mount('notifications');
     $html = $response->html();
-    $_instance->logRenderedChild('aPMSBOl', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
+    $_instance->logRenderedChild('k7ClETI', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
 }
 echo $html;
 ?>
@@ -133,15 +133,15 @@ echo $html;
 <?php
 if (! isset($_instance)) {
     $html = \Livewire\Livewire::mount('livewire-ui-spotlight')->html();
-} elseif ($_instance->childHasBeenRendered('di5qHGd')) {
-    $componentId = $_instance->getRenderedChildComponentId('di5qHGd');
-    $componentTag = $_instance->getRenderedChildComponentTagName('di5qHGd');
+} elseif ($_instance->childHasBeenRendered('7he4I4s')) {
+    $componentId = $_instance->getRenderedChildComponentId('7he4I4s');
+    $componentTag = $_instance->getRenderedChildComponentTagName('7he4I4s');
     $html = \Livewire\Livewire::dummyMount($componentId, $componentTag);
-    $_instance->preserveRenderedChild('di5qHGd');
+    $_instance->preserveRenderedChild('7he4I4s');
 } else {
     $response = \Livewire\Livewire::mount('livewire-ui-spotlight');
     $html = $response->html();
-    $_instance->logRenderedChild('di5qHGd', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
+    $_instance->logRenderedChild('7he4I4s', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
 }
 echo $html;
 ?>

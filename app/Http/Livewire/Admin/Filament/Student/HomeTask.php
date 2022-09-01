@@ -6,7 +6,6 @@ use App\Models\Batch;
 use Filament\Forms\ComponentContainer;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -120,14 +119,15 @@ use Filament\Tables\Columns\TextColumn;
         protected function getFormSchema(): array
         {
             return [
-                Grid::make(2)
+                Grid::make(1)
                 ->schema([
                 TextInput::make('title')->columnSpan(1),
-                DateTimePicker::make('due_date_time')->columnSpan(1)
-                ->withoutSeconds(),
+                DateTimePicker::make('due_date_time')
+                ->withoutSeconds()
+                ->columnSpan(1),
                 Textarea::make('homework')
                     ->rows(10)
-                    ->columnSpan(2),
+                    ->columnSpan(1),
                          ])
             ];
         }

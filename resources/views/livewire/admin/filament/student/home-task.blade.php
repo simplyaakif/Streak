@@ -5,9 +5,11 @@
     <div>
         <form wire:submit.prevent="submit">
             <x-modal.dialog wire:model="showModal" max-width="3xl">
-                <x-slot name="title">Add Lesson Plan</x-slot>
+                <x-slot name="title">Add Home Task</x-slot>
                 <x-slot name="content" >
+                    <div>
                     {{ $this->form }}
+                    </div>
                 </x-slot>
                 <x-slot name="footer">
                     <x-button.secondary wire:click="$set('showModal',false)">Cancel</x-button.secondary>
