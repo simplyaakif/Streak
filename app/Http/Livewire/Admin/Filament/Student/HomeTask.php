@@ -60,14 +60,15 @@ use Filament\Tables\Columns\TextColumn;
                     })
                     ->modalButton('Close')
                     ->form([
-                               Grid::make(2)
+                               Grid::make(1)
                                    ->schema([
-                                                TextInput::make('title')->disabled(),
+                                                TextInput::make('title')->columnSpan(1),
                                                 DateTimePicker::make('due_date_time')
-                                                    ->withoutSeconds()->disabled(),
+                                                    ->withoutSeconds()
+                                                    ->columnSpan(1),
                                                 Textarea::make('homework')
-                                                    ->rows(10)->disabled()
-                                                    ->columnSpan(2),
+                                                    ->rows(10)
+                                                    ->columnSpan(1),
                                             ])
                            ]),
                Action::make('edit')
@@ -85,14 +86,15 @@ use Filament\Tables\Columns\TextColumn;
                    ->visible(fn (HT $record): bool => auth()->user()->can('home_task_edit', $record) ||
                        $record->employee_id === auth()->user()->employee->id)
                    ->form([
-                              Grid::make(2)
+                              Grid::make(1)
                                   ->schema([
-                                               TextInput::make('title'),
+                                               TextInput::make('title')->columnSpan(1),
                                                DateTimePicker::make('due_date_time')
-                                                   ->withoutSeconds(),
+                                                   ->withoutSeconds()
+                                                   ->columnSpan(1),
                                                Textarea::make('homework')
                                                    ->rows(10)
-                                                   ->columnSpan(2),
+                                                   ->columnSpan(1),
                                            ])
                    ]),
               Action::make('delete')

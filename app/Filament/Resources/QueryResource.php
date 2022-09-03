@@ -45,6 +45,7 @@ class QueryResource extends Resource
             ->columns([
                 TextColumn::make('name')->searchable(),
                 TextColumn::make('mobile'),
+                TextColumn::make('mobile'),
                 TextColumn::make('entry_by'),
                 Tables\Columns\TagsColumn::make('course_tags'),
                 TextColumn::make('contact_type_label')
