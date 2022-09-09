@@ -45,11 +45,11 @@ use Filament\Tables\Columns\TextColumn;
 
         protected function getTableQuery(): Builder|Relation
         {
-            return HomeTask::query()->whereBetween('created_at',[
+            return HomeTask::query()->where('batch_id',$this->batch_id)->whereBetween('created_at',[
                 carbon($this->session_start_date)->subDays(7),
                 carbon($this->session_end_date)->addDays(7),
 
-            ]);
+            ])->latest();
         }
 
         public function render()
