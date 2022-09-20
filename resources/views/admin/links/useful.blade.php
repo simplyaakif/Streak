@@ -18,7 +18,7 @@
             <h2 class="font-bold text-xl border-b border-gray-200 mt-4">IELTS Book Listening Audios</h2>
             <ul>
                 <li>
-                    <a href="https://misc.appsoulz.com/ielts/">IELTS Book</a>
+                    <a href="http://ielts.englishonline.com.pk/book/">IELTS Book</a>
                 </li>
             </ul>
         </div>
@@ -26,24 +26,24 @@
             <h2 class="font-bold text-xl border-b border-gray-200 mt-4">IELTS Mock Listening Audios</h2>
             <ul>
                 <li>
-                    <a href="https://misc.appsoulz.com/ielts/test01"> Listening Audio 01</a>
+                    <a href="http://ielts.englishonline.com.pk/test01"> Listening Audio 01</a>
                 </li>
                 <li>
-                    <a href="https://misc.appsoulz.com/ielts/test02"> Listening Audio 02</a>
+                    <a href="http://ielts.englishonline.com.pk/test02"> Listening Audio 02</a>
 
                 </li>
                 <li>
-                    <a href="https://misc.appsoulz.com/ielts/test03"> Listening Audio 03</a>
+                    <a href="http://ielts.englishonline.com.pk/test03"> Listening Audio 03</a>
 
                 </li>
                 <li>
-                    <a href="https://misc.appsoulz.com/ielts/test04"> Listening Audio 04</a>
+                    <a href="http://ielts.englishonline.com.pk/test04"> Listening Audio 04</a>
                 </li>
                 <li>
-                    <a href="https://misc.appsoulz.com/ielts/test05"> Listening Audio 05</a>
+                    <a href="http://ielts.englishonline.com.pk/test05"> Listening Audio 05</a>
                 </li>
                 <li>
-                    <a href="https://misc.appsoulz.com/ielts/test06"> Listening Audio 06</a>
+                    <a href="http://ielts.englishonline.com.pk/test06"> Listening Audio 06</a>
                 </li>
             </ul>
         </div>
@@ -129,7 +129,7 @@
             <h2 class="font-bold text-xl border-b border-gray-200 mt-4">Invoice</h2>
             <ul>
                 <li>
-                    <a href="https://misc.appsoulz.com/invoice">Invoice</a>
+                    <a href="http://misc.englishonline.com.pk/invoice/">Invoice</a>
                 </li>
             </ul>
         </div>
@@ -138,7 +138,7 @@
             <h2 class="font-bold text-xl border-b border-gray-200 mt-4">Certificate</h2>
             <ul>
                 <li>
-                    <a href="https://misc.appsoulz.com/certificate/">Certificate</a>
+                    <a href="http://misc.englishonline.com.pk/certificate/">Certificate</a>
                 </li>
             </ul>
         </div>
