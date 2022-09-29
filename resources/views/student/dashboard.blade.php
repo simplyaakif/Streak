@@ -25,7 +25,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             @forelse(Auth::user()->student->batches as $batch)
-                <a href="{{route('student.course',$batch->id)}}">
+                <a href="{{route('student.course',$batch->pivot->id)}}">
                 <div class="text-xl bg-cyan-50 shadow rounded-md  flex justify-between items-center p-4
                 text-coolGray-900">
                     <div>

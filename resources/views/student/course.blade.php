@@ -74,22 +74,17 @@
                 <livewire:student.course.class-lesson
                     :student_id="Auth::user()->student->id"
                     :batch_id="$batch->id"
-                    :session_start_date="$batch->pivot->session_start_date"
-                    :session_end_date="$batch->pivot->session_end_date"
+                    :session_start_date="$batchStudent->session_start_date"
+                    :session_end_date="$batchStudent->session_end_date"
                 />
             </div>
         </x-tab-details>
         <x-tab-details tab="home">
-            <div>
-            {{$batch->pivot->session_start_date}}
-            </div>
-            <div>
-            {{$batch->pivot->session_end_date}}
-            </div>
+
             <livewire:student.course.home
                 :batch_id="$batch->id"
-                :session_start_date="$batch->pivot->session_start_date"
-                :session_end_date="$batch->pivot->session_end_date"/>
+                :session_start_date="$batchStudent->session_start_date"
+                :session_end_date="$batchStudent->session_end_date"/>
         </x-tab-details>
             </x-slot>
         </x-tabs>

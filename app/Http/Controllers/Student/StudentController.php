@@ -3,6 +3,7 @@
     namespace App\Http\Controllers\Student;
 
     use App\Http\Controllers\Controller;
+    use App\Models\BatchStudent;
     use App\Models\Discussion;
     use App\Models\HomeTask;
     use App\Models\Lesson;
@@ -30,9 +31,10 @@
         public function course($id)
         {
             $student = Student::where('user_id',Auth::id())->first();
-            $batch = $student->batches->where('id',$id)->first();
+            $batchStudent= BatchStudent::find($id);
+            $batch = $batchStudent->batch;
 
-            return view('student.course',compact('batch','student'));
+            return view('student.course',compact('batch','student','batchStudent'));
 
         }
 
