@@ -7,7 +7,7 @@
     use App\Models\HomeTask;
     use App\Models\Lesson;
     use App\Models\Student;
-    use Auth;
+    use Illuminate\Support\Facades\Auth;
 
     class StudentController extends Controller {
 
@@ -30,7 +30,7 @@
         public function course($id)
         {
             $student = Student::where('user_id',Auth::id())->first();
-            $batch = $student->batches->where('id',$id)->latest()->first();
+            $batch = $student->batches->where('id',$id)->first();
 
             return view('student.course',compact('batch','student'));
 
