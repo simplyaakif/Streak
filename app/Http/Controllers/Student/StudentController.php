@@ -30,7 +30,7 @@
         public function course($id)
         {
             $student = Student::where('user_id',Auth::id())->first();
-            $batch = $student->batches->where('id',$id)->first();
+            $batch = $student->batches->where('id',$id)->latest()->first();
 
             return view('student.course',compact('batch','student'));
 
