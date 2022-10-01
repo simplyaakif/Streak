@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use \DateTimeInterface;
 use App\Support\HasAdvancedFilter;
 use App\Traits\Auditable;
@@ -164,6 +165,16 @@ class Student extends Model implements HasMedia
 
             return $media;
         });
+    }
+
+    public function getLastLoginAttribute()
+    {
+        if($this->user){
+            return $this->user->last_login_at? Carbon::parse($this->user->last_login_at)->format('D h:i A d-M-Y') :  'Never logged In';
+        }
+        else {
+            return 'No User Found';
+        }
     }
 
     protected function serializeDate(DateTimeInterface $date)

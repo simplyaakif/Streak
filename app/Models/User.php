@@ -52,6 +52,8 @@ class User extends Authenticatable implements FilamentUser
         'email',
         'password',
         'is_staff',
+        'last_login_at',
+        'last_login_ip',
     ];
 
     protected $dates = [

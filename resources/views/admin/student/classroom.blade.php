@@ -47,21 +47,22 @@
                                         </a>
                                     <dl class="mt-1 flex-grow flex flex-col justify-between">
                                         <dt class="sr-only">Student Details</dt>
-                                        <dd class="mb-3">
-                                            <span
-                                                class="px-2 py-1 text-green-800 text-xs font-medium bg-green-100 rounded-full">Admin</span>
-                                        </dd>
-                                        <dd class="text-gray-500 text-sm">Start Date:
+{{--                                        <dd class="mb-3">--}}
+{{--                                            <span--}}
+{{--                                                class="px-2 py-1 text-green-800 text-xs font-medium bg-green-100 rounded-full">Admin</span>--}}
+{{--                                        </dd>--}}
+                                        <dd class="text-gray-500 text-sm">Start:
                                             <span class="text-black">
-                                {{$student->pivot->session_start_date}}
+                                {{carbon($student->pivot->session_start_date)->format('d-M-Y')}}
                                 </span>
                                         </dd>
-                                        <dd class="text-gray-500 text-sm">End Date:
+                                        <dd class="text-gray-500 text-sm">End:
                                             <span class="text-black">
-                                {{$student->pivot->session_end_date}}
+                                {{carbon($student->pivot->session_end_date)->format('d-M-Y')}}
                                 </span>
                                         </dd>
-                                        <dt class="sr-only">Role</dt>
+                                        <dt class="text-sm my-2 bg-cyan-100 ">Last Login</dt>
+                                        <dd class="text-xs">{{json_encode($student->last_login)}}</dd>
                                     </dl>
                                 </div>
                             </li>
