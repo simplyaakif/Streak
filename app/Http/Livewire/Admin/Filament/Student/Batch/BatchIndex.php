@@ -11,6 +11,7 @@
     use Filament\Forms\Components\DatePicker;
     use Filament\Forms\Components\Repeater;
     use Filament\Forms\Components\Select;
+    use Filament\Forms\Components\Textarea;
     use Filament\Forms\Components\TextInput;
     use Filament\Forms\Components\Toggle;
     use Filament\Notifications\Notification;
@@ -44,6 +45,7 @@
                         'session_end_date'=>$record->session_end_date,
                         'batch_status'=>$record->batch_status,
                         'batch_id'=>$record->batch_id,
+                        'status_comments'=>$record->status_comments,
                     ]))
                     ->form([
                         Card::make()
@@ -53,7 +55,14 @@
                         DatePicker::make('session_start_date'),
                         DatePicker::make('session_end_date'),
                         Select::make('batch_status')
-                        ->options(BatchStudent::STATUS)
+                        ->options(BatchStudent::STATUS),
+                        Textarea::make('status_comments')
+                        ->placeholder('Kindly enter status for Cancelled & Freeze.
+Incase of Cancelled mention the reason of cancelling admission.
+For Freezing mention the start of Freeze Date and Expected end of freeze Date.
+
+Also mention your name & today Date so that we may know who updated the status')
+                        ->columnSpan(2)
                              ])->columns(2),
                            ])
                 ->action(function(BatchStudent $record, $data){
