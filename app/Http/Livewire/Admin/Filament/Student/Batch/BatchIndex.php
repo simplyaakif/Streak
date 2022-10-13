@@ -70,6 +70,7 @@ Also mention your name & today Date so that we may know who updated the status')
                     $record->batch_id = $data['batch_id'];
                     $record->session_start_date = $data['session_start_date'];
                     $record->session_end_date = $data['session_end_date'];
+                    $record->status_comments = $data['status_comments'];
                     $record->save();
 
                     Notification::make()
