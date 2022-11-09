@@ -4,12 +4,16 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\RecoveryResource\Pages;
 use App\Filament\Resources\RecoveryResource\RelationManagers;
+use App\Models\Batch;
 use App\Models\Recovery;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -52,13 +56,14 @@ class RecoveryResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('batch_student_id'),
-                Tables\Columns\TextColumn::make('batch.title'),
-                Tables\Columns\TextColumn::make('student.name'),
+                Tables\Columns\TextColumn::make('batch.title')->searchable(),
+                Tables\Columns\TextColumn::make('student.name')->searchable(),
                 Tables\Columns\TextColumn::make('amount'),
                 Tables\Columns\TextColumn::make('due_date')
                     ->date(),
                 Tables\Columns\BooleanColumn::make('is_paid'),
                 Tables\Columns\TextColumn::make('paid_on')
+                    ->searchable()
                     ->date(),
                 Tables\Columns\TextColumn::make('account_id'),
                 Tables\Columns\TextColumn::make('slip_number'),
@@ -70,8 +75,46 @@ class RecoveryResource extends Resource
                 Tables\Columns\TextColumn::make('campus_id'),
             ])
             ->filters([
-                //
-            ])
+                          Filter::make('due_date')
+                              ->form([
+                                         DatePicker::make('due_from'),
+                                         DatePicker::make('due_until'),
+                                     ])
+                              ->query(function (Builder $query, array $data): Builder {
+                                  return $query
+                                      ->when(
+                                          $data['due_from'],
+                                          fn (Builder $query, $date): Builder => $query->whereDate('due_date', '>=', $date),
+                                      )
+                                      ->when(
+                                          $data['due_until'],
+                                          fn (Builder $query, $date): Builder => $query->whereDate('due_date', '<=', $date),
+                                      );
+                              }),
+                          Filter::make('paid_on')
+                              ->form([
+                                         DatePicker::make('paid_from'),
+                                         DatePicker::make('paid_until'),
+                                     ])
+                              ->query(function (Builder $query, array $data): Builder {
+                                  return $query
+                                      ->when(
+                                          $data['paid_from'],
+                                          fn (Builder $query, $date): Builder => $query->whereDate('paid_on', '>=', $date),
+                                      )
+                                      ->when(
+                                          $data['paid_until'],
+                                          fn (Builder $query, $date): Builder => $query->whereDate('paid_on', '<=', $date),
+                                      );
+                              }),
+                Tables\Filters\SelectFilter::make('is_paid')
+                    ->options([
+                        '0'=>'No',
+                        '1'=>'Yes'
+                              ]),
+                SelectFilter::make('batch_id')->label('Batch')
+                    ->options(Batch::all()->pluck('title','id')),
+            ],Tables\Filters\Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])

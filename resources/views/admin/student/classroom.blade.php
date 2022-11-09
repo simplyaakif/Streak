@@ -77,6 +77,7 @@
                     </ul>
                 </x-tab-details>
                 <x-tab-details tab="attendance">
+                    <livewire:admin.filament.classroom.student-attendance/>
                     <livewire:admin.student-attendance :batch="$batch"/>
                 </x-tab-details>
                 <x-tab-details tab="lesson_planner">
