@@ -43,7 +43,7 @@
                 ->required(),
                 TextInput::make('father_name')->label('Father Name')->required(),
 //
-                MultiSelect::make('courses')
+                Select::make('courses')
                     ->options(Course::pluck('title','id'))
                     ->helperText('Enter the course or courses you are applying for')
                     ->required(),
