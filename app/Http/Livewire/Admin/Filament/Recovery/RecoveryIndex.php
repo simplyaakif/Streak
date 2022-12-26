@@ -54,7 +54,7 @@
 
                     Filter::make('due_date')
                         ->form([
-                                   DatePicker::make('due_from')->default(now()->subMonth()->startOfMonth()),
+                                   DatePicker::make('due_from'),
                                    DatePicker::make('due_until'),
                                ])
                         ->query(function (Builder $query, array $data): Builder {
@@ -84,7 +84,7 @@
                                     fn (Builder $query, $date): Builder => $query->whereDate('paid_on', '<=', $date),
                                 );
                         }),
-                    TernaryFilter::make('is_paid')->label('Is Paid ?')->default(0),
+                    TernaryFilter::make('is_paid')->label('Is Paid ?'),
                     SelectFilter::make('batch_id')->label('Batch')
                         ->options(Batch::all()->pluck('title','id')),
 
@@ -93,7 +93,7 @@
 //                            MultiSelect::make('status')
                                  Select::make('status')
 //                                ->multiple()
-                                ->options(BatchStudent::STATUS)->default(1),
+                                ->options(BatchStudent::STATUS),
                                ])
                         ->query(function (Builder $query, array $data): Builder {
                             return $query
