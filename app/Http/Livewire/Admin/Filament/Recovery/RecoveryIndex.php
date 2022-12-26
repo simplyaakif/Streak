@@ -9,6 +9,7 @@
     use Filament\Forms\ComponentContainer;
     use Filament\Forms\Components\DatePicker;
     use Filament\Forms\Components\Grid;
+    use Filament\Forms\Components\MultiSelect;
     use Filament\Forms\Components\Select;
     use Filament\Forms\Components\TextInput;
     use Filament\Tables\Actions\Action;
@@ -53,7 +54,7 @@
 
                     Filter::make('due_date')
                         ->form([
-                                   DatePicker::make('due_from'),
+                                   DatePicker::make('due_from')->default(now()->subMonth()->startOfMonth()),
                                    DatePicker::make('due_until'),
                                ])
                         ->query(function (Builder $query, array $data): Builder {
@@ -83,22 +84,21 @@
                                     fn (Builder $query, $date): Builder => $query->whereDate('paid_on', '<=', $date),
                                 );
                         }),
-                    TernaryFilter::make('is_paid')->label('Is Paid ?'),
+                    TernaryFilter::make('is_paid')->label('Is Paid ?')->default(0),
                     SelectFilter::make('batch_id')->label('Batch')
                         ->options(Batch::all()->pluck('title','id')),
-//                    SelectFilter::make('status')->label('Status')
-//                        ->options(BatchStudent::STATUS)
-//                    ->column('batch_student.batch_status'),
 
-//                    Filter::make('Status')
-//                        ->form([
-//                                 Select::make('status')
-//                                ->options(BatchStudent::STATUS),
-//                               ])
-//                        ->query(function (Builder $query, array $data): Builder {
-//                            return $query->join('batch_student','batch_student.id','=','recoveries.batch_student_id')
-//                                ->where('batch_status','=',$data['status']);
-//                        })
+                    Filter::make('Status')
+                        ->form([
+//                            MultiSelect::make('status')
+                                 Select::make('status')
+//                                ->multiple()
+                                ->options(BatchStudent::STATUS)->default(1),
+                               ])
+                        ->query(function (Builder $query, array $data): Builder {
+                            return $query
+                                ->where('batch_status','=',$data['status']);
+                        })->default()
                 ];
             }
             protected function getTableActions(): array
@@ -146,7 +146,7 @@
 
             protected function getTableQuery(): Builder|Relation
             {
-                return Recovery::query();
+                return Recovery::query()->join('batch_student','batch_student.id','=','recoveries.batch_student_id');
             }
 
             protected function getTableContentFooter()
