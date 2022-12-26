@@ -88,17 +88,17 @@
                     SelectFilter::make('batch_id')->label('Batch')
                         ->options(Batch::all()->pluck('title','id')),
 
-//                    Filter::make('Status')
-//                        ->form([
-////                            MultiSelect::make('status')
-//                                 Select::make('status')
-////                                ->multiple()
-//                                ->options(BatchStudent::STATUS),
-//                               ])
-//                        ->query(function (Builder $query, array $data): Builder {
-//                            return $query
-//                                ->where('batch_status','=',$data['status']);
-//                        })
+                    Filter::make('Status')
+                        ->form([
+//                            MultiSelect::make('status')
+                                 Select::make('status')
+//                                ->multiple()
+                                ->options(BatchStudent::STATUS)->default(1),
+                               ])
+                        ->query(function (Builder $query, array $data): Builder {
+                            return $query
+                                ->where('batch_status','=',$data['status']);
+                        })
                 ];
             }
             protected function getTableActions(): array
