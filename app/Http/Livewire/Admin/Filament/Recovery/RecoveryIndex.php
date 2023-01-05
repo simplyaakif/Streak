@@ -39,11 +39,12 @@
                     TextColumn::make('student.name')->searchable(),
                     TextColumn::make('batch.title')->label('Batch'),
                     TextColumn::make('batch_student.status')->label('Status'),
-                    TextColumn::make('amount')->suffix(' Rs'),
                     TextColumn::make('due_date')->date('d-M-Y')->sortable(),
+                    TextColumn::make('amount')->suffix(' Rs'),
                     BooleanColumn::make('is_paid'),
-                    TextColumn::make('slip_number'),
                     TextColumn::make('paid_on')->date('d-M-Y')->sortable(),
+                    TextColumn::make('account.title')->sortable(),
+                    TextColumn::make('slip_number'),
 
                 ];
             }
@@ -88,17 +89,22 @@
                     SelectFilter::make('batch_id')->label('Batch')
                         ->options(Batch::all()->pluck('title','id')),
 
-//                    Filter::make('Status')
-//                        ->form([
-////                            MultiSelect::make('status')
-//                                 Select::make('status')
-////                                ->multiple()
-//                                ->options(BatchStudent::STATUS)->default(1),
-//                               ])
-//                        ->query(function (Builder $query, array $data): Builder {
-//                            return $query
+                    Filter::make('Status')
+                        ->form([
+//                            MultiSelect::make('status')
+                                 Select::make('status')
+//                                ->multiple()
+                                ->options(BatchStudent::STATUS),
+                               ])
+                        ->query(function (Builder $query, array $data): Builder {
+                            return $query
+                                ->when($data['status'],function ($q,$status){
+                                $q->join('batch_student','batch_student_id','=','batch_student.id')
+                                ->where('batch_student_id',$status);
+                                });
+//                                ->join('batch_student','recovery.batch_student_id','=','batch_student.id')
 //                                ->where('batch_status','=',$data['status']);
-//                        })
+                        })
                 ];
             }
             protected function getTableActions(): array
