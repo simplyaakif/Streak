@@ -129,7 +129,7 @@
             <h2 class="font-bold text-xl border-b border-gray-200 mt-4">Invoice</h2>
             <ul>
                 <li>
-                    <a href="http://misc.englishonline.com.pk/invoice/">Invoice</a>
+                    <a href="http://invoice.ace.org.pk/">Invoice</a>
                 </li>
             </ul>
         </div>
@@ -138,7 +138,7 @@
             <h2 class="font-bold text-xl border-b border-gray-200 mt-4">Certificate</h2>
             <ul>
                 <li>
-                    <a href="http://misc.englishonline.com.pk/certificate/">Certificate</a>
+                    <a href="http://certificate.ace.org.pk/">Certificate</a>
                 </li>
             </ul>
         </div>

@@ -55,7 +55,6 @@ class RecoveryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('batch_student_id'),
                 Tables\Columns\TextColumn::make('batch.title')->searchable(),
                 Tables\Columns\TextColumn::make('student.name')->searchable(),
                 Tables\Columns\TextColumn::make('amount'),
@@ -65,14 +64,12 @@ class RecoveryResource extends Resource
                 Tables\Columns\TextColumn::make('paid_on')
                     ->searchable()
                     ->date(),
-                Tables\Columns\TextColumn::make('account_id'),
+                Tables\Columns\TextColumn::make('account.title'),
                 Tables\Columns\TextColumn::make('slip_number'),
-                Tables\Columns\TextColumn::make('course_id'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(),
-                Tables\Columns\TextColumn::make('campus_id'),
             ])
             ->filters([
                           Filter::make('due_date')
