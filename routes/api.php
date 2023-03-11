@@ -5,7 +5,7 @@ use App\Http\Controllers\Api\V1\Admin\QueryApiController;
 use App\Http\Controllers\Api\V1\Admin\StudentApiController;
 use App\Http\Controllers\Api\V1\Admin\UserApiController;
 
-Route::group(['prefix' => 'v1', 'as' => 'api.', 'middleware' => ['auth:sanctum']], function () {
+Route::group(['prefix' => 'v1', 'as' => 'api.'], function () {
     // Users
     Route::apiResource('users', UserApiController::class);
 
@@ -21,3 +21,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'middleware' => ['auth:sanctum']
     Route::post('students/media', [StudentApiController::class, 'storeMedia'])->name('students.store_media');
     Route::apiResource('students', StudentApiController::class);
 });
+
+
+
+Route::apiResource('queries', QueryApiController::class);

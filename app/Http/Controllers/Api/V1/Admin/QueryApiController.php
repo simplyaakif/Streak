@@ -15,8 +15,7 @@ class QueryApiController extends Controller
 {
     public function index()
     {
-        abort_if(Gate::denies('query_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
+//        abort_if(Gate::denies('query_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         return new QueryResource(Query::all());
     }
 
@@ -35,7 +34,6 @@ class QueryApiController extends Controller
 
     public function show(Query $query)
     {
-        abort_if(Gate::denies('query_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         return new QueryResource($query);
     }
@@ -62,7 +60,6 @@ class QueryApiController extends Controller
 
     public function destroy(Query $query)
     {
-        abort_if(Gate::denies('query_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $query->delete();
 
