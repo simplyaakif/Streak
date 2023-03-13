@@ -18,7 +18,7 @@
                     </label>
                     <label for="">
                         Date
-                        <x-common.data-input-text error="lesson.date" disabled type="date" wire:model="lesson.date"/>
+                        <x-common.data-input-text error="lesson.date"  type="date" wire:model="lesson.date"/>
                     </label>
                     <label for="">
                         Description
