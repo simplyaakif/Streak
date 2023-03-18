@@ -21,6 +21,7 @@ class QueryApiController extends Controller
 
     public function store(StoreQueryRequest $request)
     {
+        \Log::warning($request);
         $query = Query::create($request->validated());
 
         if ($request->input('dp', false)) {
