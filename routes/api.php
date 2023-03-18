@@ -24,4 +24,4 @@ Route::group(['prefix' => 'v1', 'as' => 'api.'], function () {
 
 
 
-Route::apiResource('queries', QueryApiController::class);
+Route::apiResource('qr', QueryApiController::class);

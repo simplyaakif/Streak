@@ -19,10 +19,14 @@ class QueryApiController extends Controller
         return new QueryResource(Query::all());
     }
 
-    public function store(StoreQueryRequest $request)
+    public function store(Request $request)
     {
-        \Log::warning($request);
-        $query = Query::create($request->validated());
+        $query = [
+            "name"=>$request->name,
+            "mobile"=>$request->mobile,
+        ];
+//        \Log::warning($request);
+        $query = Query::create($query);
 
         if ($request->input('dp', false)) {
             $query->addMedia(storage_path('tmp/uploads/' . basename($request->input('dp'))))->toMediaCollection('dp');

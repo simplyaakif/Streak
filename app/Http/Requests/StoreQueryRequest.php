@@ -11,7 +11,9 @@ class StoreQueryRequest extends FormRequest
 {
     public function authorize()
     {
-        return Gate::allows('query_create');
+//        return Gate::allows('query_create');
+//        dd(Gate::allows('query_create'));
+        return true;
     }
 
     protected function rules(): array
