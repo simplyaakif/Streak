@@ -93,6 +93,7 @@
         protected $appends
             = [
                 'dp',
+                'avatar_url'
             ];
 
         protected $dates
@@ -137,6 +138,11 @@
         {
 
             return 'https://avatars.dicebear.com/api/initials/' . $this->name . '.svg';
+        }
+
+        public function getAvatarUrlAttribute()
+        {
+            return $this->avatarUrl();
         }
 
         public function timelines()
