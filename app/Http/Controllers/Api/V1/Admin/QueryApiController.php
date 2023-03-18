@@ -16,7 +16,7 @@ class QueryApiController extends Controller
     public function index()
     {
 //        abort_if(Gate::denies('query_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        return new QueryResource(Query::all());
+        return new QueryResource(Query::latest()->limit(20)->get());
     }
 
     public function store(Request $request)
