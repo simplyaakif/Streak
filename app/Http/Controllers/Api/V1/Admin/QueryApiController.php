@@ -24,6 +24,7 @@ class QueryApiController extends Controller
         $query = [
             "name"=>$request->name,
             "mobile"=>$request->mobile,
+            "email"=>$request->email,
         ];
 //        \Log::warning($request);
         $query = Query::create($query);
