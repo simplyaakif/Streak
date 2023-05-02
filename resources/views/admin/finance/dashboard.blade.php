@@ -5,6 +5,12 @@
         <x-common.ph-section-header title="Finance Status" subtitle="Finance Reports of the month"/>
     </x-common.page-header>
     <x-common.layout-subpage>
+        <div>
+            <form action="{{route('admin.finance.dashboard')}}"  class="flex gap-2">
+                <x-common.data-input-text label="Date" type="date" name="date" value="{{$date}}" />
+                <x-button.primary type="submit">Submit</x-button.primary>
+            </form>
+        </div>
         <div class="grid md:grid-cols-4 gap-4 mb-10">
             @forelse($accounts as $key=>$account)
                 <x-common.stat-card

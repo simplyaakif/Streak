@@ -178,14 +178,14 @@
             <x-admin.sidebar-dd-nav-subitem label="Calendar" :route="route('admin.task-calendars.index')"/>
         </x-admin.sidebar-dd-nav-item>
 
-        {{--                    <x-admin.sidebar-nv-item label="Reports" route="{{route('admin.students.index')}}">--}}
-        {{--                        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"--}}
-        {{--                             x-description="Heroicon name: outline/document-report" xmlns="http://www.w3.org/2000/svg"--}}
-        {{--                             fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">--}}
-        {{--                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"--}}
-        {{--                                  d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>--}}
-        {{--                        </svg>--}}
-        {{--                    </x-admin.sidebar-nv-item>--}}
+                            <x-admin.sidebar-nv-item label="Reports" route="{{route('admin.reports.index')}}">
+                                <svg class="mr-3 flex-shrink-0 h-6 w-6 text-cyan-200"
+                                     x-description="Heroicon name: outline/document-report" xmlns="http://www.w3.org/2000/svg"
+                                     fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </x-admin.sidebar-nv-item>
 
         <x-admin.sidebar-nv-item
             can="system_calendar_access"

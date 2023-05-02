@@ -15,7 +15,12 @@
         {
             abort_if(Gate::denies('finance_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+            $date = request()->get('date') ? request()->get('date') : null ;
+
             $account_status = DB::table('recoveries')
+                ->when($date, function ($q) use ($date){
+                    return $q->where('recoveries.created_at','<=',$date);
+                })
                 ->where('is_paid','1')
                 ->whereBetween('paid_on',[now()->startOfMonth(),now()->endOfMonth()])
                 ->join('accounts','recoveries.account_id','accounts.id')
@@ -34,6 +39,9 @@
 
 
             $batchFinanceStatus = Recovery::join('batches','batches.id','=','recoveries.batch_id')
+            ->when($date, function ($q) use ($date){
+                return $q->where('batches.created_at','<=',$date);
+            })
                 ->where('is_paid',1)
             ->whereBetween('paid_on',[
                 now()->startOfMonth()->toDate(),
@@ -51,6 +59,6 @@
 
 
 
-            return view('admin.finance.dashboard',compact('accounts','batchFinanceStatus'));
+            return view('admin.finance.dashboard',compact('accounts','batchFinanceStatus','date'));
         }
     }

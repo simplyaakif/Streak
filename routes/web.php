@@ -30,6 +30,7 @@ use App\Http\Controllers\Auth\UserProfileController;
     use App\Http\Controllers\LessonsController;
     use App\Http\Controllers\OnlineRegistrationsController;
     use App\Http\Controllers\RecoveriesController;
+    use App\Http\Controllers\ReportsController;
     use App\Http\Controllers\SmsController;
     use App\Http\Controllers\Student\IssuesController;
     use App\Http\Controllers\StudentAttendancesController;
@@ -144,7 +145,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','st
 
 
 
-    Route::get('finance/dashboard',[FinanceController::class,'index'])->name('finance.dashboard');
+    Route::get('finance/dashboard/{date?}',[FinanceController::class,'index'])->name('finance.dashboard');
     //    Expense
     Route::resource('finance/expenses',ExpensesController::class,['except' => ['store','update','destroy']]);
 
@@ -184,6 +185,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','st
     Route::get('useful-links',function (){
     return view('admin.links.useful');
     })->name('useful-links');
+
+    Route::get('reports',[ReportsController::class,'index'])->name('reports.index');
 
 
 });
