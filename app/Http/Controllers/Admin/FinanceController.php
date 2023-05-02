@@ -19,10 +19,12 @@
 
             $account_status = DB::table('recoveries')
                 ->when($date, function ($q) use ($date){
-                    return $q->where('recoveries.created_at','<=',$date);
+                return $q->whereBetween('paid_on',[carbon($date)->startOfMonth(),carbon($date)->endOfMonth()]);
+                })
+                ->when($date == null, function ($q){
+                return $q->whereBetween('paid_on',[now()->startOfMonth(),now()->endOfMonth()]);
                 })
                 ->where('is_paid','1')
-                ->whereBetween('paid_on',[now()->startOfMonth(),now()->endOfMonth()])
                 ->join('accounts','recoveries.account_id','accounts.id')
                 ->select('title','recoveries.amount')
                 ->get();
@@ -40,13 +42,18 @@
 
             $batchFinanceStatus = Recovery::join('batches','batches.id','=','recoveries.batch_id')
             ->when($date, function ($q) use ($date){
-                return $q->where('batches.created_at','<=',$date);
+                return $q->whereBetween('paid_on',[
+                    carbon($date)->startOfMonth()->toDate(),
+                    carbon($date)->endOfMonth()->toDate()
+                ]);
             })
-                ->where('is_paid',1)
-            ->whereBetween('paid_on',[
-                now()->startOfMonth()->toDate(),
-                now()->endOfMonth()->toDate()
-            ])
+            ->when($date==null, function ($q) {
+                return $q->whereBetween('paid_on',[
+                    now()->startOfMonth()->toDate(),
+                    now()->endOfMonth()->toDate()
+                ]);
+            })
+            ->where('is_paid',1)
             ->select('title','amount')
             ->get();
             $batchFinanceStatus = $batchFinanceStatus->groupBy('title');
