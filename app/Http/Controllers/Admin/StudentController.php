@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Batch;
 use App\Models\Student;
+use Carbon\Carbon;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -22,17 +23,19 @@ class StudentController extends Controller
     {
         abort_if(Gate::denies('student_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $date = request()->get('date') ? carbon(request()->get('date')) : now() ;
+        $date = request()->get('date') ? Carbon::parse(request()->get('date')) : now() ;
 
-        $dStudent = Student::whereDate('created_at', $date->toDate())->get()->count();
-        $wStudent = Student::whereBetween('created_at', [$date->startOfWeek(),$date->endOfWeek()])->get()->count();
-        $mStudent = Student::whereMonth('created_at', $date->month)
-            ->whereYear('created_at',$date->year)
+        $dStudent = Student::whereDate('created_at', $date->copy()->toDate())->get()->count();
+        $wStudent = Student::whereBetween('created_at', [$date->copy()->startOfWeek(),$date->copy()->endOfWeek()])->get()
+            ->count();
+        $mStudent = Student::whereMonth('created_at', $date->copy()->month)
+            ->whereYear('created_at',$date->copy()->year)
             ->get()->count();
-        $pMstudent = Student::whereMonth('created_at', $date->subMonth()->month)
-            ->whereYear('created_at',$date->subMonth()->year)
+        $pMstudent = Student::whereMonth('created_at', $date->copy()->subMonth()->month)
+            ->whereYear('created_at',$date->copy()->subMonth()->year)
             ->get()->count();
 
+//        dd($date->toDateString());
         $students = Student::latest()->take(10)->get();
         return view('admin.student.dashboard',compact('dStudent','wStudent','mStudent','pMstudent','students','date'));
     }
