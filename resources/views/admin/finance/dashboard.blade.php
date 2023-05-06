@@ -11,7 +11,7 @@
                 <x-button.primary type="submit">Submit</x-button.primary>
             </form>
         </div>
-        <div class="grid md:grid-cols-4 gap-4 mb-10">
+        <div class="grid md:grid-cols-4 gap-4 my-10">
             @forelse($accounts as $key=>$account)
                 <x-common.stat-card
                     can="recovery_show"
@@ -40,6 +40,11 @@
                         </x-common.table.row>
                     @empty
                     @endforelse
+                        <x-common.table.row>
+                            <x-common.table.cell>Total Recoveries + Amount</x-common.table.cell>
+                            <x-common.table.cell>{{$batchFinanceStatus->sum('count')}}</x-common.table.cell>
+                            <x-common.table.cell>{{$batchFinanceStatus->sum('total')}} Rs</x-common.table.cell>
+                        </x-common.table.row>
                 </x-slot>
             </x-common.table>
         </div>

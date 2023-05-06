@@ -137,7 +137,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','st
     Route::resource('home-task',HomeTaskController::class,['only' =>['index']]);
 
     // Student
-    Route::get('students/dashboard',[StudentController::class,'dashboard'])->name('students.dashboard');
+    Route::get('students/dashboard/{date?}',[StudentController::class,'dashboard'])->name('students.dashboard');
     Route::get('students/classrooms',[StudentController::class,'classrooms'])->name('students.classrooms');
     Route::get('students/classroom/{batch}',[StudentController::class,'classroom'])->name('students.classroom');
     Route::post('students/media', [StudentController::class, 'storeMedia'])->name('students.storeMedia');

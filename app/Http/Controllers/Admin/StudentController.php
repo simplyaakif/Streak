@@ -21,17 +21,20 @@ class StudentController extends Controller
     public function dashboard()
     {
         abort_if(Gate::denies('student_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $dStudent = Student::whereDate('created_at', now()->toDate())->get()->count();
-        $wStudent = Student::whereBetween('created_at', [now()->startOfWeek(),now()->endOfWeek()])->get()->count();
-        $mStudent = Student::whereMonth('created_at', now()->month)
-            ->whereYear('created_at',now()->year)
+
+        $date = request()->get('date') ? carbon(request()->get('date')) : now() ;
+
+        $dStudent = Student::whereDate('created_at', $date->toDate())->get()->count();
+        $wStudent = Student::whereBetween('created_at', [$date->startOfWeek(),$date->endOfWeek()])->get()->count();
+        $mStudent = Student::whereMonth('created_at', $date->month)
+            ->whereYear('created_at',$date->year)
             ->get()->count();
-        $pMstudent = Student::whereMonth('created_at', now()->subMonth()->month)
-            ->whereYear('created_at',now()->subMonth()->year)
+        $pMstudent = Student::whereMonth('created_at', $date->subMonth()->month)
+            ->whereYear('created_at',$date->subMonth()->year)
             ->get()->count();
 
         $students = Student::latest()->take(10)->get();
-        return view('admin.student.dashboard',compact('dStudent','wStudent','mStudent','pMstudent','students'));
+        return view('admin.student.dashboard',compact('dStudent','wStudent','mStudent','pMstudent','students','date'));
     }
 
     public function classrooms()

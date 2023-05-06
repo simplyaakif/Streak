@@ -6,6 +6,12 @@
     </x-common.page-header>
     <x-common.page-body>
         <div>
+            <form action="{{route('admin.students.dashboard')}}"  class="flex gap-2">
+                <x-common.data-input-text label="Date" type="date" name="date" value="{{$date->toDateString()}}" />
+                <x-button.primary type="submit">Submit</x-button.primary>
+            </form>
+        </div>
+        <div class="mt-8">
             <h2 class="text-lg leading-6 font-medium text-gray-900">Overview</h2>
             <div class="mt-2 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
                 <x-common.stat-card can="student_show" label="Daily Admissions" stat="{{$dStudent}}">
