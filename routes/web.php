@@ -168,10 +168,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','st
     //      Certificate
     Route::resource('certificates',CertificatesController::class,['except' => ['store','update','destroy']]);
 
-// Sms Hub
+    // Sms Hub
     Route::resource('sms',SmsController::class,['except' => ['store','update','destroy','create']]);
 
-//Online Registration
+    //Online Registration
     Route::resource('online-registration',OnlineRegistrationsController::class,
                     ['except' => ['create']]);
 

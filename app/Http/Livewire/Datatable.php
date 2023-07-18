@@ -76,6 +76,7 @@
                 ->when($this->filters['date_min'],fn($query,$date)=>$query->where('created_at','>=',Carbon::parse($date)))
                 ->when($this->filters['date_max'],fn($query,$date)=>$query->where('created_at','<=',Carbon::parse($date)))
                 ->when($this->filters['search'], fn($query, $search) => $query->where('name', 'like', '%'.$search.'%'))
+                ->when($this->filters['search'], fn($query, $search) => $query->where('mobile', 'like', '%'.$search.'%'))
                     ->orderBy($this->sortField, $this->sortDirection)
                     ->latest()
                     ->paginate(10)

@@ -6,6 +6,7 @@
     use App\Models\Campus;
     use App\Models\Course;
     use App\Models\OnlineRegistration;
+    use Filament\Pages\Actions\Action;
     use Filament\Tables\Columns\TextColumn;
     use Filament\Tables\Concerns\InteractsWithTable;
     use Filament\Tables\Contracts\HasTable;
@@ -67,7 +68,23 @@
 
         protected function getTableActions(): array
         {
-            return [ ];
+
+            return [
+                Action::make('updateAuthor')
+                    ->mountUsing(fn (Forms\ComponentContainer $form, User $record) => $form->fill([
+                        'authorId' => $record->author->id,
+                    ]))
+                    ->action(function (User $record, array $data): void {
+                        $record->author()->associate($data['authorId']);
+                        $record->save();
+                    })
+                    ->form([
+                        Forms\Components\Select::make('authorId')
+                            ->label('Author')
+                            ->options(User::query()->pluck('name', 'id'))
+                            ->required(),
+                    ]),
+            ];
     }
 
         protected function getTableBulkActions(): array
