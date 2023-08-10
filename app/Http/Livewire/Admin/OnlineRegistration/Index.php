@@ -8,7 +8,7 @@
     use App\Models\User;
     use Filament\Forms\ComponentContainer;
     use Filament\Forms\Components\Select;
-    use Filament\Pages\Actions\Action;
+    use Filament\Tables\Actions\Action;
     use Filament\Tables\Columns\TextColumn;
     use Filament\Tables\Concerns\InteractsWithTable;
     use Filament\Tables\Contracts\HasTable;
