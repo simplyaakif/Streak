@@ -2,10 +2,12 @@
 
     namespace App\Http\Livewire\Admin\OnlineRegistration;
 
-    use App\Http\Controllers\OnlineRegistrationsController;
     use App\Models\Campus;
     use App\Models\Course;
     use App\Models\OnlineRegistration;
+    use App\Models\User;
+    use Filament\Forms\ComponentContainer;
+    use Filament\Forms\Components\Select;
     use Filament\Pages\Actions\Action;
     use Filament\Tables\Columns\TextColumn;
     use Filament\Tables\Concerns\InteractsWithTable;
@@ -15,8 +17,6 @@
     use Illuminate\Database\Eloquent\Builder;
     use Illuminate\Database\Eloquent\Relations\Relation;
     use Livewire\Component;
-    use Filament\Tables\Actions\BulkAction;
-    use Illuminate\Database\Eloquent\Collection;
 
     class Index extends Component implements HasTable {
         use InteractsWithTable;
@@ -71,7 +71,7 @@
 
             return [
                 Action::make('updateAuthor')
-                    ->mountUsing(fn (Forms\ComponentContainer $form, User $record) => $form->fill([
+                    ->mountUsing(fn (ComponentContainer $form, User $record) => $form->fill([
                         'authorId' => $record->author->id,
                     ]))
                     ->action(function (User $record, array $data): void {
@@ -79,7 +79,7 @@
                         $record->save();
                     })
                     ->form([
-                        Forms\Components\Select::make('authorId')
+                        Select::make('authorId')
                             ->label('Author')
                             ->options(User::query()->pluck('name', 'id'))
                             ->required(),
