@@ -38,18 +38,19 @@
                 ->whereMonth('paid_on', now()->month)->whereYear('paid_on', now()->year)
                 ->get()->sum('amount');
 
-            $mIndividualSale = Recovery::where('is_paid',1)
-                ->whereMonth('paid_on', now()->month)->whereYear('paid_on', now()->year)
-                ->with(['batch'=>function ($query){
-                    $query->where('is_sale_skip',1);
-                }])
+            $mIndividualSale = Recovery::withWhereHas('batch',function ($query){
+                $query->where('is_sale_skip',1);
+            })->where('is_paid',1)
+                ->whereMonth('paid_on', now()->month)
+                ->whereYear('paid_on', now()->year)
                 ->get()->sum('amount');
 
-            $mAceSale = Recovery::where('is_paid',1)
-                ->whereMonth('paid_on', now()->month)->whereYear('paid_on', now()->year)
-                ->with(['batch'=>function ($query){
-                    $query->where('is_sale_skip',0);
-                }])
+
+            $mAceSale = Recovery::withWhereHas('batch',function ($query){
+                $query->where('is_sale_skip',0);
+            })->where('is_paid',1)
+                ->whereMonth('paid_on', now()->month)
+                ->whereYear('paid_on', now()->year)
                 ->get()->sum('amount');
 
 
