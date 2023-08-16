@@ -32,9 +32,28 @@
             $mExpense = Expense::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->get()
                 ->sum('amount');
 
+
+
             $mSale = Recovery::where('is_paid',1)
                 ->whereMonth('paid_on', now()->month)->whereYear('paid_on', now()->year)
                 ->get()->sum('amount');
+
+            $mIndividualSale = Recovery::where('is_paid',1)
+                ->whereMonth('paid_on', now()->month)->whereYear('paid_on', now()->year)
+                ->with(['batch'=>function ($query){
+                    $query->where('is_sale_skip',1);
+                }])
+                ->get()->sum('amount');
+
+            $mAceSale = Recovery::where('is_paid',1)
+                ->whereMonth('paid_on', now()->month)->whereYear('paid_on', now()->year)
+                ->with(['batch'=>function ($query){
+                    $query->where('is_sale_skip',0);
+                }])
+                ->get()->sum('amount');
+
+
+
 
             $rQueries= Query::select()->latest()->with('courses')->take(5)->get();
             $rAdmissions = Student::select()->latest()->take(5)->get();
@@ -133,7 +152,7 @@
                                                   'dSale','mSale',
                                                   'chart1','chart2','chart3','chart4','chart5',
                                                   'rAdmissions','rQueries','rExpenses',
-                                                  'user_tasks'
+                                                  'user_tasks','mIndividualSale','mAceSale'
                                               ]));
 
         }

@@ -57,6 +57,7 @@ class Batch extends Model implements HasMedia
         'course_id',
         'session_duration',
         'description',
+        'is_sale_skip'
     ];
 
     public function registerMediaConversions(Media $media = null): void

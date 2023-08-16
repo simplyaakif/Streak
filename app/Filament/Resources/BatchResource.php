@@ -41,6 +41,7 @@ class BatchResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')->searchable(),
+                Tables\Columns\ToggleColumn::make('is_sale_skip'),
                 Tables\Columns\TextColumn::make('course.title'),
                 Tables\Columns\TextColumn::make('limit'),
                 Tables\Columns\TextColumn::make('time'),
