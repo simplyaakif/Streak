@@ -164,12 +164,12 @@
                         </x-slot>
                     </x-common.stat-card>
 
-                    <x-common.stat-card can="view_monthly_sale" label="Total Ace Sale" stat="{{$mSale}}">
+                    <x-common.stat-card can="view_monthly_sale" label="Total Sale" stat="{{$mSale}}">
                         <x-slot name="icon">
                             <x-icons.todo-list class="w-6 h-6 text-gray-400"/>
                         </x-slot>
                     </x-common.stat-card>
-                    <x-common.stat-card can="view_monthly_sale" label="Other Sale" :stat="$mIndividualSale">
+                    <x-common.stat-card can="view_monthly_sale" label="Other/Individual Sale" :stat="$mIndividualSale">
                         <x-slot name="icon">
                             <x-icons.money-check class="w-6 h-6 text-gray-400"/>
                         </x-slot>
