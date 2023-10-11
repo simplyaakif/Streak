@@ -65,7 +65,10 @@
                     ->join('batch_student','students.id','=','student_id')
                     ->join('batches','batch_student.batch_id','=','batches.id')
                     ->join('courses','batches.course_id','=','courses.id')
-                    ->when($this->filters['search'], fn($student, $search) => $student->where('name', 'like', '%' . $search . '%'))
+                    ->when($this->filters['search'], fn($student, $search) => $student
+                        ->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('mobile', 'like', '%'.$search.'%'))
+
                     ->when($this->filters['date_min'], fn($student, $date) => $student->where('students.created_at', '>=', Carbon::parse($date)))->when($this->filters['date_max'], fn($student, $date) => $student->where('students.created_at', '<=', Carbon::parse($date)))
 
                     ->when($this->filters['batch'], function ($student,$batch) {

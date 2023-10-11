@@ -28,7 +28,7 @@
         public function avatarUrl()
         {
 
-            return 'https://avatars.dicebear.com/api/initials/' . $this->name . '.svg';
+            return 'https://api.dicebear.com/7.x/initials/svg?seed=' . $this->name;
         }
 
         public function registerMediaConversions(Media $media = null): void

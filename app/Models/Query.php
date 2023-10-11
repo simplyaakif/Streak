@@ -137,7 +137,7 @@
         public function avatarUrl()
         {
 
-            return 'https://avatars.dicebear.com/api/initials/' . $this->name . '.svg';
+            return 'https://api.dicebear.com/7.x/notionists/svg?scale=200&seed=' . $this->name;
         }
 
         public function getAvatarUrlAttribute()
