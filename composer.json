@@ -34,6 +34,7 @@
         "livewire/livewire": "^2.3",
         "maatwebsite/excel": "^3.1",
         "pusher/pusher-php-server": "^7.0",
+        "pxlrbt/filament-excel": "^1.1",
         "rappasoft/laravel-livewire-tables": "^1.20",
         "spatie/laravel-medialibrary": "^9.4",
         "staudenmeir/eloquent-has-many-deep": "^1.7",
