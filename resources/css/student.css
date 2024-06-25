@@ -1,0 +1,63 @@
+@import '../../vendor/filament/forms/dist/module.esm.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+html {
+    /*overflow: scroll;*/
+    /*overflow-x: hidden;*/
+    font-family: 'Poppins', sans-serif;
+}
+::-webkit-scrollbar {
+    width: 5px;  /* Remove scrollbar space */
+    height: 5px;
+    /*background: transparent;  !* Optional: just make scrollbar invisible *!*/
+    @apply bg-transparent
+}
+/* Optional: show position indicator in red */
+::-webkit-scrollbar-thumb {
+    height: 8px;
+    @apply bg-cyan-900 rounded-full
+}
+
+
+.form-group {
+    @apply my-2 block
+}
+.form-control {
+@apply rounded border-gray-300 w-full block
+}
+.card-title{
+    @apply text-lg leading-6 font-medium text-gray-900
+}
+.btn-secondary{
+    @apply inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500
+}
+.btn-indigo{
+    @apply inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500
+}
+.row .card{
+    @apply px-8 py-4
+}
+.table{
+   @apply min-w-full divide-y divide-gray-200 rounded
+}
+.table-view tbody{
+  @apply  bg-white divide-y divide-gray-200
+}
+.table-view tbody td{
+    @apply  py-1
+}
+.table-index{
+    @apply mt-10
+}
+.card-header-container{
+    @apply flex justify-between items-center mb-4
+}
+
+/*.flatpickr input{*/
+/*    @apply h-24*/
+/*}*/
+
+
