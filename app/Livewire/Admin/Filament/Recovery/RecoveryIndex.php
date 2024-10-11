@@ -41,7 +41,10 @@
             public function table(Table $table): Table
             {
                 return $table
-                    ->query(Recovery::query())
+                    ->query(Recovery::query()
+                        ->join('batch_student','recoveries.batch_student_id','=','batch_student.id')
+                    ->select('recoveries.*','batch_student.batch_status',)
+                    )
                     ->columns([
                         SpatieMediaLibraryImageColumn::make('student.dp')
                             ->collection('student_dp')
@@ -57,8 +60,12 @@
                     TextColumn::make('paid_on')->date('d-M-Y')->sortable(),
                     TextColumn::make('account.title')->sortable(),
                     TextColumn::make('slip_number')->toggleable(),
+                    TextColumn::make('created_at')->toggledHiddenByDefault()
+                        ->date('d-M-Y')
+                        ->toggleable(),
 
-                ])->filters([
+                ])->defaultSort('created_at', 'desc')
+                    ->filters([
                         Filter::make('due_date')
                             ->form([
                                 DatePicker::make('due_from'),
@@ -110,12 +117,15 @@
                             ])
                             ->query(function (Builder $query, array $data): Builder {
                                 return $query
-                                    ->when($data['status'],function ($q,$status){
-                                        $q->join('batch_student','batch_student_id','=','batch_student.id')
-                                            ->where('batch_student_id',$status);
-                                    });
 //                                ->join('batch_student','recovery.batch_student_id','=','batch_student.id')
-//                                ->where('batch_status','=',$data['status']);
+                                    ->when($data['status'],function ($q,$status){
+                                        $q
+//                                            ->join('batch_student','recoveries.batch_student_id','=','batch_student.id')
+//                                            ->select('batch_student.batch_status', 'recovery.*')
+                                            ->where('batch_student.batch_status',$status);
+//                                        dd ($q);
+                                    });
+//                                    ->where('id','=',$data['status']);
                             })
                     ],FiltersLayout::AboveContent)
                     ->actions([

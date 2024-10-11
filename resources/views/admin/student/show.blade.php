@@ -133,7 +133,7 @@
                                                     <div>{{$recovery->due_date}}</div>
                                                     <div>{{$recovery->is_paid ? "Paid":"Pending" }}</div>
                                                     <div>{{$recovery->paid_on}}</div>
-                                                    <div>{{$recovery->account->title}}</div>
+                                                    <div>{{$recovery->account?->title}}</div>
                                                     <div>{{$recovery->slip_number}}</div>
                                                     </div>
                                                 </li>
