@@ -55,7 +55,14 @@
                     TextColumn::make('batch.title')->label('Batch'),
                     TextColumn::make('batch_student.status')->label('Status'),
                     TextColumn::make('due_date')->date('d-M-Y')->sortable(),
-                    TextColumn::make('amount')->sortable()->suffix(' Rs')->summarize(Sum::make()->label('Total')->money('PKR')),
+                    TextColumn::make('amount')
+                        ->sortable()
+                        ->suffix(' Rs')
+                        ->summarize(
+                            Sum::make()
+                                ->label('Total')
+                                ->money('PKR')
+                        ),
                     BooleanColumn::make('is_paid'),
                     TextColumn::make('paid_on')->date('d-M-Y')->sortable(),
                     TextColumn::make('account.title')->sortable(),
@@ -98,7 +105,7 @@
                                         fn (Builder $query, $date): Builder => $query->whereDate('paid_on', '<=', $date),
                                     );
                             }),
-                        TernaryFilter::make('is_paid')->label('Is Paid ?'),
+                        TernaryFilter::make('is_paid')->label('Is Paid ?')->default(0),
                         SelectFilter::make('account_id')
                     ->multiple()
                     ->label('Account')
@@ -109,11 +116,11 @@
                             ->options(Batch::all()->pluck('title','id')),
 
                         Filter::make('Status')
+                            ->default(1)
                             ->form([
-//                            MultiSelect::make('status')
                                 Select::make('status')
-//                                ->multiple()
-                                    ->options(BatchStudent::STATUS),
+                                    ->options(BatchStudent::STATUS)
+                                ->default(1),
                             ])
                             ->query(function (Builder $query, array $data): Builder {
                                 return $query

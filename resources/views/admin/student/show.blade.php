@@ -117,7 +117,7 @@
                                         <div>
                                             <ul>
                                                 <li>
-                                                    <div class="grid gap-4 md:grid-cols-6">
+                                                    <div class="grid gap-4 grid-cols-6">
                                                         <div class="font-bold">Amount</div>
                                                         <div class="font-bold">Due Date</div>
                                                         <div class="font-bold">Status</div>
@@ -128,7 +128,7 @@
                                                 </li>
                                                 @forelse($recoveries as $recovery)
                                                 <li>
-                                                    <div class="grid gap-4 md:grid-cols-6">
+                                                    <div class="grid gap-4 grid-cols-6">
                                                     <div>{{$recovery->amount}} Rs</div>
                                                     <div>{{$recovery->due_date}}</div>
                                                     <div>{{$recovery->is_paid ? "Paid":"Pending" }}</div>
