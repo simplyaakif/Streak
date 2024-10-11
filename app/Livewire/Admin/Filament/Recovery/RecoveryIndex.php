@@ -42,7 +42,7 @@
                 return $table
                     ->query(Recovery::query())
                     ->columns([
-                        ImageColumn::make('student.dp')->label('DP')->toggleable()->circular(),
+//                        ImageColumn::make('student')->label('DP')->toggleable()->circular(),
                     TextColumn::make('student.name')->searchable()->sortable(),
                     TextColumn::make('student.mobile')->label('Contact')->toggleable(),
                         TextColumn::make('student.father_name')->label('Father Name')->toggleable(),
