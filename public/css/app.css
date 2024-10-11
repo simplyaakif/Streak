@@ -7539,6 +7539,10 @@ input:checked+.\[input\:checked\+\&\]\:bg-custom-600 {
   --tw-bg-opacity: 1;
   background-color: rgb(8 145 178 / var(--tw-bg-opacity));
 }
+input:checked+.\[input\:checked\+\&\]\:bg-gray-400 {
+  --tw-bg-opacity: 1;
+  background-color: rgba(var(--gray-400), var(--tw-bg-opacity));
+}
 input:checked+.\[input\:checked\+\&\]\:text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
@@ -7552,13 +7556,25 @@ input:checked+.\[input\:checked\+\&\]\:hover\:bg-custom-500:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(6 182 212 / var(--tw-bg-opacity));
 }
+input:checked+.\[input\:checked\+\&\]\:hover\:bg-gray-300:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgba(var(--gray-300), var(--tw-bg-opacity));
+}
 input:checked+.dark\:\[input\:checked\+\&\]\:bg-custom-500:is(.dark *) {
   --tw-bg-opacity: 1;
   background-color: rgb(6 182 212 / var(--tw-bg-opacity));
 }
+input:checked+.dark\:\[input\:checked\+\&\]\:bg-gray-600:is(.dark *) {
+  --tw-bg-opacity: 1;
+  background-color: rgba(var(--gray-600), var(--tw-bg-opacity));
+}
 input:checked+.dark\:\[input\:checked\+\&\]\:hover\:bg-custom-400:hover:is(.dark *) {
   --tw-bg-opacity: 1;
   background-color: rgb(34 211 238 / var(--tw-bg-opacity));
+}
+input:checked+.dark\:\[input\:checked\+\&\]\:hover\:bg-gray-500:hover:is(.dark *) {
+  --tw-bg-opacity: 1;
+  background-color: rgba(var(--gray-500), var(--tw-bg-opacity));
 }
 input:checked:focus-visible+.\[input\:checked\:focus-visible\+\&\]\:ring-custom-500\/50 {
   --tw-ring-color: rgb(6 182 212 / 0.5);

@@ -23,6 +23,7 @@
         "jquery": "^3.2",
         "laravel-echo": "^1.11.3",
         "laravel-mix": "^6.0.18",
+        "laravel-vite-plugin": "^1.0.5",
         "lodash": "^4.17.19",
         "postcss": "^8.4.38",
         "postcss-nesting": "^12.1.5",
