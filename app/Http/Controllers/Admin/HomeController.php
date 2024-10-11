@@ -57,7 +57,7 @@
 
 
             $rQueries= Query::select()->latest()->with('courses')->take(5)->get();
-            $rAdmissions = Student::select()->latest()->take(5)->get();
+            $rAdmissions = Student::with('batches')->latest()->take(5)->get();
             $rExpenses= Expense::select()->with('vendor')->latest()->take(5)
                 ->get();
 
