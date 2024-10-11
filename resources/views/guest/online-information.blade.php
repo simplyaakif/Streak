@@ -12,11 +12,11 @@
 
     <!-- Styles -->
     <style>[x-cloak] { display: none !important; }</style>
-    @livewireStyles
+    @filamentStyles
     <link rel="stylesheet" href="{{ asset('css/student.css') }}">
 
     <!-- Scripts -->
-    @livewireScripts
+    @filamentScripts
     <script src="{{ mix('js/filament.js') }}" defer></script>
     @stack('scripts')
 </head>

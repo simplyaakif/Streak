@@ -1,4 +1,11 @@
-<div <?php echo e($attributes->merge($getExtraAttributes())); ?>>
+<div
+    <?php echo e($attributes
+            ->merge([
+                'id' => $getId(),
+            ], escape: false)
+            ->merge($getExtraAttributes(), escape: false)); ?>
+
+>
     <?php echo e($getChildComponentContainer()); ?>
 
 </div>

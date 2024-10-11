@@ -31,7 +31,7 @@
     <div>
 
         @if($showAttendanceModal)
-            <x-modal.dialog maxWidth="3xl" wire:model="showAttendanceModal">
+            <x-modal.dialog maxWidth="3xl" wire:model.live="showAttendanceModal">
                 <x-slot name="title">
                     {{Carbon\Carbon::parse($attendanceRecord[0]["datetime"])->format('D d F Y') }}
                 </x-slot>
@@ -64,8 +64,8 @@
         @endif
     </div>
 
-    <form wire:submit.prevent="submit">
-        <x-modal.dialog  maxWidth="3xl" wire:model="showModal">
+    <form wire:submit="submit">
+        <x-modal.dialog  maxWidth="3xl" wire:model.live="showModal">
             <x-slot name="title">
                 <span class="text-cyan-700 font-medium">{{$batch->title}}</span>
                 <span class="text-base text-gray-400">Student Attendance</span>
@@ -89,7 +89,7 @@
                                             <label for="status_{{$student->id}}_{{$status}}">
                                                 <input type="radio" id="status_{{$student->id}}_{{$status}}"
                                                        name="status_{{$student->id}}"
-                                                       wire:model.defer="statuses.{{$student->id}}"
+                                                       wire:model="statuses.{{$student->id}}"
                                                        value="{{$status}}"/>
                                                 {{$status}}
                                             </label>

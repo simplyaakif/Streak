@@ -1,45 +1,74 @@
+<?php
+    use Filament\Support\Enums\ActionSize;
+    use Filament\Support\Enums\IconSize;
+?>
+
 <?php $attributes ??= new \Illuminate\View\ComponentAttributeBag; ?>
 <?php foreach($attributes->onlyProps([
+    'badge' => null,
+    'badgeColor' => 'primary',
+    'badgeSize' => 'xs',
     'color' => 'primary',
-    'darkMode' => false,
     'disabled' => false,
     'form' => null,
+    'formId' => null,
+    'href' => null,
     'icon' => null,
+    'iconAlias' => null,
+    'iconSize' => null,
     'keyBindings' => null,
-    'indicator' => null,
     'label' => null,
-    'size' => 'md',
+    'loadingIndicator' => true,
+    'size' => ActionSize::Medium,
+    'spaMode' => null,
     'tag' => 'button',
+    'target' => null,
     'tooltip' => null,
     'type' => 'button',
 ]) as $__key => $__value) {
     $$__key = $$__key ?? $__value;
 } ?>
 <?php $attributes = $attributes->exceptProps([
+    'badge' => null,
+    'badgeColor' => 'primary',
+    'badgeSize' => 'xs',
     'color' => 'primary',
-    'darkMode' => false,
     'disabled' => false,
     'form' => null,
+    'formId' => null,
+    'href' => null,
     'icon' => null,
+    'iconAlias' => null,
+    'iconSize' => null,
     'keyBindings' => null,
-    'indicator' => null,
     'label' => null,
-    'size' => 'md',
+    'loadingIndicator' => true,
+    'size' => ActionSize::Medium,
+    'spaMode' => null,
     'tag' => 'button',
+    'target' => null,
     'tooltip' => null,
     'type' => 'button',
 ]); ?>
 <?php foreach (array_filter(([
+    'badge' => null,
+    'badgeColor' => 'primary',
+    'badgeSize' => 'xs',
     'color' => 'primary',
-    'darkMode' => false,
     'disabled' => false,
     'form' => null,
+    'formId' => null,
+    'href' => null,
     'icon' => null,
+    'iconAlias' => null,
+    'iconSize' => null,
     'keyBindings' => null,
-    'indicator' => null,
     'label' => null,
-    'size' => 'md',
+    'loadingIndicator' => true,
+    'size' => ActionSize::Medium,
+    'spaMode' => null,
     'tag' => 'button',
+    'target' => null,
     'tooltip' => null,
     'type' => 'button',
 ]), 'is_string', ARRAY_FILTER_USE_KEY) as $__key => $__value) {
@@ -52,178 +81,319 @@
 <?php unset($__defined_vars); ?>
 
 <?php
-    $buttonClasses = [
-        'filament-icon-button relative flex items-center justify-center rounded-full outline-none hover:bg-gray-500/5 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-70',
-        'text-primary-500 focus:bg-primary-500/10' => $color === 'primary',
-        'text-danger-500 focus:bg-danger-500/10' => $color === 'danger',
-        'text-gray-500 focus:bg-gray-500/10' => $color === 'secondary',
-        'dark:text-gray-400' => $color === 'secondary' && $darkMode,
-        'text-success-500 focus:bg-success-500/10' => $color === 'success',
-        'text-warning-500 focus:bg-warning-500/10' => $color === 'warning',
-        'dark:hover:bg-gray-300/5' => $darkMode,
-        'h-10 w-10' => $size === 'md',
-        'h-8 w-8' => $size === 'sm',
-        'h-8 w-8 md:h-10 md:w-10' => $size === 'sm md:md',
-        'h-12 w-12' => $size === 'lg',
-    ];
+    if (! $size instanceof ActionSize) {
+        $size = filled($size) ? (ActionSize::tryFrom($size) ?? $size) : null;
+    }
+
+    $iconSize ??= match ($size) {
+        ActionSize::ExtraSmall => IconSize::Small,
+        ActionSize::Small, ActionSize::Medium => IconSize::Medium,
+        ActionSize::Large, ActionSize::ExtraLarge => IconSize::Large,
+        default => IconSize::Medium,
+    };
+
+    if (! $iconSize instanceof IconSize) {
+        $iconSize = filled($iconSize) ? (IconSize::tryFrom($iconSize) ?? $iconSize) : null;
+    }
+
+    $buttonClasses = \Illuminate\Support\Arr::toCssClasses([
+        'fi-icon-btn relative flex items-center justify-center rounded-lg outline-none transition duration-75 focus-visible:ring-2',
+        'pointer-events-none opacity-70' => $disabled,
+        ...match ($size) {
+            ActionSize::ExtraSmall => [
+                match ($iconSize) {
+                    IconSize::Small => '-m-1.5',
+                    IconSize::Medium => '-m-1',
+                    IconSize::Large => '-m-0.5',
+                },
+                'h-7 w-7',
+            ],
+            ActionSize::Small => [
+                match ($iconSize) {
+                    IconSize::Small => '-m-2',
+                    IconSize::Medium => '-m-1.5',
+                    IconSize::Large => '-m-1',
+                },
+                'h-8 w-8',
+            ],
+            ActionSize::Medium => [
+                match ($iconSize) {
+                    IconSize::Small => '-m-2.5',
+                    IconSize::Medium => '-m-2',
+                    IconSize::Large => '-m-1.5',
+                },
+                'h-9 w-9',
+            ],
+            ActionSize::Large => [
+                match ($iconSize) {
+                    IconSize::Small => '-m-3',
+                    IconSize::Medium => '-m-2.5',
+                    IconSize::Large => '-m-2',
+                },
+                'h-10 w-10',
+            ],
+            ActionSize::ExtraLarge => [
+                match ($iconSize) {
+                    IconSize::Small => '-m-3.5',
+                    IconSize::Medium => '-m-3',
+                    IconSize::Large => '-m-2.5',
+                },
+                'h-11 w-11',
+            ],
+        },
+        match ($color) {
+            'gray' => 'text-gray-400 hover:text-gray-500 focus-visible:ring-primary-600 dark:text-gray-500 dark:hover:text-gray-400 dark:focus-visible:ring-primary-500',
+            default => 'fi-color-custom text-custom-500 hover:text-custom-600 focus-visible:ring-custom-600 dark:text-custom-400 dark:hover:text-custom-300 dark:focus-visible:ring-custom-500',
+        },
+        is_string($color) ? "fi-color-{$color}" : null,
+    ]);
+
+    $buttonStyles = \Filament\Support\get_color_css_variables(
+        $color,
+        shades: [300, 400, 500, 600],
+        alias: 'icon-button',
+    );
 
     $iconClasses = \Illuminate\Support\Arr::toCssClasses([
-        'filament-icon-button-icon',
-        'w-5 h-5' => $size === 'md',
-        'w-4 h-4' => $size === 'sm',
-        'w-4 h-4 md:w-5 md:h-5' => $size === 'sm md:md',
-        'w-6 h-6' => $size === 'lg',
+        'fi-icon-btn-icon',
+        match ($iconSize) {
+            IconSize::Small => 'h-4 w-4',
+            IconSize::Medium => 'h-5 w-5',
+            IconSize::Large => 'h-6 w-6',
+            default => $iconSize,
+        },
     ]);
 
-    $indicatorClasses = \Illuminate\Support\Arr::toCssClasses([
-        'filament-icon-button-indicator absolute rounded-full text-xs inline-block w-4 h-4 -top-0.5 -right-0.5',
-        'bg-primary-500/10' => $color === 'primary',
-        'bg-danger-500/10' => $color === 'danger',
-        'bg-gray-500/10' => $color === 'secondary',
-        'bg-success-500/10' => $color === 'success',
-        'bg-warning-500/10' => $color === 'warning',
-    ]);
+    $badgeContainerClasses = 'fi-icon-btn-badge-ctn absolute start-full top-1 z-[1] w-max -translate-x-1/2 -translate-y-1/2 rounded-md bg-white dark:bg-gray-900 rtl:translate-x-1/2';
 
-    $wireTarget = $attributes->whereStartsWith(['wire:target', 'wire:click'])->first();
+    $wireTarget = $loadingIndicator ? $attributes->whereStartsWith(['wire:target', 'wire:click'])->filter(fn ($value): bool => filled($value))->first() : null;
 
     $hasLoadingIndicator = filled($wireTarget) || ($type === 'submit' && filled($form));
 
     if ($hasLoadingIndicator) {
         $loadingIndicatorTarget = html_entity_decode($wireTarget ?: $form, ENT_QUOTES);
     }
+
+    $hasTooltip = filled($tooltip);
 ?>
 
-<?php if($tag === 'button'): ?>
+<!--[if BLOCK]><![endif]--><?php if($tag === 'button'): ?>
     <button
-        <?php if($keyBindings): ?>
-            x-mousetrap.global.<?php echo e(collect($keyBindings)->map(fn (string $keyBinding): string => str_replace('+', '-', $keyBinding))->implode('.')); ?>
-
-        <?php endif; ?>
-        <?php if($label): ?>
-            title="<?php echo e($label); ?>"
-        <?php endif; ?>
-        <?php if($tooltip): ?>
-            x-tooltip.raw="<?php echo e($tooltip); ?>"
-        <?php endif; ?>
-        type="<?php echo e($type); ?>"
-        <?php echo $disabled ? 'disabled' : ''; ?>
-
-        <?php if($keyBindings || $tooltip): ?>
+        <?php if($keyBindings || $hasTooltip): ?>
             x-data="{}"
         <?php endif; ?>
-        <?php echo e($attributes->class($buttonClasses)); ?>
+        <?php if($keyBindings): ?>
+            x-bind:id="$id('key-bindings')"
+            x-mousetrap.global.<?php echo e(collect($keyBindings)->map(fn (string $keyBinding): string => str_replace('+', '-', $keyBinding))->implode('.')); ?>="document.getElementById($el.id).click()"
+        <?php endif; ?>
+        <?php if($hasTooltip): ?>
+            x-tooltip="{
+                content: <?php echo \Illuminate\Support\Js::from($tooltip)->toHtml() ?>,
+                theme: $store.theme,
+            }"
+        <?php endif; ?>
+        <?php echo e($attributes
+                ->merge([
+                    'disabled' => $disabled,
+                    'form' => $formId,
+                    'type' => $type,
+                ], escape: false)
+                ->merge([
+                    'title' => $label,
+                ], escape: true)
+                ->class([$buttonClasses])
+                ->style([$buttonStyles])); ?>
 
     >
-        <?php if($label): ?>
+        <!--[if BLOCK]><![endif]--><?php if($label): ?>
             <span class="sr-only">
                 <?php echo e($label); ?>
 
             </span>
-        <?php endif; ?>
+        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-        <?php if (isset($component)) { $__componentOriginal511d4862ff04963c3c16115c05a86a9d = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal511d4862ff04963c3c16115c05a86a9d = $attributes; } ?>
-<?php $component = Illuminate\View\DynamicComponent::resolve(['component' => $icon] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('dynamic-component'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\DynamicComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['wire:loading.remove.delay' => $hasLoadingIndicator,'wire:target' => $hasLoadingIndicator ? $loadingIndicatorTarget : false,'class' => $iconClasses]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal511d4862ff04963c3c16115c05a86a9d)): ?>
-<?php $attributes = $__attributesOriginal511d4862ff04963c3c16115c05a86a9d; ?>
-<?php unset($__attributesOriginal511d4862ff04963c3c16115c05a86a9d); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal511d4862ff04963c3c16115c05a86a9d)): ?>
-<?php $component = $__componentOriginal511d4862ff04963c3c16115c05a86a9d; ?>
-<?php unset($__componentOriginal511d4862ff04963c3c16115c05a86a9d); ?>
-<?php endif; ?>
-
-        <?php if($hasLoadingIndicator): ?>
-            <?php if (isset($component)) { $__componentOriginal68a3024fa61352b757a05bc2899e1852 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal68a3024fa61352b757a05bc2899e1852 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-support::components.loading-indicator','data' => ['xCloak' => true,'wire:loading.delay' => true,'wire:target' => $loadingIndicatorTarget,'class' => $iconClasses]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('filament-support::loading-indicator'); ?>
+        <?php if (isset($component)) { $__componentOriginalbfc641e0710ce04e5fe02876ffc6f950 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalbfc641e0710ce04e5fe02876ffc6f950 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.icon','data' => ['attributes' => 
+                \Filament\Support\prepare_inherited_attributes(
+                    new \Illuminate\View\ComponentAttributeBag([
+                        'alias' => $iconAlias,
+                        'icon' => $icon,
+                        'wire:loading.remove.delay.' . config('filament.livewire_loading_delay', 'default') => $hasLoadingIndicator,
+                        'wire:target' => $hasLoadingIndicator ? $loadingIndicatorTarget : null,
+                    ])
+                )->class([$iconClasses])
+            ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament::icon'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['x-cloak' => true,'wire:loading.delay' => true,'wire:target' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($loadingIndicatorTarget),'class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($iconClasses)]); ?>
+<?php $component->withAttributes(['attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
+                \Filament\Support\prepare_inherited_attributes(
+                    new \Illuminate\View\ComponentAttributeBag([
+                        'alias' => $iconAlias,
+                        'icon' => $icon,
+                        'wire:loading.remove.delay.' . config('filament.livewire_loading_delay', 'default') => $hasLoadingIndicator,
+                        'wire:target' => $hasLoadingIndicator ? $loadingIndicatorTarget : null,
+                    ])
+                )->class([$iconClasses])
+            )]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal68a3024fa61352b757a05bc2899e1852)): ?>
-<?php $attributes = $__attributesOriginal68a3024fa61352b757a05bc2899e1852; ?>
-<?php unset($__attributesOriginal68a3024fa61352b757a05bc2899e1852); ?>
+<?php if (isset($__attributesOriginalbfc641e0710ce04e5fe02876ffc6f950)): ?>
+<?php $attributes = $__attributesOriginalbfc641e0710ce04e5fe02876ffc6f950; ?>
+<?php unset($__attributesOriginalbfc641e0710ce04e5fe02876ffc6f950); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal68a3024fa61352b757a05bc2899e1852)): ?>
-<?php $component = $__componentOriginal68a3024fa61352b757a05bc2899e1852; ?>
-<?php unset($__componentOriginal68a3024fa61352b757a05bc2899e1852); ?>
+<?php if (isset($__componentOriginalbfc641e0710ce04e5fe02876ffc6f950)): ?>
+<?php $component = $__componentOriginalbfc641e0710ce04e5fe02876ffc6f950; ?>
+<?php unset($__componentOriginalbfc641e0710ce04e5fe02876ffc6f950); ?>
 <?php endif; ?>
-        <?php endif; ?>
 
-        <?php if($indicator): ?>
-            <span class="<?php echo e($indicatorClasses); ?>">
-                <?php echo e($indicator); ?>
+        <!--[if BLOCK]><![endif]--><?php if($hasLoadingIndicator): ?>
+            <?php if (isset($component)) { $__componentOriginalbef7c2371a870b1887ec3741fe311a10 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalbef7c2371a870b1887ec3741fe311a10 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.loading-indicator','data' => ['attributes' => 
+                    \Filament\Support\prepare_inherited_attributes(
+                        new \Illuminate\View\ComponentAttributeBag([
+                            'wire:loading.delay.' . config('filament.livewire_loading_delay', 'default') => '',
+                            'wire:target' => $loadingIndicatorTarget,
+                        ])
+                    )->class([$iconClasses])
+                ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament::loading-indicator'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
+                    \Filament\Support\prepare_inherited_attributes(
+                        new \Illuminate\View\ComponentAttributeBag([
+                            'wire:loading.delay.' . config('filament.livewire_loading_delay', 'default') => '',
+                            'wire:target' => $loadingIndicatorTarget,
+                        ])
+                    )->class([$iconClasses])
+                )]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalbef7c2371a870b1887ec3741fe311a10)): ?>
+<?php $attributes = $__attributesOriginalbef7c2371a870b1887ec3741fe311a10; ?>
+<?php unset($__attributesOriginalbef7c2371a870b1887ec3741fe311a10); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalbef7c2371a870b1887ec3741fe311a10)): ?>
+<?php $component = $__componentOriginalbef7c2371a870b1887ec3741fe311a10; ?>
+<?php unset($__componentOriginalbef7c2371a870b1887ec3741fe311a10); ?>
+<?php endif; ?>
+        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-            </span>
-        <?php endif; ?>
+        <!--[if BLOCK]><![endif]--><?php if(filled($badge)): ?>
+            <div class="<?php echo e($badgeContainerClasses); ?>">
+                <?php if (isset($component)) { $__componentOriginal986dce9114ddce94a270ab00ce6c273d = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal986dce9114ddce94a270ab00ce6c273d = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.badge','data' => ['color' => $badgeColor,'size' => $badgeSize]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament::badge'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['color' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($badgeColor),'size' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($badgeSize)]); ?>
+                    <?php echo e($badge); ?>
+
+                 <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal986dce9114ddce94a270ab00ce6c273d)): ?>
+<?php $attributes = $__attributesOriginal986dce9114ddce94a270ab00ce6c273d; ?>
+<?php unset($__attributesOriginal986dce9114ddce94a270ab00ce6c273d); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal986dce9114ddce94a270ab00ce6c273d)): ?>
+<?php $component = $__componentOriginal986dce9114ddce94a270ab00ce6c273d; ?>
+<?php unset($__componentOriginal986dce9114ddce94a270ab00ce6c273d); ?>
+<?php endif; ?>
+            </div>
+        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
     </button>
 <?php elseif($tag === 'a'): ?>
     <a
-        <?php if($keyBindings): ?>
-            x-mousetrap.global.<?php echo e(collect($keyBindings)->map(fn (string $keyBinding): string => str_replace('+', '-', $keyBinding))->implode('.')); ?>
+        <?php echo e(\Filament\Support\generate_href_html($href, $target === '_blank', $spaMode)); ?>
 
-        <?php endif; ?>
-        <?php if($label): ?>
-            title="<?php echo e($label); ?>"
-        <?php endif; ?>
-        <?php if($tooltip): ?>
-            x-tooltip.raw="<?php echo e($tooltip); ?>"
-        <?php endif; ?>
-        <?php if($keyBindings || $tooltip): ?>
+        <?php if($keyBindings || $hasTooltip): ?>
             x-data="{}"
         <?php endif; ?>
-        <?php echo e($attributes->class($buttonClasses)); ?>
+        <?php if($keyBindings): ?>
+            x-bind:id="$id('key-bindings')"
+            x-mousetrap.global.<?php echo e(collect($keyBindings)->map(fn (string $keyBinding): string => str_replace('+', '-', $keyBinding))->implode('.')); ?>="document.getElementById($el.id).click()"
+        <?php endif; ?>
+        <?php if($hasTooltip): ?>
+            x-tooltip="{
+                content: <?php echo \Illuminate\Support\Js::from($tooltip)->toHtml() ?>,
+                theme: $store.theme,
+            }"
+        <?php endif; ?>
+        <?php echo e($attributes
+                ->merge([
+                    'title' => $label,
+                ], escape: true)
+                ->class([$buttonClasses])
+                ->style([$buttonStyles])); ?>
 
     >
-        <?php if($label): ?>
+        <!--[if BLOCK]><![endif]--><?php if($label): ?>
             <span class="sr-only">
                 <?php echo e($label); ?>
 
             </span>
-        <?php endif; ?>
+        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-        <?php if (isset($component)) { $__componentOriginal511d4862ff04963c3c16115c05a86a9d = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal511d4862ff04963c3c16115c05a86a9d = $attributes; } ?>
-<?php $component = Illuminate\View\DynamicComponent::resolve(['component' => $icon] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('dynamic-component'); ?>
+        <?php if (isset($component)) { $__componentOriginalbfc641e0710ce04e5fe02876ffc6f950 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalbfc641e0710ce04e5fe02876ffc6f950 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.icon','data' => ['alias' => $iconAlias,'icon' => $icon,'class' => $iconClasses]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament::icon'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\DynamicComponent::class))->getConstructor()): ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['class' => $iconClasses]); ?>
+<?php $component->withAttributes(['alias' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($iconAlias),'icon' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($icon),'class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($iconClasses)]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal511d4862ff04963c3c16115c05a86a9d)): ?>
-<?php $attributes = $__attributesOriginal511d4862ff04963c3c16115c05a86a9d; ?>
-<?php unset($__attributesOriginal511d4862ff04963c3c16115c05a86a9d); ?>
+<?php if (isset($__attributesOriginalbfc641e0710ce04e5fe02876ffc6f950)): ?>
+<?php $attributes = $__attributesOriginalbfc641e0710ce04e5fe02876ffc6f950; ?>
+<?php unset($__attributesOriginalbfc641e0710ce04e5fe02876ffc6f950); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal511d4862ff04963c3c16115c05a86a9d)): ?>
-<?php $component = $__componentOriginal511d4862ff04963c3c16115c05a86a9d; ?>
-<?php unset($__componentOriginal511d4862ff04963c3c16115c05a86a9d); ?>
+<?php if (isset($__componentOriginalbfc641e0710ce04e5fe02876ffc6f950)): ?>
+<?php $component = $__componentOriginalbfc641e0710ce04e5fe02876ffc6f950; ?>
+<?php unset($__componentOriginalbfc641e0710ce04e5fe02876ffc6f950); ?>
 <?php endif; ?>
 
-        <?php if($indicator): ?>
-            <span class="<?php echo e($indicatorClasses); ?>">
-                <?php echo e($indicator); ?>
+        <!--[if BLOCK]><![endif]--><?php if(filled($badge)): ?>
+            <div class="<?php echo e($badgeContainerClasses); ?>">
+                <?php if (isset($component)) { $__componentOriginal986dce9114ddce94a270ab00ce6c273d = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal986dce9114ddce94a270ab00ce6c273d = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.badge','data' => ['color' => $badgeColor,'size' => 'xs']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament::badge'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['color' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($badgeColor),'size' => 'xs']); ?>
+                    <?php echo e($badge); ?>
 
-            </span>
-        <?php endif; ?>
+                 <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal986dce9114ddce94a270ab00ce6c273d)): ?>
+<?php $attributes = $__attributesOriginal986dce9114ddce94a270ab00ce6c273d; ?>
+<?php unset($__attributesOriginal986dce9114ddce94a270ab00ce6c273d); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal986dce9114ddce94a270ab00ce6c273d)): ?>
+<?php $component = $__componentOriginal986dce9114ddce94a270ab00ce6c273d; ?>
+<?php unset($__componentOriginal986dce9114ddce94a270ab00ce6c273d); ?>
+<?php endif; ?>
+            </div>
+        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
     </a>
-<?php endif; ?>
+<?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 <?php /**PATH /Users/muhammadaakifraza/Herd/Portal/vendor/filament/support/src/../resources/views/components/icon-button.blade.php ENDPATH**/ ?>

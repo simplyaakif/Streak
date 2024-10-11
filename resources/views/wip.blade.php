@@ -11,7 +11,7 @@
         [x-cloak] { display: none !important; }
     </style>
 
-    @livewireStyles
+    @filamentStyles
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.2/dist/alpine.min.js" defer></script>
     <script src="{{asset('js/components.js')}}"></script>
@@ -43,7 +43,7 @@
     </x-tabs>
 
 
-    @livewireScripts
+    @filamentScripts
     @yield('scripts')
     @stack('scripts')
     <script>

@@ -1,7 +1,7 @@
-<div x-data="{ open: @entangle('showQuery') }" class="align-middle min-w-full overflow-x-auto space-y-4 overflow-hidden
+<div x-data="{ open: @entangle('showQuery').live }" class="align-middle min-w-full overflow-x-auto space-y-4 overflow-hidden
 sm:rounded-lg">
 
-    <x-modal.dialog wire:model="showEditModal">
+    <x-modal.dialog wire:model.live="showEditModal">
         <x-slot name="title">Edit Query</x-slot>
         <x-slot name="content">
             <div>
@@ -11,24 +11,24 @@ sm:rounded-lg">
                         <x-common.data-input-text
                             error="editing.name"
                             placeholder="Enter Query Name"
-                            wire:model.lazy="editing.name"/>
+                            wire:model.blur="editing.name"/>
                     </x-shared.form.input-wrapper>
                     <x-shared.form.input-wrapper
                         label="Mobile Number">
                         <x-common.data-input-text
                             error="editing.mobile"
                             placeholder="Enter Mobile Number 03335335792"
-                            wire:model.lazy="editing.mobile"/>
+                            wire:model.blur="editing.mobile"/>
                     </x-shared.form.input-wrapper>
                     <x-shared.form.input-wrapper label="Email">
                         <x-common.data-input-text error="editing.email" type="email"
-                                                  wire:model.lazy="editing.email" placeholder="Enter Email Address"/>
+                                                  wire:model.blur="editing.email" placeholder="Enter Email Address"/>
                     </x-shared.form.input-wrapper>
                     <x-shared.form.input-wrapper label="Mobile Number">
                         <x-common.data-input-text
                             error="editing.mobile"
                             placeholder="Enter Mobile Number 03335335792"
-                            wire:model.lazy="editing.mobile"/>
+                            wire:model.blur="editing.mobile"/>
                     </x-shared.form.input-wrapper>
 
                 </div>
@@ -45,12 +45,12 @@ sm:rounded-lg">
 
     <div class="grid grid-cols-3 gap-2">
         <x-common.filter-wrapper label="Search by Name">
-            <x-common.data-input-text wire:model="filters.search" placeholder="Search Query by Name"/>
+            <x-common.data-input-text wire:model.live="filters.search" placeholder="Search Query by Name"/>
         </x-common.filter-wrapper>
         <div>
 
             <x-common.filter-select label="Select Course">
-                <x-common.data-input-select wire:model="filters.course">
+                <x-common.data-input-select wire:model.live="filters.course">
                     <option value="">All</option>
                     @foreach($courses as $course)
                         <option value="{{$course->id}}">{{$course->title}}</option>
@@ -62,9 +62,9 @@ sm:rounded-lg">
             <x-common.filter-wrapper label="Created Between">
                 <div class="mb-2">
                     <div class="mb-2 flex space-x-1">
-                        <x-common.data-input-text wire:model="filters.date_min" type="date"
+                        <x-common.data-input-text wire:model.live="filters.date_min" type="date"
                                                   placeholder="Search Query by Name"/>
-                        <x-common.data-input-text wire:model="filters.date_max" type="date"
+                        <x-common.data-input-text wire:model.live="filters.date_max" type="date"
                                                   placeholder="Search Query by Name"/>
                     </div>
                 </div>
@@ -341,14 +341,14 @@ sm:rounded-lg">
                                                     </table>
                                                 </div>
                                                 <div class="mt-4">
-                                                    <form wire:submit.prevent="addTimeline">
+                                                    <form wire:submit="addTimeline">
 
                                                     <div class="grid grid-cols-2 gap-2">
                                                         <div>
                                                             <label for="">Status </label>
                                                             <x-common.data-input-select
                                                                 error="addTimelineData.timeline_id"
-                                                                wire:model.defer="addTimelineData.timeline_id">
+                                                                wire:model="addTimelineData.timeline_id">
                                                                 @foreach($timelines as $timeline)
                                                                     <option
                                                                         value="{{$timeline->id}}">{{$timeline->title}}</option>
@@ -359,7 +359,7 @@ sm:rounded-lg">
                                                             <label for="">Follow Up date </label>
                                                             <x-common.data-input-text label="Follow Up Date"
                                                                                       error="addTimelineData.fw_date_time"
-                                                          wire:model.defer="addTimelineData.fw_date_time"
+                                                          wire:model="addTimelineData.fw_date_time"
                                                                                       type="datetime-local"/>
                                                         </div>
                                                     </div>
@@ -367,7 +367,7 @@ sm:rounded-lg">
                                                         <label for="">Remarks</label>
                                                         <x-common.data-input-text
                                                             error="addTimelineData.remarks"
-                                                            wire:model.defer="addTimelineData.remarks"/>
+                                                            wire:model="addTimelineData.remarks"/>
                                                     </div>
                                                     <div>
                                                         <x-button.primary type="submit">Add Status</x-button.primary>

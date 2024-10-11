@@ -9,7 +9,7 @@
 
                 <div class="mt-8">
                     <div class="mt-6">
-                        <form wire:submit.prevent="register">
+                        <form wire:submit="register">
                             {{ $this->form }}
 
                             <button type="submit" class="bg-indigo-600 text-white rounded px-4 py-2 mt-4">

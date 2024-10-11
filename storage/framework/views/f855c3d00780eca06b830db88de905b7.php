@@ -1,6 +1,6 @@
 <?php $attributes ??= new \Illuminate\View\ComponentAttributeBag; ?>
 <?php foreach($attributes->onlyProps([
-    'error' => false,
+    'disabled' => false,
     'prefix' => null,
     'required' => false,
     'suffix' => null,
@@ -8,13 +8,13 @@
     $$__key = $$__key ?? $__value;
 } ?>
 <?php $attributes = $attributes->exceptProps([
-    'error' => false,
+    'disabled' => false,
     'prefix' => null,
     'required' => false,
     'suffix' => null,
 ]); ?>
 <?php foreach (array_filter(([
-    'error' => false,
+    'disabled' => false,
     'prefix' => null,
     'required' => false,
     'suffix' => null,
@@ -28,31 +28,16 @@
 <?php unset($__defined_vars); ?>
 
 <label
-    <?php echo e($attributes->class(['filament-forms-field-wrapper-label inline-flex items-center space-x-3 rtl:space-x-reverse'])); ?>
+    <?php echo e($attributes->class(['fi-fo-field-wrp-label inline-flex items-center gap-x-3'])); ?>
 
 >
     <?php echo e($prefix); ?>
 
 
-    <span
-        class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-            'text-sm font-medium leading-4',
-            'text-gray-700' => ! $error,
-            'dark:text-gray-300' => (! $error) && config('forms.dark_mode'),
-            'text-danger-700' => $error,
-            'dark:text-danger-400' => $error && config('forms.dark_mode'),
-        ]); ?>"
-    >
+    <span class="text-sm font-medium leading-6 text-gray-950 dark:text-white">
         
-        <?php echo e($slot); ?><?php if($required): ?><sup
-                class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                    'text-danger-700 whitespace-nowrap font-medium',
-                    'dark:text-danger-400' => config('forms.dark_mode'),
-                ]); ?>"
-            >
-                *
-            </sup>
-        <?php endif; ?>
+        <?php echo e($slot); ?><!--[if BLOCK]><![endif]--><?php if($required && (! $disabled)): ?><sup class="text-danger-600 dark:text-danger-400 font-medium">*</sup>
+        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
     </span>
 
     <?php echo e($suffix); ?>

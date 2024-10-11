@@ -1,7 +1,10 @@
+<?php
+    use Filament\Support\Enums\Alignment;
+?>
+
 <?php $attributes ??= new \Illuminate\View\ComponentAttributeBag; ?>
 <?php foreach($attributes->onlyProps([
-    'actions' => null,
-    'columnSearches' => false,
+    'actions' => [],
     'description' => null,
     'heading',
     'icon',
@@ -9,15 +12,13 @@
     $$__key = $$__key ?? $__value;
 } ?>
 <?php $attributes = $attributes->exceptProps([
-    'actions' => null,
-    'columnSearches' => false,
+    'actions' => [],
     'description' => null,
     'heading',
     'icon',
 ]); ?>
 <?php foreach (array_filter(([
-    'actions' => null,
-    'columnSearches' => false,
+    'actions' => [],
     'description' => null,
     'heading',
     'icon',
@@ -31,66 +32,41 @@
 <?php unset($__defined_vars); ?>
 
 <div
-    <?php echo e($attributes->class([
-            'filament-tables-empty-state mx-auto flex flex-1 flex-col items-center justify-center space-y-6 bg-white p-6 text-center',
-            'dark:bg-gray-800' => config('tables.dark_mode'),
-        ])); ?>
+    <?php echo e($attributes->class(['fi-ta-empty-state px-6 py-12'])); ?>
 
 >
     <div
-        class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-            'flex h-16 w-16 items-center justify-center rounded-full bg-primary-50 text-primary-500',
-            'dark:bg-gray-700' => config('tables.dark_mode'),
-        ]); ?>"
+        class="fi-ta-empty-state-content mx-auto grid max-w-lg justify-items-center text-center"
     >
-        <?php if (isset($component)) { $__componentOriginal511d4862ff04963c3c16115c05a86a9d = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal511d4862ff04963c3c16115c05a86a9d = $attributes; } ?>
-<?php $component = Illuminate\View\DynamicComponent::resolve(['component' => $icon] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('dynamic-component'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\DynamicComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['class' => 'h-6 w-6','wire:loading.remove.delay' => true,'wire:target' => ''.e(implode(',', \Filament\Tables\Table::LOADING_TARGETS)).'']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal511d4862ff04963c3c16115c05a86a9d)): ?>
-<?php $attributes = $__attributesOriginal511d4862ff04963c3c16115c05a86a9d; ?>
-<?php unset($__attributesOriginal511d4862ff04963c3c16115c05a86a9d); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal511d4862ff04963c3c16115c05a86a9d)): ?>
-<?php $component = $__componentOriginal511d4862ff04963c3c16115c05a86a9d; ?>
-<?php unset($__componentOriginal511d4862ff04963c3c16115c05a86a9d); ?>
-<?php endif; ?>
-
-        <?php if (isset($component)) { $__componentOriginal68a3024fa61352b757a05bc2899e1852 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal68a3024fa61352b757a05bc2899e1852 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-support::components.loading-indicator','data' => ['class' => 'h-6 w-6','wire:loading.delay' => true,'wire:target' => ''.e(implode(',', \Filament\Tables\Table::LOADING_TARGETS)).'']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('filament-support::loading-indicator'); ?>
+        <div
+            class="fi-ta-empty-state-icon-ctn mb-4 rounded-full bg-gray-100 p-3 dark:bg-gray-500/20"
+        >
+            <?php if (isset($component)) { $__componentOriginalbfc641e0710ce04e5fe02876ffc6f950 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalbfc641e0710ce04e5fe02876ffc6f950 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.icon','data' => ['icon' => $icon,'class' => 'fi-ta-empty-state-icon h-6 w-6 text-gray-500 dark:text-gray-400']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament::icon'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['class' => 'h-6 w-6','wire:loading.delay' => true,'wire:target' => ''.e(implode(',', \Filament\Tables\Table::LOADING_TARGETS)).'']); ?>
+<?php $component->withAttributes(['icon' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($icon),'class' => 'fi-ta-empty-state-icon h-6 w-6 text-gray-500 dark:text-gray-400']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal68a3024fa61352b757a05bc2899e1852)): ?>
-<?php $attributes = $__attributesOriginal68a3024fa61352b757a05bc2899e1852; ?>
-<?php unset($__attributesOriginal68a3024fa61352b757a05bc2899e1852); ?>
+<?php if (isset($__attributesOriginalbfc641e0710ce04e5fe02876ffc6f950)): ?>
+<?php $attributes = $__attributesOriginalbfc641e0710ce04e5fe02876ffc6f950; ?>
+<?php unset($__attributesOriginalbfc641e0710ce04e5fe02876ffc6f950); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal68a3024fa61352b757a05bc2899e1852)): ?>
-<?php $component = $__componentOriginal68a3024fa61352b757a05bc2899e1852; ?>
-<?php unset($__componentOriginal68a3024fa61352b757a05bc2899e1852); ?>
+<?php if (isset($__componentOriginalbfc641e0710ce04e5fe02876ffc6f950)): ?>
+<?php $component = $__componentOriginalbfc641e0710ce04e5fe02876ffc6f950; ?>
+<?php unset($__componentOriginalbfc641e0710ce04e5fe02876ffc6f950); ?>
 <?php endif; ?>
-    </div>
+        </div>
 
-    <div class="max-w-md space-y-1">
-        <?php if (isset($component)) { $__componentOriginal3a47edca5cfdbec7223a479baefe8ffa = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal3a47edca5cfdbec7223a479baefe8ffa = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.empty-state.heading','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::empty-state.heading'); ?>
+        <?php if (isset($component)) { $__componentOriginal130fd53052f7fb96516142d5e36c3545 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal130fd53052f7fb96516142d5e36c3545 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.empty-state.heading','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::empty-state.heading'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
@@ -101,87 +77,62 @@
 
          <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal3a47edca5cfdbec7223a479baefe8ffa)): ?>
-<?php $attributes = $__attributesOriginal3a47edca5cfdbec7223a479baefe8ffa; ?>
-<?php unset($__attributesOriginal3a47edca5cfdbec7223a479baefe8ffa); ?>
+<?php if (isset($__attributesOriginal130fd53052f7fb96516142d5e36c3545)): ?>
+<?php $attributes = $__attributesOriginal130fd53052f7fb96516142d5e36c3545; ?>
+<?php unset($__attributesOriginal130fd53052f7fb96516142d5e36c3545); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal3a47edca5cfdbec7223a479baefe8ffa)): ?>
-<?php $component = $__componentOriginal3a47edca5cfdbec7223a479baefe8ffa; ?>
-<?php unset($__componentOriginal3a47edca5cfdbec7223a479baefe8ffa); ?>
+<?php if (isset($__componentOriginal130fd53052f7fb96516142d5e36c3545)): ?>
+<?php $component = $__componentOriginal130fd53052f7fb96516142d5e36c3545; ?>
+<?php unset($__componentOriginal130fd53052f7fb96516142d5e36c3545); ?>
 <?php endif; ?>
 
-        <?php if($description): ?>
-            <?php if (isset($component)) { $__componentOriginal5fca776d8f90795e89ea34d84cbdc3a6 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal5fca776d8f90795e89ea34d84cbdc3a6 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.empty-state.description','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::empty-state.description'); ?>
+        <!--[if BLOCK]><![endif]--><?php if($description): ?>
+            <?php if (isset($component)) { $__componentOriginalc142a3e962e03b45ea4d798cbb1a12b4 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalc142a3e962e03b45ea4d798cbb1a12b4 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.empty-state.description','data' => ['class' => 'mt-1']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::empty-state.description'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes([]); ?>
+<?php $component->withAttributes(['class' => 'mt-1']); ?>
                 <?php echo e($description); ?>
 
              <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal5fca776d8f90795e89ea34d84cbdc3a6)): ?>
-<?php $attributes = $__attributesOriginal5fca776d8f90795e89ea34d84cbdc3a6; ?>
-<?php unset($__attributesOriginal5fca776d8f90795e89ea34d84cbdc3a6); ?>
+<?php if (isset($__attributesOriginalc142a3e962e03b45ea4d798cbb1a12b4)): ?>
+<?php $attributes = $__attributesOriginalc142a3e962e03b45ea4d798cbb1a12b4; ?>
+<?php unset($__attributesOriginalc142a3e962e03b45ea4d798cbb1a12b4); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal5fca776d8f90795e89ea34d84cbdc3a6)): ?>
-<?php $component = $__componentOriginal5fca776d8f90795e89ea34d84cbdc3a6; ?>
-<?php unset($__componentOriginal5fca776d8f90795e89ea34d84cbdc3a6); ?>
+<?php if (isset($__componentOriginalc142a3e962e03b45ea4d798cbb1a12b4)): ?>
+<?php $component = $__componentOriginalc142a3e962e03b45ea4d798cbb1a12b4; ?>
+<?php unset($__componentOriginalc142a3e962e03b45ea4d798cbb1a12b4); ?>
 <?php endif; ?>
-        <?php endif; ?>
-    </div>
+        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-    <?php if($actions): ?>
-        <?php if (isset($component)) { $__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.actions.index','data' => ['actions' => $actions,'alignment' => 'center','wrap' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::actions'); ?>
+        <!--[if BLOCK]><![endif]--><?php if($actions): ?>
+            <?php if (isset($component)) { $__componentOriginal32a2358b99de73a2a27625c392d6fe38 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal32a2358b99de73a2a27625c392d6fe38 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.actions','data' => ['actions' => $actions,'alignment' => Alignment::Center,'wrap' => true,'class' => 'mt-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::actions'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actions),'alignment' => 'center','wrap' => true]); ?>
+<?php $component->withAttributes(['actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actions),'alignment' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(Alignment::Center),'wrap' => true,'class' => 'mt-6']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94)): ?>
-<?php $attributes = $__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94; ?>
-<?php unset($__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94); ?>
+<?php if (isset($__attributesOriginal32a2358b99de73a2a27625c392d6fe38)): ?>
+<?php $attributes = $__attributesOriginal32a2358b99de73a2a27625c392d6fe38; ?>
+<?php unset($__attributesOriginal32a2358b99de73a2a27625c392d6fe38); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94)): ?>
-<?php $component = $__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94; ?>
-<?php unset($__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94); ?>
+<?php if (isset($__componentOriginal32a2358b99de73a2a27625c392d6fe38)): ?>
+<?php $component = $__componentOriginal32a2358b99de73a2a27625c392d6fe38; ?>
+<?php unset($__componentOriginal32a2358b99de73a2a27625c392d6fe38); ?>
 <?php endif; ?>
-    <?php endif; ?>
-
-    <?php if($columnSearches): ?>
-        <?php if (isset($component)) { $__componentOriginal8088337a56406b46fecf9bd6589edc2f = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal8088337a56406b46fecf9bd6589edc2f = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.link','data' => ['wire:click' => '$set(\'tableColumnSearchQueries\', [])','color' => 'danger','tag' => 'button','size' => 'sm']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::link'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['wire:click' => '$set(\'tableColumnSearchQueries\', [])','color' => 'danger','tag' => 'button','size' => 'sm']); ?>
-            <?php echo e(__('tables::table.empty.buttons.reset_column_searches.label')); ?>
-
-         <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal8088337a56406b46fecf9bd6589edc2f)): ?>
-<?php $attributes = $__attributesOriginal8088337a56406b46fecf9bd6589edc2f; ?>
-<?php unset($__attributesOriginal8088337a56406b46fecf9bd6589edc2f); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal8088337a56406b46fecf9bd6589edc2f)): ?>
-<?php $component = $__componentOriginal8088337a56406b46fecf9bd6589edc2f; ?>
-<?php unset($__componentOriginal8088337a56406b46fecf9bd6589edc2f); ?>
-<?php endif; ?>
-    <?php endif; ?>
+        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+    </div>
 </div>
 <?php /**PATH /Users/muhammadaakifraza/Herd/Portal/vendor/filament/tables/src/../resources/views/components/empty-state/index.blade.php ENDPATH**/ ?>

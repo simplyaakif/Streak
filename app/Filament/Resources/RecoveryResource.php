@@ -8,9 +8,9 @@ use App\Models\Batch;
 use App\Models\Recovery;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -22,7 +22,7 @@ class RecoveryResource extends Resource
 {
     protected static ?string $model = Recovery::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-cash';
+    protected static ?string $navigationIcon = 'heroicon-o-banknotes';
 
     protected static ?string $navigationGroup = 'Finance Management';
 
@@ -112,7 +112,7 @@ class RecoveryResource extends Resource
                               ]),
                 SelectFilter::make('batch_id')->label('Batch')
                     ->options(Batch::all()->pluck('title','id')),
-            ],Tables\Filters\Layout::AboveContent)
+            ],\Filament\Tables\Enums\FiltersLayout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])

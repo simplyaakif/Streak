@@ -1,15 +1,18 @@
 const plugin = require("tailwindcss/plugin")
 const colors = require('tailwindcss/colors')
+import preset from './filament-preset'
 
 module.exports = {
-  mode: 'jit',
-  purge: {
-    enabled: false,
-    content: ['./resources/views/**/*.blade.php', './safelist.txt'],
-    options: {
-      safelist: []
-    }
-  },
+    darkMode: 'class',
+    presets: [preset],
+    content: [
+        './resources/views/**/*.blade.php',
+        './safelist.txt',
+        './app/Filament/**/*.php',
+        './resources/views/filament/**/*.blade.php',
+        './vendor/filament/**/*.blade.php',
+    ],
+
   theme: {
     extend: {
       colors: {
@@ -18,7 +21,8 @@ module.exports = {
         blueGray: colors.blueGray,
         lightBlue: colors.sky,
         orange: colors.orange,
-        red: colors.red
+        red: colors.red,
+          primary:colors.cyan,
       },
       minHeight: {
         'screen-75': '75vh'

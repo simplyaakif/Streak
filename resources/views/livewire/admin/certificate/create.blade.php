@@ -3,29 +3,29 @@
         <x-button.primary wire:click="$set('showModal',true)">Generate Certificate</x-button.primary>
     </div>
     <div>
-        <form wire:submit.prevent="submit()">
-            <x-modal.dialog wire:model="showModal">
+        <form wire:submit="submit()">
+            <x-modal.dialog wire:model.live="showModal">
                 <x-slot name="title">Generate Certificate</x-slot>
                 <x-slot name="content">
                     <label for="">
                         Name
-                        <x-common.data-input-text disabled wire:model="student.name"/>
+                        <x-common.data-input-text disabled wire:model.live="student.name"/>
                     </label>
                     <label for="">
                         Father Name
-                        <x-common.data-input-text disabled wire:model="student.father_name"/>
+                        <x-common.data-input-text disabled wire:model.live="student.father_name"/>
                     </label>
                     <label for="">
                         Course
-                        <x-common.data-input-text disabled wire:model="course.title"/>
+                        <x-common.data-input-text disabled wire:model.live="course.title"/>
                     </label>
                     <label for="">
                         Course Duration
-                        <x-common.data-input-text disabled wire:model="course.duration"/>
+                        <x-common.data-input-text disabled wire:model.live="course.duration"/>
                     </label>
                     <label for="">
                         Grade
-                        <x-common.data-input-select wire:model="certificate.grade">
+                        <x-common.data-input-select wire:model.live="certificate.grade">
                             <option value="A">A</option>
                             <option value="A-">A-</option>
                             <option value="B+">B+</option>

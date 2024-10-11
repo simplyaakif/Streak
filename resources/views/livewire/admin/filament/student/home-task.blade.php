@@ -3,8 +3,8 @@
         <x-button.primary wire:click="$set('showModal',true)">Add Home Work</x-button.primary>
     </div>
     <div>
-        <form wire:submit.prevent="submit">
-            <x-modal.dialog wire:model="showModal" max-width="3xl">
+        <form wire:submit="submit">
+            <x-modal.dialog wire:model.live="showModal" max-width="3xl">
                 <x-slot name="title">Add Home Task</x-slot>
                 <x-slot name="content" >
                     <div>

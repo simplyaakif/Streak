@@ -6,9 +6,9 @@ use App\Filament\Resources\QueryResource\Pages;
 use App\Filament\Resources\QueryResource\RelationManagers;
 use App\Models\Query;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,7 +19,7 @@ class QueryResource extends Resource
 {
     protected static ?string $model = Query::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-user-add';
+    protected static ?string $navigationIcon = 'heroicon-o-user-plus';
     protected static ?string $navigationGroup='Query Management';
 
     public static function form(Form $form): Form

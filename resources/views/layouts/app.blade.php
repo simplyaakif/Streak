@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="{{ asset('css/app.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/student.css') }}" />
-    <title>{{ __('panel.site_title') }}</title>
+    <title>{{ config('app.name') }}</title>
 </head>
 
 <body class="h-full">

@@ -1,12 +1,12 @@
 <div class="space-y-4">
     <div class="grid grid-cols-3 gap-2">
         <x-common.filter-wrapper label="Search by Name">
-            <x-common.data-input-text wire:model="filters.search" placeholder="Search Query by Name"/>
+            <x-common.data-input-text wire:model.live="filters.search" placeholder="Search Query by Name"/>
         </x-common.filter-wrapper>
         <div>
 
             <x-common.filter-select label="Select Batch">
-                <x-common.data-input-select wire:model="filters.batch">
+                <x-common.data-input-select wire:model.live="filters.batch">
                     <option value="">All</option>
                     @foreach($batches as $batch)
                         <option value="{{$batch->id}}">{{$batch->title}}</option>
@@ -18,9 +18,9 @@
             <x-common.filter-wrapper label="Created Between">
                 <div class="mb-2">
                     <div class="mb-2 flex space-x-1">
-                        <x-common.data-input-text wire:model="filters.date_min" type="date"
+                        <x-common.data-input-text wire:model.live="filters.date_min" type="date"
                                                   placeholder="Search Student by Name"/>
-                        <x-common.data-input-text wire:model="filters.date_max" type="date"
+                        <x-common.data-input-text wire:model.live="filters.date_max" type="date"
                                                   placeholder="Search Student by Name"/>
                     </div>
                 </div>

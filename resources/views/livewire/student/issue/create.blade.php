@@ -1,7 +1,7 @@
 <div>
     <x-button.primary wire:click="$toggle('showCreateModal')">Request Support</x-button.primary>
-    <form wire:submit.prevent="submit">
-        <x-modal.dialog wire:model="showCreateModal">
+    <form wire:submit="submit">
+        <x-modal.dialog wire:model.live="showCreateModal">
             <x-slot name="title">
                 Request Support by Filling the form below
             </x-slot>
@@ -9,11 +9,11 @@
                 <label for="">Issue Subject</label>
                 <x-common.data-input-text
                     error="issue.title"
-                    wire:model="issue.title"/>
+                    wire:model.live="issue.title"/>
                 <label for="">Issue Type</label>
                 <x-common.data-input-select
                     error="issue.type"
-                    wire:model.defer="issue.type">
+                    wire:model="issue.type">
                     <option value="">-- Select Option --</option>
                     @forelse(App\Models\Issue::TYPES as $key => $type)
                         <option value="{{$key}}">{{$type}}</option>
@@ -25,7 +25,7 @@
                 <x-common.data-textarea
                     cols="30" rows="10"
                     error="reply.message"
-                    wire:model.defer="reply.message"
+                    wire:model="reply.message"
                     placeholder="Kindly describe your Issue, Complaint, Request"
                 ></x-common.data-textarea>
             </x-slot>

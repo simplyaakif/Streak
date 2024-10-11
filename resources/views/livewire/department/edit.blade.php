@@ -1,8 +1,8 @@
-<form wire:submit.prevent="submit" class="pt-3">
+<form wire:submit="submit" class="pt-3">
 
     <div class="form-group {{ $errors->has('department.title') ? 'invalid' : '' }}">
         <label class="form-label required" for="title">{{ trans('cruds.department.fields.title') }}</label>
-        <input class="form-control" type="text" name="title" id="title" required wire:model.defer="department.title">
+        <input class="form-control" type="text" name="title" id="title" required wire:model="department.title">
         <div class="validation-message">
             {{ $errors->first('department.title') }}
         </div>
@@ -22,7 +22,7 @@
     </div>
     <div class="form-group {{ $errors->has('department.icon') ? 'invalid' : '' }}">
         <label class="form-label" for="icon">{{ trans('cruds.department.fields.icon') }}</label>
-        <input class="form-control" type="text" name="icon" id="icon" wire:model.defer="department.icon">
+        <input class="form-control" type="text" name="icon" id="icon" wire:model="department.icon">
         <div class="validation-message">
             {{ $errors->first('department.icon') }}
         </div>
@@ -32,7 +32,7 @@
     </div>
     <div class="form-group {{ $errors->has('department.description') ? 'invalid' : '' }}">
         <label class="form-label" for="description">{{ trans('cruds.department.fields.description') }}</label>
-        <input class="form-control" type="text" name="description" id="description" wire:model.defer="department.description">
+        <input class="form-control" type="text" name="description" id="description" wire:model="department.description">
         <div class="validation-message">
             {{ $errors->first('department.description') }}
         </div>

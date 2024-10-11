@@ -15,7 +15,7 @@
     {{--    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">--}}
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.2.4/dist/cdn.min.js"
             integrity="sha256-w70uaH0T7oKUdZDY2JAQDIHJbgrF37i/Z9nr9B2e3Fs=" crossorigin="anonymous"></script>
-    @livewireStyles
+    @filamentStyles
     @stack('styles')
 </head>
 <body>
@@ -32,7 +32,7 @@
     {{ csrf_field() }}
 </form>
 <x-student.footer/>
-@livewireScripts
+@filamentScripts
 @yield('scripts')
 @stack('scripts')
 

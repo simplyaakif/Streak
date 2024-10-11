@@ -1,13 +1,13 @@
 <div class="align-middle min-w-full overflow-x-auto space-y-4 overflow-hidden sm:rounded-lg">
 
     <div>
-        <x-modal.dialog wire:model="showEditModal">
+        <x-modal.dialog wire:model.live="showEditModal">
             <x-slot name="title">Create an Expense</x-slot>
             <x-slot name="content">
                 <div class="grid sm:grid-cols-2 gap-2">
                     <div>
                         <label for="">Expense Vendor</label>
-                        <x-common.data-input-select wire:model="editing.vendor_id"
+                        <x-common.data-input-select wire:model.live="editing.vendor_id"
                                                     error="editing.vendor_id">
                             <option value="0" >Select Vendor</option>
                             @foreach($vendors as $vendor)
@@ -21,19 +21,19 @@
                         <x-common.data-input-text type="number"
                                                   name="amount"
                                                   error="editing.amount"
-                                                  wire:model.defer="editing.amount" placeholder="Enter Expense Amount"/>
+                                                  wire:model="editing.amount" placeholder="Enter Expense Amount"/>
                     </div>
 
                     <div>
                         <label for="">Due Date</label>
                         <x-common.data-input-text type="date"
                                                   error="editing.due_date"
-                                                  wire:model="editing.due_date"/>
+                                                  wire:model.live="editing.due_date"/>
                     </div>
 
                     <div>
                         <label for="">Is paid</label>
-                        <x-common.data-input-select wire:model="editing.is_paid"
+                        <x-common.data-input-select wire:model.live="editing.is_paid"
                                                     error="editing.is_paid">
                             <option value="0">No</option>
                             <option value="1">Yes</option>
@@ -47,7 +47,7 @@
                                 <label for="">Pay from Account</label>
                                 <x-common.data-input-select
                                     error="account_id"
-                                    wire:model="account_id">
+                                    wire:model.live="account_id">
                                     @foreach($accounts as $account)
                                         <option value="{{$account->id}}">{{$account->title}}</option>
                                     @endforeach
@@ -58,7 +58,7 @@
                                 <label for="">Paid By</label>
                                 <x-common.data-input-select
                                     error="editing.paid_by"
-                                    wire:model.defer="editing.paid_by">
+                                    wire:model="editing.paid_by">
                                     @foreach($users as $user)
                                         <option value="{{$user->id}}">{{$user->name}}</option>
                                     @endforeach
@@ -67,7 +67,7 @@
 
                             <div>
                                 <label for="">Paid To</label>
-                                <x-common.data-input-text wire:model="editing.paid_to"
+                                <x-common.data-input-text wire:model.live="editing.paid_to"
                                                           name="name"
                                                           error="editing.paid_to"
                                                           placeholder="Enter Payee Name"/>
@@ -76,7 +76,7 @@
                                 <label for="">Paid On</label>
                                 <x-common.data-input-text type="date"
                                                           error="editing.paid_on"
-                                                          wire:model="editing.paid_on"/>
+                                                          wire:model.live="editing.paid_on"/>
                             </div>
                         </div>
                     @endif

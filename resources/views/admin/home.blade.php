@@ -344,7 +344,7 @@
                                 <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
                                     @forelse($rAdmissions as $admission)
                                         <li>
-                                            <a href="{{route('admin.queries.show',$query->id)}}" class="block px-4 py-4
+                                            <a href="{{route('admin.students.show',$admission->id)}}" class="block px-4 py-4
                                     bg-white
                                     hover:bg-gray-50">
                     <span class="flex items-center space-x-4">
@@ -353,8 +353,8 @@
 
                         <span class="flex flex-col text-gray-500 text-sm truncate">
                           <span class="truncate">{{$admission->name}}</span>
-                          <span><span class="text-gray-900 font-medium">{{$query->course->title}}</span> </span>
-                          <span class="text-xs">{{$query->entry_by}}</span>
+{{--                          <span><span class="text-gray-900 font-medium">{{$admission->course->title}}</span> </span>--}}
+{{--                          <span class="text-xs">{{$query->entry_by}}</span>--}}
                         </span>
                       </span>
                       <svg class="flex-shrink-0 h-5 w-5 text-gray-400"
@@ -409,11 +409,11 @@
 
                                                         </td>
                                                         <td class="hidden px-6 py-4 whitespace-nowrap text-sm text-gray-500 md:block">
-                                                            {{$query->course->title}}
+{{--                                                            {{$query->course->title}}--}}
                                                         </td>
                                                         <td class="max-w-0 px-6 py-4 text-right whitespace-nowrap text-xs truncate
                                                 text-gray-500">
-                                                            {{$query->entry_by}}
+{{--                                                            {{$query->entry_by}}--}}
                                                         </td>
                                                     </tr>
                                                 @empty

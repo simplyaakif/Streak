@@ -1,7 +1,7 @@
 <div>
     <div>
-        <form wire:submit.prevent="submit">
-            <x-modal.dialog wire:model="showModal">
+        <form wire:submit="submit">
+            <x-modal.dialog wire:model.live="showModal">
                 <x-slot name="title">Add Vendor</x-slot>
                 <x-slot name="content">
                     <div class="grid grid-cols-2 gap-2">
@@ -11,21 +11,21 @@
                             <x-common.data-input-text
                                 name="name"
                                 error="vendor.name"
-                                wire:model.defer="vendor.name"/>
+                                wire:model="vendor.name"/>
                         </label>
                         <label for="">
                             Mobile
                             <x-common.data-input-text
                                 name="phone"
                                 error="vendor.mobile"
-                                wire:model.defer="vendor.mobile"/>
+                                wire:model="vendor.mobile"/>
                         </label>
 
                         <label for="">
                             Type
                             <x-common.data-input-select name="type"
                                                         error="vendor.type"
-                                                        wire:model.defer="vendor.type">
+                                                        wire:model="vendor.type">
                                 @foreach(App\Models\Vendor::TYPES as $val =>$label)
                                     <option value="{{$val}}">{{$label}}</option>
                                 @endforeach
@@ -36,7 +36,7 @@
                             <x-common.data-textarea
                                 name="address"
                                 error="vendor.address"
-                                wire:model.defer="vendor.address">
+                                wire:model="vendor.address">
                             </x-common.data-textarea>
                         </label>
                     </div>

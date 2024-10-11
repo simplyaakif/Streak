@@ -10,7 +10,7 @@ class EditRecovery extends EditRecord
 {
     protected static string $resource = RecoveryResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\DeleteAction::make(),

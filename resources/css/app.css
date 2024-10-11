@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import "theme.css";
+/*@import "theme.css";*/
 @import "~select2/dist/css/select2.min.css";
 @import "select.css";
 @import "~dropzone/dist/dropzone.css";

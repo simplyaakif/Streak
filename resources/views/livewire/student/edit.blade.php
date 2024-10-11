@@ -1,4 +1,4 @@
-<form wire:submit.prevent="submit" class="pt-3">
+<form wire:submit="submit" class="pt-3">
 
     <div class="form-group {{ $errors->has('mediaCollections.student_dp') ? 'invalid' : '' }}">
         <label class="form-label" for="dp">{{ trans('cruds.student.fields.dp') }}</label>
@@ -12,7 +12,7 @@
     </div>
     <div class="form-group {{ $errors->has('student.name') ? 'invalid' : '' }}">
         <label class="form-label" for="name">{{ trans('cruds.student.fields.name') }}</label>
-        <input class="form-control" type="text" name="name" id="name" wire:model.defer="student.name">
+        <input class="form-control" type="text" name="name" id="name" wire:model="student.name">
         <div class="validation-message">
             {{ $errors->first('student.name') }}
         </div>
@@ -22,7 +22,7 @@
     </div>
     <div class="form-group {{ $errors->has('student.user_id') ? 'invalid' : '' }}">
         <label class="form-label" for="user">{{ trans('cruds.student.fields.user') }}</label>
-        <x-select-list class="form-control" id="user" name="user" :options="$this->listsForFields['user']" wire:model="student.user_id" />
+        <x-select-list class="form-control" id="user" name="user" :options="$this->listsForFields['user']" wire:model.live="student.user_id" />
         <div class="validation-message">
             {{ $errors->first('student.user_id') }}
         </div>
@@ -32,7 +32,7 @@
     </div>
     <div class="form-group {{ $errors->has('student.father_name') ? 'invalid' : '' }}">
         <label class="form-label" for="father_name">{{ trans('cruds.student.fields.father_name') }}</label>
-        <input class="form-control" type="text" name="father_name" id="father_name" wire:model.defer="student.father_name">
+        <input class="form-control" type="text" name="father_name" id="father_name" wire:model="student.father_name">
         <div class="validation-message">
             {{ $errors->first('student.father_name') }}
         </div>
@@ -42,7 +42,7 @@
     </div>
     <div class="form-group {{ $errors->has('student.gender') ? 'invalid' : '' }}">
         <label class="form-label">{{ trans('cruds.student.fields.gender') }}</label>
-        <select class="form-control" wire:model="student.gender">
+        <select class="form-control" wire:model.live="student.gender">
             <option value="null" disabled>{{ trans('global.pleaseSelect') }}...</option>
             @foreach($this->listsForFields['gender'] as $key => $value)
                 <option value="{{ $key }}">{{ $value }}</option>
@@ -57,7 +57,7 @@
     </div>
     <div class="form-group {{ $errors->has('student.nationality') ? 'invalid' : '' }}">
         <label class="form-label" for="nationality">{{ trans('cruds.student.fields.nationality') }}</label>
-        <input class="form-control" type="text" name="nationality" id="nationality" wire:model.defer="student.nationality">
+        <input class="form-control" type="text" name="nationality" id="nationality" wire:model="student.nationality">
         <div class="validation-message">
             {{ $errors->first('student.nationality') }}
         </div>
@@ -67,7 +67,7 @@
     </div>
     <div class="form-group {{ $errors->has('student.date_of_birth') ? 'invalid' : '' }}">
         <label class="form-label" for="date_of_birth">{{ trans('cruds.student.fields.date_of_birth') }}</label>
-        <x-date-picker class="form-control" wire:model="student.date_of_birth" id="date_of_birth" name="date_of_birth" picker="date" />
+        <x-date-picker class="form-control" wire:model.live="student.date_of_birth" id="date_of_birth" name="date_of_birth" picker="date" />
         <div class="validation-message">
             {{ $errors->first('student.date_of_birth') }}
         </div>
@@ -77,7 +77,7 @@
     </div>
     <div class="form-group {{ $errors->has('student.cnic_passport') ? 'invalid' : '' }}">
         <label class="form-label" for="cnic_passport">{{ trans('cruds.student.fields.cnic_passport') }}</label>
-        <input class="form-control" type="text" name="cnic_passport" id="cnic_passport" wire:model.defer="student.cnic_passport">
+        <input class="form-control" type="text" name="cnic_passport" id="cnic_passport" wire:model="student.cnic_passport">
         <div class="validation-message">
             {{ $errors->first('student.cnic_passport') }}
         </div>
@@ -87,7 +87,7 @@
     </div>
     <div class="form-group {{ $errors->has('student.mobile') ? 'invalid' : '' }}">
         <label class="form-label" for="mobile">{{ trans('cruds.student.fields.mobile') }}</label>
-        <input class="form-control" type="text" name="mobile" id="mobile" wire:model.defer="student.mobile">
+        <input class="form-control" type="text" name="mobile" id="mobile" wire:model="student.mobile">
         <div class="validation-message">
             {{ $errors->first('student.mobile') }}
         </div>
@@ -97,7 +97,7 @@
     </div>
     <div class="form-group {{ $errors->has('student.email') ? 'invalid' : '' }}">
         <label class="form-label" for="email">{{ trans('cruds.student.fields.email') }}</label>
-        <input class="form-control" type="email" name="email" id="email" wire:model.defer="student.email">
+        <input class="form-control" type="email" name="email" id="email" wire:model="student.email">
         <div class="validation-message">
             {{ $errors->first('student.email') }}
         </div>

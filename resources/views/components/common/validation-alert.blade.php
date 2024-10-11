@@ -1,7 +1,7 @@
 @props([
     'errors'=>'',
 ])
-<div x-data="{ show: @entangle('validationAlert') }" aria-live="assertive" class="fixed inset-0 z-10 flex items-end
+<div x-data="{ show: @entangle('validationAlert').live }" aria-live="assertive" class="fixed inset-0 z-10 flex items-end
 px-4 py-6
 pointer-events-none
  sm:p-6 sm:items-start">

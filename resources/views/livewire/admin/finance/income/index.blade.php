@@ -1,7 +1,7 @@
 <div>
     {{--    Modal--}}
-    <form wire:submit.prevent="delete">
-        <x-modal.confirmation wire:model.defer="showDeleteModal">
+    <form wire:submit="delete">
+        <x-modal.confirmation wire:model="showDeleteModal">
             <x-slot name="title">Delete Transaction</x-slot>
 
             <x-slot name="content">
@@ -14,8 +14,8 @@
             </x-slot>
         </x-modal.confirmation>
     </form>
-    <form wire:submit.prevent="save">
-        <x-modal.dialog wire:model="showEditModal">
+    <form wire:submit="save">
+        <x-modal.dialog wire:model.live="showEditModal">
             <x-slot name="title">Transaction</x-slot>
             <x-slot name="content">
 
@@ -23,7 +23,7 @@
                     <label for="">Type</label>
                     <x-common.data-input-select
                         label="type" error="editing.type"
-                        wire:model="editing.type">
+                        wire:model.live="editing.type">
                         <option value="" disabled> -- Select One --</option>
                         @foreach(App\Models\Income::Types as $id => $label)
                             <option value="{{$id}}">{{$label}}</option>
@@ -33,13 +33,13 @@
 
                 <div>
                     <label for="">Amount</label>
-                    <x-common.data-input-text wire:model.lazy="editing.amount" label="amount" error="editing.amount"/>
+                    <x-common.data-input-text wire:model.blur="editing.amount" label="amount" error="editing.amount"/>
                 </div>
                 <div>
                     <label for="">Account</label>
                     <x-common.data-input-select
                         label="type" error="account_id"
-                        wire:model="account_id">
+                        wire:model.live="account_id">
                         <option value="" disabled> -- Select One --</option>
                         @foreach($accounts as $account)
                             <option value="{{$account->id}}">{{$account->title}}</option>
@@ -49,13 +49,13 @@
 
                 <div>
                     <label for="">Paid By</label>
-                    <x-common.data-input-text wire:model.lazy="editing.paid_by" label="amount" error="editing.paid_by"/>
+                    <x-common.data-input-text wire:model.blur="editing.paid_by" label="amount" error="editing.paid_by"/>
                 </div>
                 <div>
                     <label for="">Received By</label>
                     <x-common.data-input-select
                         label="type" error="editing.user_id"
-                        wire:model="editing.user_id">
+                        wire:model.live="editing.user_id">
                         <option value="" disabled> -- Select One --</option>
                         @foreach($users as $user)
                             <option value="{{$user->id}}">{{$user->name}}</option>
@@ -66,13 +66,13 @@
                 {{--                <div>--}}
                 {{--                    <label for="">Received On</label>--}}
                 {{--                    <x-date-picker id="paid_on" name="paid_on"--}}
-                {{--                                   wire:model="" label="amount"--}}
+                {{--                                   wire:model.live="" label="amount"--}}
                 {{--                                   error="editing--}}
                 {{--                    .paid_on"/>--}}
                 {{--                </div>--}}
                 <div>
                     <label for="">Remarks/Comments</label>
-                    <x-common.data-input-text wire:model.lazy="editing.remarks" label="amount"
+                    <x-common.data-input-text wire:model.blur="editing.remarks" label="amount"
                                               error="editing.remarks"/>
                 </div>
             </x-slot>

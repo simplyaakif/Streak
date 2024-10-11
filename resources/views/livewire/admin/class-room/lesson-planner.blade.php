@@ -3,28 +3,28 @@
         <x-button.primary wire:click="$set('showModal',true)">Add Lesson Planner</x-button.primary>
     </div>
     <div>
-        <form wire:submit.prevent="submit">
-            <x-modal.dialog wire:model="showModal">
+        <form wire:submit="submit">
+            <x-modal.dialog wire:model.live="showModal">
                 <x-slot name="title">Add Lesson Plan</x-slot>
                 <x-slot name="content">
                     <label for="">
                         Title
-                        <x-common.data-input-text error="lesson.title" wire:model.defer="lesson.title"/>
+                        <x-common.data-input-text error="lesson.title" wire:model="lesson.title"/>
                     </label>
                     <label for="">
                         Topics
                         <x-common.data-input-text error="lesson.short_description"
-                                                  wire:model.defer="lesson.short_description"/>
+                                                  wire:model="lesson.short_description"/>
                     </label>
                     <label for="">
                         Date
-                        <x-common.data-input-text error="lesson.date"  type="date" wire:model="lesson.date"/>
+                        <x-common.data-input-text error="lesson.date"  type="date" wire:model.live="lesson.date"/>
                     </label>
                     <label for="">
                         Description
                         <x-common.data-textarea error="lesson.long_description"
                                                 rows="10"
-                                                wire:model.defer="lesson.long_description"></x-common.data-textarea>
+                                                wire:model="lesson.long_description"></x-common.data-textarea>
                     </label>
                 </x-slot>
                 <x-slot name="footer">

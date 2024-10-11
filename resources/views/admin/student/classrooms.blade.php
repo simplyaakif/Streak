@@ -10,6 +10,7 @@
             <h2 class="text-lg leading-6 font-medium text-gray-900">Active Class Batches</h2>
             <div class="mt-4 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-3">
                 @forelse($batches as $batch)
+                    @if(count($batch->activeStudents))
                     <div class="bg-white rounded-lg shadow">
                         <div class="p-4">
                             <div class="flex justify-between items-center">
@@ -37,6 +38,7 @@
                             </a>
                         </div>
                     </div>
+                    @endif
                 @empty
                 @endforelse
             </div>

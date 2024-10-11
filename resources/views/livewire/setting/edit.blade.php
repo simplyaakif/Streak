@@ -1,8 +1,8 @@
-<form wire:submit.prevent="submit" class="pt-3">
+<form wire:submit="submit" class="pt-3">
 
     <div class="form-group {{ $errors->has('setting.key') ? 'invalid' : '' }}">
         <label class="form-label required" for="key">{{ trans('cruds.setting.fields.key') }}</label>
-        <input class="form-control" type="text" name="key" id="key" required wire:model.defer="setting.key">
+        <input class="form-control" type="text" name="key" id="key" required wire:model="setting.key">
         <div class="validation-message">
             {{ $errors->first('setting.key') }}
         </div>
@@ -12,7 +12,7 @@
     </div>
     <div class="form-group {{ $errors->has('setting.value') ? 'invalid' : '' }}">
         <label class="form-label required" for="value">{{ trans('cruds.setting.fields.value') }}</label>
-        <input class="form-control" type="text" name="value" id="value" required wire:model.defer="setting.value">
+        <input class="form-control" type="text" name="value" id="value" required wire:model="setting.value">
         <div class="validation-message">
             {{ $errors->first('setting.value') }}
         </div>

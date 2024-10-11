@@ -221,19 +221,20 @@
         </div>
         <div class="mt-8">
         <?php
-if (! isset($_instance)) {
-    $html = \Livewire\Livewire::mount('admin.filament.recovery.recovery-index', [])->html();
-} elseif ($_instance->childHasBeenRendered('z0XcXYs')) {
-    $componentId = $_instance->getRenderedChildComponentId('z0XcXYs');
-    $componentTag = $_instance->getRenderedChildComponentTagName('z0XcXYs');
-    $html = \Livewire\Livewire::dummyMount($componentId, $componentTag);
-    $_instance->preserveRenderedChild('z0XcXYs');
-} else {
-    $response = \Livewire\Livewire::mount('admin.filament.recovery.recovery-index', []);
-    $html = $response->html();
-    $_instance->logRenderedChild('z0XcXYs', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
-}
-echo $html;
+$__split = function ($name, $params = []) {
+    return [$name, $params];
+};
+[$__name, $__params] = $__split('admin.filament.recovery.recovery-index', []);
+
+$__html = app('livewire')->mount($__name, $__params, 'lw-3248768001-0', $__slots ?? [], get_defined_vars());
+
+echo $__html;
+
+unset($__html);
+unset($__name);
+unset($__params);
+unset($__split);
+if (isset($__slots)) unset($__slots);
 ?>
         </div>
      <?php echo $__env->renderComponent(); ?>

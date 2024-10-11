@@ -10,7 +10,7 @@ class EditStudent extends EditRecord
 {
     protected static string $resource = StudentResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\DeleteAction::make(),

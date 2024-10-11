@@ -2,7 +2,7 @@
 
     namespace Tests\Feature\Admin\Finance;
 
-    use App\Http\Livewire\Admin\Finance\Income\Index;
+    use App\Livewire\Admin\Finance\Income\Index;
     use App\Models\Income;
     use Livewire\Livewire;
     use Tests\TestCase;

@@ -5,7 +5,7 @@
             <div class="w-1/4">
                 <x-common.data-input-text
                     placeholder="Search in {{ucfirst($searchColumn)}}"
-                    wire:model="filters.search"/>
+                    wire:model.live="filters.search"/>
             </div>
             <div class="flex space-x-2">
                 <x-icons.refresh-right-square wire:click="resetFilters" bold class="w-8 h-8 text-cyan-600"/>
@@ -18,7 +18,7 @@
 
         <x-common.filter-select  label="Select Filter">
             <x-select-list id="course" class="w-full shadow-inner  rounded border-gray-200 text-sm"  :options="['1'=>'Spoken English','2'=>'Fluency English']"
-                           wire:model="filters.course" />
+                           wire:model.live="filters.course" />
         </x-common.filter-select>
         </div>
         <div>

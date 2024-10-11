@@ -1,6 +1,6 @@
 <div class="max-w-3xl mx-auto py-10 px-4 sm:px-6 lg:py-2 lg:px-8">
 
-    <form wire:loading.class="opacity-50" wire:submit.prevent="submit" class="mt-6 mb-6 space-y-8 divide-y
+    <form wire:loading.class="opacity-50" wire:submit="submit" class="mt-6 mb-6 space-y-8 divide-y
     divide-y-blue-gray-200">
 
         <div class="grid grid-cols-1 gap-y-6 sm:grid-cols-6 sm:gap-x-6">
@@ -14,16 +14,16 @@
                 <label for="name">{{ trans('cruds.student.fields.name') }}</label>
                 <x-common.data-input-text
                     error="student.name"
-                    name="name" id="name" wire:model.defer="student.name"/>
+                    name="name" id="name" wire:model.live="student.name"/>
             </div>
             <div class="sm:col-span-3 form-group {{ $errors->has('student.father_name') ? 'invalid' : '' }}">
                 <label for="father_name">{{ trans('cruds.student.fields.father_name') }}</label>
                 <x-common.data-input-text error="student.father_name" name="father_name" id="father_name"
-                                          wire:model.defer="student.father_name"/>
+                                          wire:model="student.father_name"/>
             </div>
             <div class="sm:col-span-3 form-group {{ $errors->has('student.gender') ? 'invalid' : '' }}">
                 <label class="form-label">{{ trans('cruds.student.fields.gender') }}</label>
-                <x-common.data-input-select wire:model="student.gender">
+                <x-common.data-input-select wire:model.live="student.gender">
                     <option value="null" disabled>{{ trans('global.pleaseSelect') }}...</option>
                     @foreach($this->listsForFields['gender'] as $key => $value)
                         <option value="{{ $key }}">{{ $value }}</option>
@@ -39,19 +39,19 @@
             <div class="sm:col-span-3 form-group {{ $errors->has('student.nationality') ? 'invalid' : '' }}">
                 <label class="form-label" for="nationality">{{ trans('cruds.student.fields.nationality') }}</label>
                 <x-common.data-input-text error="student.nationality" name="nationality" id="nationality"
-                                          wire:model.defer="student.nationality"/>
+                                          wire:model="student.nationality"/>
             </div>
             <div class="sm:col-span-3 form-group {{ $errors->has('student.date_of_birth') ? 'invalid' : '' }}">
                 <label class="form-label" for="date_of_birth">{{ trans('cruds.student.fields.date_of_birth') }}</label>
                 <x-common.data-input-text
                     error="student.date_of_birth"
                     type="date"
-                    wire:model="student.date_of_birth" id="date_of_birth" name="date_of_birth"/>
+                    wire:model.live="student.date_of_birth" id="date_of_birth" name="date_of_birth"/>
             </div>
             <div class="col-span-3 form-group {{ $errors->has('student.cnic_passport') ? 'invalid' : '' }}">
                 <label class="form-label" for="cnic_passport">{{ trans('cruds.student.fields.cnic_passport') }}</label>
                 <x-common.data-input-text error="student.cnic_passport" name="cnic_passport" id="cnic_passport"
-                                          wire:model.defer="student.cnic_passport"/>
+                                          wire:model="student.cnic_passport"/>
             </div>
 
         </div>
@@ -67,13 +67,13 @@
                 <x-common.data-input-text
                     placeholder="03335335792"
                     error="student.mobile"
-                    name="mobile" id="mobile" wire:model.defer="student.mobile"/>
+                    name="mobile" id="mobile" wire:model="student.mobile"/>
             </div>
             <div class="col-span-3 form-group {{ $errors->has('student.email') ? 'invalid' : '' }}">
                 <label class="form-label" for="email">{{ trans('cruds.student.fields.email') }}</label>
                 <x-common.data-input-text
                     error="student.email"
-                    name="email" id="email" wire:model.defer="student.email"/>
+                    name="email" id="email" wire:model="student.email"/>
             </div>
         </div>
 
@@ -123,7 +123,7 @@
                 <div class="p-4 bg-gray-50 rounded-t-lg flex items-center justify-between">
                     <div class="w-3/4">
                         <x-common.data-label class="form-label required" label="Select Batch" for=""/>
-                        <x-common.data-input-select error="selectedBatches" wire:model="selectBoxBatchId">
+                        <x-common.data-input-select error="selectedBatches" wire:model.live="selectBoxBatchId">
                             <option value=""> -- Select Batch --</option>
                             @forelse($batches as $batch)
                                 <option value="{{$batch->id}}">{{$batch->title}}</option>
@@ -152,12 +152,12 @@
                                     <div>
                                         <x-common.data-label class="text-xs" label="Course Fee" for=""/>
                                         <x-common.data-input-text
-            wire:model="selectedBatches.{{$key}}.total_fee" />
+            wire:model.live="selectedBatches.{{$key}}.total_fee" />
                                     </div>
                                     <div>
                                         <x-common.data-label class="text-xs" label="Course Start Date" for=""/>
                                         <x-common.data-input-text
-                                            wire:model="selectedBatches.{{$key}}.sessions.session_start_date"
+                                            wire:model.live="selectedBatches.{{$key}}.sessions.session_start_date"
                                             type="date" value="{{now()->format('Y-m-d')}}"/>
                                     </div>
                                     <div>
@@ -165,7 +165,7 @@
                                             class="text-xs"
                                             label="Course End Date" for=""/>
                                         <x-common.data-input-text
-                                            wire:model="selectedBatches.{{$key}}.sessions.session_end_date"
+                                            wire:model.live="selectedBatches.{{$key}}.sessions.session_end_date"
                                             value="{{now()->add($individualBatch['batch']['session_duration'])->format('Y-m-d')}}"
                                             type="date"/>
                                     </div>
@@ -208,20 +208,20 @@
                                             <div class="col-span-2">
                                                 <x-common.data-label class="text-xs" label="Installment Amount" for=""/>
                                                 <x-common.data-input-text
-wire:model="selectedBatches.{{$key}}.installments.{{$ikey}}.installment_amount"
+wire:model.live="selectedBatches.{{$key}}.installments.{{$ikey}}.installment_amount"
                                                 />
                                             </div>
                                             <div class="col-span-2">
                                                 <x-common.data-label class="text-xs" label="Due Date" for=""/>
                                                 <x-common.data-input-text type="date"
-              wire:model="selectedBatches.{{$key}}.installments.{{$ikey}}.installment_due_date"
+              wire:model.live="selectedBatches.{{$key}}.installments.{{$ikey}}.installment_due_date"
                                                 />
                                             </div>
                                             <div class="col-span-2">
                                                 <x-common.data-label class="text-xs" label="Status" for=""/>
     <x-common.data-input-select
 
-        wire:model="selectedBatches.{{$key}}.installments.{{$ikey}}.installment_paid_status"
+        wire:model.live="selectedBatches.{{$key}}.installments.{{$ikey}}.installment_paid_status"
                                                 >
                                                     <option value="0">Unpaid</option>
                                                     <option value="1">Paid</option>
@@ -234,7 +234,7 @@ wire:model="selectedBatches.{{$key}}.installments.{{$ikey}}.installment_amount"
 
                                                 <x-common.data-label class="text-xs" label="Account" for=""/>
         <x-common.data-input-select
-wire:model="selectedBatches.{{$key}}.installments.{{$ikey}}.installment_account_id"
+wire:model.live="selectedBatches.{{$key}}.installments.{{$ikey}}.installment_account_id"
                                                 >
                                                     @forelse($accounts as $account)
                                                         <option value="{{$account->id}}">{{$account->title}}</option>
@@ -246,13 +246,13 @@ wire:model="selectedBatches.{{$key}}.installments.{{$ikey}}.installment_account_
                                             <div class="col-span-2">
                                                 <x-common.data-label class="text-xs" label="Transaction/Slip #" for=""/>
                                                 <x-common.data-input-text
-wire:model="selectedBatches.{{$key}}.installments.{{$ikey}}.installment_transaction_number"
+wire:model.live="selectedBatches.{{$key}}.installments.{{$ikey}}.installment_transaction_number"
                                                 />
                                             </div>
                                                 <div class="col-span-2">
                                                 <x-common.data-label class="text-xs" label="Date of Payment" for=""/>
                                                 <x-common.data-input-text type="date"
-wire:model="selectedBatches.{{$key}}.installments.{{$ikey}}.installment_paid_on"
+wire:model.live="selectedBatches.{{$key}}.installments.{{$ikey}}.installment_paid_on"
                                                 />
                                             </div>
                         @endif
@@ -283,7 +283,7 @@ wire:model="selectedBatches.{{$key}}.installments.{{$ikey}}.installment_paid_on"
                     <div class="">
                         <ul role="list" class="mt-2 divide-y divide-gray-200">
                             <li class="py-4 flex items-center justify-between"
-                                x-data="{ on: @entangle('notifications.sms') }">
+                                x-data="{ on: @entangle('notifications.sms').live }">
                                 <div class="flex flex-col">
                                     <p class="text-sm font-medium text-gray-900" id="privacy-option-1-label">
                                         Send SMS
@@ -309,7 +309,7 @@ wire:model="selectedBatches.{{$key}}.installments.{{$ikey}}.installment_paid_on"
                                 </button>
                             </li>
                             <li class="py-4 flex items-center justify-between"
-                                x-data="{ on: @entangle('notifications.email') }">
+                                x-data="{ on: @entangle('notifications.email').live }">
                                 <div class="flex flex-col">
                                     <p class="text-sm font-medium text-gray-900" id="privacy-option-2-label">
                                         Send Email
@@ -332,7 +332,7 @@ wire:model="selectedBatches.{{$key}}.installments.{{$ikey}}.installment_paid_on"
                                 </button>
                             </li>
                             <li class="py-4 flex items-center justify-between"
-                                x-data="{ on: @entangle('notifications.account') }">
+                                x-data="{ on: @entangle('notifications.account').live }">
                                 <div class="flex flex-col">
                                     <p class="text-sm font-medium text-gray-900" id="privacy-option-3-label">
                                         Create Student Login Account

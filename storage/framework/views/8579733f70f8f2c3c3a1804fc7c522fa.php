@@ -1,43 +1,74 @@
 <?php
-    use Filament\Tables\Actions\Position as ActionsPosition;
-    use Filament\Tables\Actions\RecordCheckboxPosition;
-    use Filament\Tables\Filters\Layout as FiltersLayout;
+    use Filament\Support\Enums\Alignment;
+    use Filament\Support\Enums\VerticalAlignment;
+    use Filament\Support\Facades\FilamentView;
+    use Filament\Tables\Columns\Column;
+    use Filament\Tables\Columns\ColumnGroup;
+    use Filament\Tables\Enums\ActionsPosition;
+    use Filament\Tables\Enums\FiltersLayout;
+    use Filament\Tables\Enums\RecordCheckboxPosition;
+    use Illuminate\Support\Str;
 
     $actions = $getActions();
+    $actionsAlignment = $getActionsAlignment();
     $actionsPosition = $getActionsPosition();
     $actionsColumnLabel = $getActionsColumnLabel();
-    $columns = $getColumns();
+    $activeFiltersCount = $getActiveFiltersCount();
+    $columns = $getVisibleColumns();
     $collapsibleColumnsLayout = $getCollapsibleColumnsLayout();
+    $columnsLayout = $getColumnsLayout();
     $content = $getContent();
     $contentGrid = $getContentGrid();
     $contentFooter = $getContentFooter();
-    $filterIndicators = collect($getFilters())
-        ->mapWithKeys(fn (\Filament\Tables\Filters\BaseFilter $filter): array => [$filter->getName() => $filter->getIndicators()])
-        ->filter(fn (array $indicators): bool => count($indicators))
-        ->all();
+    $filterIndicators = $getFilterIndicators();
+    $hasColumnGroups = $hasColumnGroups();
     $hasColumnsLayout = $hasColumnsLayout();
+    $hasSummary = $hasSummary();
     $header = $getHeader();
-    $headerActions = $getHeaderActions();
+    $headerActions = array_filter(
+        $getHeaderActions(),
+        fn (\Filament\Tables\Actions\Action | \Filament\Tables\Actions\BulkAction | \Filament\Tables\Actions\ActionGroup $action): bool => $action->isVisible(),
+    );
+    $headerActionsPosition = $getHeaderActionsPosition();
     $heading = $getHeading();
+    $group = $getGrouping();
+    $bulkActions = array_filter(
+        $getBulkActions(),
+        fn (\Filament\Tables\Actions\BulkAction | \Filament\Tables\Actions\ActionGroup $action): bool => $action->isVisible(),
+    );
+    $groups = $getGroups();
     $description = $getDescription();
+    $isGroupsOnly = $isGroupsOnly() && $group;
     $isReorderable = $isReorderable();
     $isReordering = $isReordering();
+    $areGroupingSettingsVisible = (! $isReordering) && count($groups) && (! $areGroupingSettingsHidden());
+    $isGroupingDirectionSettingHidden = $isGroupingDirectionSettingHidden();
     $isColumnSearchVisible = $isSearchableByColumn();
     $isGlobalSearchVisible = $isSearchable();
-    $isSelectionEnabled = $isSelectionEnabled();
+    $isSearchOnBlur = $isSearchOnBlur();
+    $isSelectionEnabled = $isSelectionEnabled() && (! $isGroupsOnly);
+    $selectsCurrentPageOnly = $selectsCurrentPageOnly();
     $recordCheckboxPosition = $getRecordCheckboxPosition();
     $isStriped = $isStriped();
     $isLoaded = $isLoaded();
     $hasFilters = $isFilterable();
     $filtersLayout = $getFiltersLayout();
-    $hasFiltersPopover = $hasFilters && ($filtersLayout === FiltersLayout::Popover);
+    $filtersTriggerAction = $getFiltersTriggerAction();
+    $hasFiltersDialog = $hasFilters && in_array($filtersLayout, [FiltersLayout::Dropdown, FiltersLayout::Modal]);
     $hasFiltersAboveContent = $hasFilters && in_array($filtersLayout, [FiltersLayout::AboveContent, FiltersLayout::AboveContentCollapsible]);
     $hasFiltersAboveContentCollapsible = $hasFilters && ($filtersLayout === FiltersLayout::AboveContentCollapsible);
-    $hasFiltersAfterContent = $hasFilters && ($filtersLayout === FiltersLayout::BelowContent);
-    $isColumnToggleFormVisible = $hasToggleableColumns();
+    $hasFiltersBelowContent = $hasFilters && ($filtersLayout === FiltersLayout::BelowContent);
+    $hasColumnToggleDropdown = $hasToggleableColumns();
+    $hasHeader = $header || $heading || $description || ($headerActions && (! $isReordering)) || $isReorderable || $areGroupingSettingsVisible || $isGlobalSearchVisible || $hasFilters || count($filterIndicators) || $hasColumnToggleDropdown;
+    $hasHeaderToolbar = $isReorderable || $areGroupingSettingsVisible || $isGlobalSearchVisible || $hasFiltersDialog || $hasColumnToggleDropdown;
+    $pluralModelLabel = $getPluralModelLabel();
     $records = $isLoaded ? $getRecords() : null;
-    $allSelectableRecordsCount = $isLoaded ? $getAllSelectableRecordsCount() : null;
+    $searchDebounce = $getSearchDebounce();
+    $allSelectableRecordsCount = ($isSelectionEnabled && $isLoaded) ? $getAllSelectableRecordsCount() : null;
     $columnsCount = count($columns);
+    $reorderRecordsTriggerAction = $getReorderRecordsTriggerAction($isReordering);
+    $toggleColumnsTriggerAction = $getToggleColumnsTriggerAction();
+    $page = $this->getTablePage();
 
     if (count($actions) && (! $isReordering)) {
         $columnsCount++;
@@ -47,7 +78,11 @@
         $columnsCount++;
     }
 
-    $getHiddenClasses = function (Filament\Tables\Columns\Column $column): ?string {
+    if ($group) {
+        $groupedSummarySelectedState = $this->getTableSummarySelectedState($this->getAllTableSummaryQuery(), modifyQueryUsing: fn (\Illuminate\Database\Query\Builder $query) => $group->groupQuery($query, model: $getQuery()->getModel()));
+    }
+
+    $getHiddenClasses = function (Column | ColumnGroup $column): ?string {
         if ($breakpoint = $column->getHiddenFrom()) {
             return match ($breakpoint) {
                 'sm' => 'sm:hidden',
@@ -73,110 +108,26 @@
 ?>
 
 <div
-    x-data="{
-        hasHeader: true,
-
-        isLoading: false,
-
-        selectedRecords: [],
-
-        shouldCheckUniqueSelection: true,
-
-        init: function () {
-            $wire.on('deselectAllTableRecords', () => this.deselectAllRecords())
-
-            $watch('selectedRecords', () => {
-                if (! this.shouldCheckUniqueSelection) {
-                    this.shouldCheckUniqueSelection = true
-
-                    return
-                }
-
-                this.selectedRecords = [...new Set(this.selectedRecords)]
-
-                this.shouldCheckUniqueSelection = false
-            })
-        },
-
-        mountBulkAction: function (name) {
-            $wire.mountTableBulkAction(name, this.selectedRecords)
-        },
-
-        toggleSelectRecordsOnPage: function () {
-            let keys = this.getRecordsOnPage()
-
-            if (this.areRecordsSelected(keys)) {
-                this.deselectRecords(keys)
-
-                return
-            }
-
-            this.selectRecords(keys)
-        },
-
-        getRecordsOnPage: function () {
-            let keys = []
-
-            for (checkbox of $el.getElementsByClassName(
-                'filament-tables-record-checkbox',
-            )) {
-                keys.push(checkbox.value)
-            }
-
-            return keys
-        },
-
-        selectRecords: function (keys) {
-            for (key of keys) {
-                if (this.isRecordSelected(key)) {
-                    continue
-                }
-
-                this.selectedRecords.push(key)
-            }
-        },
-
-        deselectRecords: function (keys) {
-            for (key of keys) {
-                let index = this.selectedRecords.indexOf(key)
-
-                if (index === -1) {
-                    continue
-                }
-
-                this.selectedRecords.splice(index, 1)
-            }
-        },
-
-        selectAllRecords: async function () {
-            this.isLoading = true
-
-            this.selectedRecords = await $wire.getAllSelectableTableRecordKeys()
-
-            this.isLoading = false
-        },
-
-        deselectAllRecords: function () {
-            this.selectedRecords = []
-        },
-
-        isRecordSelected: function (key) {
-            return this.selectedRecords.includes(key)
-        },
-
-        areRecordsSelected: function (keys) {
-            return keys.every((key) => this.isRecordSelected(key))
-        },
-    }"
-    class="filament-tables-component"
     <?php if(! $isLoaded): ?>
         wire:init="loadTable"
     <?php endif; ?>
+    x-ignore
+    <?php if(FilamentView::hasSpaMode()): ?>
+        ax-load="visible"
+    <?php else: ?>
+        ax-load
+    <?php endif; ?>
+    ax-load-src="<?php echo e(\Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('table', 'filament/tables')); ?>"
+    x-data="table"
+    class="<?php echo \Illuminate\Support\Arr::toCssClasses([
+        'fi-ta',
+        'animate-pulse' => $records === null,
+    ]); ?>"
 >
-    <?php if (isset($component)) { $__componentOriginaldbe408be6b5fd2d95479478edae3b0a1 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginaldbe408be6b5fd2d95479478edae3b0a1 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.container','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::container'); ?>
+    <?php if (isset($component)) { $__componentOriginal848259f0d87ae1451c78bda371b1fb91 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal848259f0d87ae1451c78bda371b1fb91 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.container','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::container'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
@@ -184,385 +135,311 @@
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
         <div
-            class="filament-tables-header-container"
-            x-show="hasHeader = <?php echo \Illuminate\Support\Js::from($renderHeader = ($header || $heading || ($headerActions && (! $isReordering)) || $isReorderable || $isGlobalSearchVisible || $hasFilters || $isColumnToggleFormVisible))->toHtml() ?> || selectedRecords.length"
-            <?php echo ! $renderHeader ? 'x-cloak' : null; ?>
-
+            <?php if(! $hasHeader): ?> x-cloak <?php endif; ?>
+            x-bind:hidden="! (<?php echo \Illuminate\Support\Js::from($hasHeader)->toHtml() ?> || (selectedRecords.length && <?php echo \Illuminate\Support\Js::from(count($bulkActions))->toHtml() ?>))"
+            x-show="<?php echo \Illuminate\Support\Js::from($hasHeader)->toHtml() ?> || (selectedRecords.length && <?php echo \Illuminate\Support\Js::from(count($bulkActions))->toHtml() ?>)"
+            class="fi-ta-header-ctn divide-y divide-gray-200 dark:divide-white/10"
         >
-            <?php if($header): ?>
+            <!--[if BLOCK]><![endif]--><?php if($header): ?>
                 <?php echo e($header); ?>
 
-            <?php elseif($heading || $headerActions): ?>
+            <?php elseif(($heading || $description || $headerActions) && ! $isReordering): ?>
+                <?php if (isset($component)) { $__componentOriginalef9fb53ceabf567a28c14d984e5af8d7 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalef9fb53ceabf567a28c14d984e5af8d7 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.header','data' => ['actions' => $isReordering ? [] : $headerActions,'actionsPosition' => $headerActionsPosition,'description' => $description,'heading' => $heading]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::header'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isReordering ? [] : $headerActions),'actions-position' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($headerActionsPosition),'description' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($description),'heading' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($heading)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalef9fb53ceabf567a28c14d984e5af8d7)): ?>
+<?php $attributes = $__attributesOriginalef9fb53ceabf567a28c14d984e5af8d7; ?>
+<?php unset($__attributesOriginalef9fb53ceabf567a28c14d984e5af8d7); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalef9fb53ceabf567a28c14d984e5af8d7)): ?>
+<?php $component = $__componentOriginalef9fb53ceabf567a28c14d984e5af8d7; ?>
+<?php unset($__componentOriginalef9fb53ceabf567a28c14d984e5af8d7); ?>
+<?php endif; ?>
+            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+            <!--[if BLOCK]><![endif]--><?php if($hasFiltersAboveContent): ?>
                 <div
+                    x-data="{ areFiltersOpen: <?php echo \Illuminate\Support\Js::from(! $hasFiltersAboveContentCollapsible)->toHtml() ?> }"
                     class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                        'px-2 pt-2',
-                        'hidden' => ! $heading && $isReordering,
+                        'fi-ta-filters-above-content-ctn grid px-4 py-4 sm:px-6',
                     ]); ?>"
                 >
-                    <?php if (isset($component)) { $__componentOriginalf61a3824e9f59808a5868485e5ef6761 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalf61a3824e9f59808a5868485e5ef6761 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.header.index','data' => ['actions' => $isReordering ? [] : $headerActions,'class' => 'mb-2']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::header'); ?>
+                    <?php if (isset($component)) { $__componentOriginal8fcc8bb3dcedd6e3c85ec7cd95e48b39 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal8fcc8bb3dcedd6e3c85ec7cd95e48b39 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.filters.index','data' => ['applyAction' => $getFiltersApplyAction(),'form' => $getFiltersForm(),'xCloak' => true,'xShow' => 'areFiltersOpen']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::filters'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isReordering ? [] : $headerActions),'class' => 'mb-2']); ?>
-                         <?php $__env->slot('heading', null, []); ?> 
-                            <?php echo e($heading); ?>
-
-                         <?php $__env->endSlot(); ?>
-
-                         <?php $__env->slot('description', null, []); ?> 
-                            <?php echo e($description); ?>
-
-                         <?php $__env->endSlot(); ?>
-                     <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalf61a3824e9f59808a5868485e5ef6761)): ?>
-<?php $attributes = $__attributesOriginalf61a3824e9f59808a5868485e5ef6761; ?>
-<?php unset($__attributesOriginalf61a3824e9f59808a5868485e5ef6761); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalf61a3824e9f59808a5868485e5ef6761)): ?>
-<?php $component = $__componentOriginalf61a3824e9f59808a5868485e5ef6761; ?>
-<?php unset($__componentOriginalf61a3824e9f59808a5868485e5ef6761); ?>
-<?php endif; ?>
-
-                    <?php if (isset($component)) { $__componentOriginal1c6b9867004d1a406262ace2c95ab783 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal1c6b9867004d1a406262ace2c95ab783 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.hr','data' => ['xShow' => \Illuminate\Support\Js::from($isReorderable || $isGlobalSearchVisible || $hasFilters || $isColumnToggleFormVisible) . ' || selectedRecords.length']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::hr'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['x-show' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Js::from($isReorderable || $isGlobalSearchVisible || $hasFilters || $isColumnToggleFormVisible) . ' || selectedRecords.length')]); ?>
+<?php $component->withAttributes(['apply-action' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getFiltersApplyAction()),'form' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getFiltersForm()),'x-cloak' => true,'x-show' => 'areFiltersOpen']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal1c6b9867004d1a406262ace2c95ab783)): ?>
-<?php $attributes = $__attributesOriginal1c6b9867004d1a406262ace2c95ab783; ?>
-<?php unset($__attributesOriginal1c6b9867004d1a406262ace2c95ab783); ?>
+<?php if (isset($__attributesOriginal8fcc8bb3dcedd6e3c85ec7cd95e48b39)): ?>
+<?php $attributes = $__attributesOriginal8fcc8bb3dcedd6e3c85ec7cd95e48b39; ?>
+<?php unset($__attributesOriginal8fcc8bb3dcedd6e3c85ec7cd95e48b39); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal1c6b9867004d1a406262ace2c95ab783)): ?>
-<?php $component = $__componentOriginal1c6b9867004d1a406262ace2c95ab783; ?>
-<?php unset($__componentOriginal1c6b9867004d1a406262ace2c95ab783); ?>
+<?php if (isset($__componentOriginal8fcc8bb3dcedd6e3c85ec7cd95e48b39)): ?>
+<?php $component = $__componentOriginal8fcc8bb3dcedd6e3c85ec7cd95e48b39; ?>
+<?php unset($__componentOriginal8fcc8bb3dcedd6e3c85ec7cd95e48b39); ?>
 <?php endif; ?>
+
+                    <!--[if BLOCK]><![endif]--><?php if($hasFiltersAboveContentCollapsible): ?>
+                        <span
+                            x-on:click="areFiltersOpen = ! areFiltersOpen"
+                            x-bind:class="{ <?php echo \Illuminate\Support\Js::from($hasDeferredFilters() ? '-mt-7' : 'mt-3')->toHtml() ?>: areFiltersOpen }"
+                            class="ms-auto"
+                        >
+                            <?php echo e($filtersTriggerAction->badge($activeFiltersCount)); ?>
+
+                        </span>
+                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                 </div>
-            <?php endif; ?>
-
-            <?php if($hasFiltersAboveContent): ?>
-                <div
-                    class="px-2 pt-2"
-                    x-data="{ areFiltersOpen: <?php echo \Illuminate\Support\Js::from(! $hasFiltersAboveContentCollapsible)->toHtml() ?> }"
-                >
-                    <?php if($hasFiltersAboveContentCollapsible): ?>
-                        <div class="flex w-full justify-end">
-                            <?php if (isset($component)) { $__componentOriginal7917fea7221db3198ac6d08be6e10451 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal7917fea7221db3198ac6d08be6e10451 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.filters.trigger','data' => ['xOn:click' => 'areFiltersOpen = ! areFiltersOpen']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::filters.trigger'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['x-on:click' => 'areFiltersOpen = ! areFiltersOpen']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal7917fea7221db3198ac6d08be6e10451)): ?>
-<?php $attributes = $__attributesOriginal7917fea7221db3198ac6d08be6e10451; ?>
-<?php unset($__attributesOriginal7917fea7221db3198ac6d08be6e10451); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal7917fea7221db3198ac6d08be6e10451)): ?>
-<?php $component = $__componentOriginal7917fea7221db3198ac6d08be6e10451; ?>
-<?php unset($__componentOriginal7917fea7221db3198ac6d08be6e10451); ?>
-<?php endif; ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <div class="mb-2 p-4" x-show="areFiltersOpen">
-                        <?php if (isset($component)) { $__componentOriginal3b3fa8ec7d71109f7bdf00def1db315e = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal3b3fa8ec7d71109f7bdf00def1db315e = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.filters.index','data' => ['form' => $getFiltersForm()]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::filters'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['form' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getFiltersForm())]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal3b3fa8ec7d71109f7bdf00def1db315e)): ?>
-<?php $attributes = $__attributesOriginal3b3fa8ec7d71109f7bdf00def1db315e; ?>
-<?php unset($__attributesOriginal3b3fa8ec7d71109f7bdf00def1db315e); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal3b3fa8ec7d71109f7bdf00def1db315e)): ?>
-<?php $component = $__componentOriginal3b3fa8ec7d71109f7bdf00def1db315e; ?>
-<?php unset($__componentOriginal3b3fa8ec7d71109f7bdf00def1db315e); ?>
-<?php endif; ?>
-                    </div>
-
-                    <?php if (isset($component)) { $__componentOriginal1c6b9867004d1a406262ace2c95ab783 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal1c6b9867004d1a406262ace2c95ab783 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.hr','data' => ['xShow' => \Illuminate\Support\Js::from($isReorderable || $isGlobalSearchVisible || $isColumnToggleFormVisible) . ' || selectedRecords.length']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::hr'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['x-show' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Js::from($isReorderable || $isGlobalSearchVisible || $isColumnToggleFormVisible) . ' || selectedRecords.length')]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal1c6b9867004d1a406262ace2c95ab783)): ?>
-<?php $attributes = $__attributesOriginal1c6b9867004d1a406262ace2c95ab783; ?>
-<?php unset($__attributesOriginal1c6b9867004d1a406262ace2c95ab783); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal1c6b9867004d1a406262ace2c95ab783)): ?>
-<?php $component = $__componentOriginal1c6b9867004d1a406262ace2c95ab783; ?>
-<?php unset($__componentOriginal1c6b9867004d1a406262ace2c95ab783); ?>
-<?php endif; ?>
-                </div>
-            <?php endif; ?>
+            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
             <div
-                x-show="<?php echo \Illuminate\Support\Js::from($shouldRenderHeaderDiv = ($isReorderable || $isGlobalSearchVisible || $hasFiltersPopover || $isColumnToggleFormVisible))->toHtml() ?> || selectedRecords.length"
-                <?php echo ! $shouldRenderHeaderDiv ? 'x-cloak' : null; ?>
-
-                class="filament-tables-header-toolbar flex h-14 items-center justify-between p-2"
-                x-bind:class="{
-                    'gap-2': <?php echo \Illuminate\Support\Js::from($isReorderable)->toHtml() ?> || selectedRecords.length,
-                }"
+                <?php if(! $hasHeaderToolbar): ?> x-cloak <?php endif; ?>
+                x-show="<?php echo \Illuminate\Support\Js::from($hasHeaderToolbar)->toHtml() ?> || (selectedRecords.length && <?php echo \Illuminate\Support\Js::from(count($bulkActions))->toHtml() ?>)"
+                class="fi-ta-header-toolbar flex items-center justify-between gap-x-4 px-4 py-3 sm:px-6"
             >
-                <div class="flex items-center gap-2">
-                    <?php if($isReorderable): ?>
-                        <?php if (isset($component)) { $__componentOriginalc0181334864fb71d91a10cbdcaecfd50 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalc0181334864fb71d91a10cbdcaecfd50 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.reorder.trigger','data' => ['enabled' => $isReordering]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::reorder.trigger'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['enabled' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isReordering)]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalc0181334864fb71d91a10cbdcaecfd50)): ?>
-<?php $attributes = $__attributesOriginalc0181334864fb71d91a10cbdcaecfd50; ?>
-<?php unset($__attributesOriginalc0181334864fb71d91a10cbdcaecfd50); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalc0181334864fb71d91a10cbdcaecfd50)): ?>
-<?php $component = $__componentOriginalc0181334864fb71d91a10cbdcaecfd50; ?>
-<?php unset($__componentOriginalc0181334864fb71d91a10cbdcaecfd50); ?>
-<?php endif; ?>
-                    <?php endif; ?>
+                <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\Tables\View\TablesRenderHook::TOOLBAR_START, scopes: static::class)); ?>
 
-                    <?php if(! $isReordering): ?>
-                        <?php if (isset($component)) { $__componentOriginal56f6ab899e86af4645d8ee58db6f126e = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal56f6ab899e86af4645d8ee58db6f126e = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.bulk-actions.index','data' => ['xShow' => 'selectedRecords.length','actions' => $getBulkActions()]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::bulk-actions'); ?>
+
+                <div class="flex shrink-0 items-center gap-x-4">
+                    <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\Tables\View\TablesRenderHook::TOOLBAR_REORDER_TRIGGER_BEFORE, scopes: static::class)); ?>
+
+
+                    <!--[if BLOCK]><![endif]--><?php if($isReorderable): ?>
+                        <span x-show="! selectedRecords.length">
+                            <?php echo e($reorderRecordsTriggerAction); ?>
+
+                        </span>
+                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                    <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\Tables\View\TablesRenderHook::TOOLBAR_REORDER_TRIGGER_AFTER, scopes: static::class)); ?>
+
+
+                    <!--[if BLOCK]><![endif]--><?php if((! $isReordering) && count($bulkActions)): ?>
+                        <?php if (isset($component)) { $__componentOriginal32a2358b99de73a2a27625c392d6fe38 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal32a2358b99de73a2a27625c392d6fe38 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.actions','data' => ['actions' => $bulkActions,'xCloak' => 'x-cloak','xShow' => 'selectedRecords.length']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::actions'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['x-show' => 'selectedRecords.length','actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getBulkActions())]); ?>
+<?php $component->withAttributes(['actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($bulkActions),'x-cloak' => 'x-cloak','x-show' => 'selectedRecords.length']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal56f6ab899e86af4645d8ee58db6f126e)): ?>
-<?php $attributes = $__attributesOriginal56f6ab899e86af4645d8ee58db6f126e; ?>
-<?php unset($__attributesOriginal56f6ab899e86af4645d8ee58db6f126e); ?>
+<?php if (isset($__attributesOriginal32a2358b99de73a2a27625c392d6fe38)): ?>
+<?php $attributes = $__attributesOriginal32a2358b99de73a2a27625c392d6fe38; ?>
+<?php unset($__attributesOriginal32a2358b99de73a2a27625c392d6fe38); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal56f6ab899e86af4645d8ee58db6f126e)): ?>
-<?php $component = $__componentOriginal56f6ab899e86af4645d8ee58db6f126e; ?>
-<?php unset($__componentOriginal56f6ab899e86af4645d8ee58db6f126e); ?>
+<?php if (isset($__componentOriginal32a2358b99de73a2a27625c392d6fe38)): ?>
+<?php $component = $__componentOriginal32a2358b99de73a2a27625c392d6fe38; ?>
+<?php unset($__componentOriginal32a2358b99de73a2a27625c392d6fe38); ?>
 <?php endif; ?>
-                    <?php endif; ?>
+                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                    <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\Tables\View\TablesRenderHook::TOOLBAR_GROUPING_SELECTOR_BEFORE, scopes: static::class)); ?>
+
+
+                    <!--[if BLOCK]><![endif]--><?php if($areGroupingSettingsVisible): ?>
+                        <?php if (isset($component)) { $__componentOriginala566838def908aaa4b134b9484794278 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginala566838def908aaa4b134b9484794278 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.groups','data' => ['directionSetting' => $isGroupingDirectionSettingHidden,'dropdownOnDesktop' => $areGroupingSettingsInDropdownOnDesktop(),'groups' => $groups,'triggerAction' => $getGroupRecordsTriggerAction()]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::groups'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['direction-setting' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isGroupingDirectionSettingHidden),'dropdown-on-desktop' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($areGroupingSettingsInDropdownOnDesktop()),'groups' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($groups),'trigger-action' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getGroupRecordsTriggerAction())]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginala566838def908aaa4b134b9484794278)): ?>
+<?php $attributes = $__attributesOriginala566838def908aaa4b134b9484794278; ?>
+<?php unset($__attributesOriginala566838def908aaa4b134b9484794278); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginala566838def908aaa4b134b9484794278)): ?>
+<?php $component = $__componentOriginala566838def908aaa4b134b9484794278; ?>
+<?php unset($__componentOriginala566838def908aaa4b134b9484794278); ?>
+<?php endif; ?>
+                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                    <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\Tables\View\TablesRenderHook::TOOLBAR_GROUPING_SELECTOR_AFTER, scopes: static::class)); ?>
+
                 </div>
 
-                <?php if($isGlobalSearchVisible || $hasFiltersPopover || $isColumnToggleFormVisible): ?>
-                    <div
-                        class="flex w-full items-center justify-end gap-2 md:max-w-md"
-                    >
-                        <?php if($isGlobalSearchVisible): ?>
-                            <div
-                                class="filament-tables-search-container flex flex-1 items-center justify-end"
-                            >
-                                <?php if (isset($component)) { $__componentOriginal4b04fa758b77ab5f3a62cdb93e6ff6e9 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal4b04fa758b77ab5f3a62cdb93e6ff6e9 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.search-input','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::search-input'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes([]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal4b04fa758b77ab5f3a62cdb93e6ff6e9)): ?>
-<?php $attributes = $__attributesOriginal4b04fa758b77ab5f3a62cdb93e6ff6e9; ?>
-<?php unset($__attributesOriginal4b04fa758b77ab5f3a62cdb93e6ff6e9); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal4b04fa758b77ab5f3a62cdb93e6ff6e9)): ?>
-<?php $component = $__componentOriginal4b04fa758b77ab5f3a62cdb93e6ff6e9; ?>
-<?php unset($__componentOriginal4b04fa758b77ab5f3a62cdb93e6ff6e9); ?>
-<?php endif; ?>
-                            </div>
-                        <?php endif; ?>
+                <!--[if BLOCK]><![endif]--><?php if($isGlobalSearchVisible || $hasFiltersDialog || $hasColumnToggleDropdown): ?>
+                    <div class="ms-auto flex items-center gap-x-4">
+                        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\Tables\View\TablesRenderHook::TOOLBAR_SEARCH_BEFORE, scopes: static::class)); ?>
 
-                        <?php if($hasFiltersPopover): ?>
-                            <?php if (isset($component)) { $__componentOriginal8126634305cb1a54df600d54efbfd138 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal8126634305cb1a54df600d54efbfd138 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.filters.popover','data' => ['form' => $getFiltersForm(),'maxHeight' => $getFiltersFormMaxHeight(),'width' => $getFiltersFormWidth(),'indicatorsCount' => count(\Illuminate\Support\Arr::flatten($filterIndicators)),'class' => 'shrink-0']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::filters.popover'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['form' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getFiltersForm()),'max-height' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getFiltersFormMaxHeight()),'width' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getFiltersFormWidth()),'indicators-count' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(count(\Illuminate\Support\Arr::flatten($filterIndicators))),'class' => 'shrink-0']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal8126634305cb1a54df600d54efbfd138)): ?>
-<?php $attributes = $__attributesOriginal8126634305cb1a54df600d54efbfd138; ?>
-<?php unset($__attributesOriginal8126634305cb1a54df600d54efbfd138); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal8126634305cb1a54df600d54efbfd138)): ?>
-<?php $component = $__componentOriginal8126634305cb1a54df600d54efbfd138; ?>
-<?php unset($__componentOriginal8126634305cb1a54df600d54efbfd138); ?>
-<?php endif; ?>
-                        <?php endif; ?>
 
-                        <?php if($isColumnToggleFormVisible): ?>
-                            <?php if (isset($component)) { $__componentOriginal59e66082a5ae391e26bfaff0cae2e27d = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal59e66082a5ae391e26bfaff0cae2e27d = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.toggleable.index','data' => ['form' => $getColumnToggleForm(),'maxHeight' => $getColumnToggleFormMaxHeight(),'width' => $getColumnToggleFormWidth(),'class' => 'shrink-0']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::toggleable'); ?>
+                        <!--[if BLOCK]><![endif]--><?php if($isGlobalSearchVisible): ?>
+                            <?php if (isset($component)) { $__componentOriginal7ccc00a3eaa8946ec9c0ec17f5ab229b = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal7ccc00a3eaa8946ec9c0ec17f5ab229b = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.search-field','data' => ['debounce' => $searchDebounce,'onBlur' => $isSearchOnBlur,'placeholder' => $getSearchPlaceholder()]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::search-field'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['form' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getColumnToggleForm()),'max-height' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getColumnToggleFormMaxHeight()),'width' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getColumnToggleFormWidth()),'class' => 'shrink-0']); ?>
+<?php $component->withAttributes(['debounce' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($searchDebounce),'on-blur' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isSearchOnBlur),'placeholder' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getSearchPlaceholder())]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal59e66082a5ae391e26bfaff0cae2e27d)): ?>
-<?php $attributes = $__attributesOriginal59e66082a5ae391e26bfaff0cae2e27d; ?>
-<?php unset($__attributesOriginal59e66082a5ae391e26bfaff0cae2e27d); ?>
+<?php if (isset($__attributesOriginal7ccc00a3eaa8946ec9c0ec17f5ab229b)): ?>
+<?php $attributes = $__attributesOriginal7ccc00a3eaa8946ec9c0ec17f5ab229b; ?>
+<?php unset($__attributesOriginal7ccc00a3eaa8946ec9c0ec17f5ab229b); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal59e66082a5ae391e26bfaff0cae2e27d)): ?>
-<?php $component = $__componentOriginal59e66082a5ae391e26bfaff0cae2e27d; ?>
-<?php unset($__componentOriginal59e66082a5ae391e26bfaff0cae2e27d); ?>
+<?php if (isset($__componentOriginal7ccc00a3eaa8946ec9c0ec17f5ab229b)): ?>
+<?php $component = $__componentOriginal7ccc00a3eaa8946ec9c0ec17f5ab229b; ?>
+<?php unset($__componentOriginal7ccc00a3eaa8946ec9c0ec17f5ab229b); ?>
 <?php endif; ?>
-                        <?php endif; ?>
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\Tables\View\TablesRenderHook::TOOLBAR_SEARCH_AFTER, scopes: static::class)); ?>
+
+
+                        <!--[if BLOCK]><![endif]--><?php if($hasFiltersDialog || $hasColumnToggleDropdown): ?>
+                            <!--[if BLOCK]><![endif]--><?php if($hasFiltersDialog): ?>
+                                <?php if (isset($component)) { $__componentOriginal067a65195e5146173dca4799c8ccf123 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal067a65195e5146173dca4799c8ccf123 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.filters.dialog','data' => ['activeFiltersCount' => $activeFiltersCount,'applyAction' => $getFiltersApplyAction(),'form' => $getFiltersForm(),'layout' => $filtersLayout,'maxHeight' => $getFiltersFormMaxHeight(),'triggerAction' => $filtersTriggerAction,'width' => $getFiltersFormWidth()]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::filters.dialog'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['active-filters-count' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($activeFiltersCount),'apply-action' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getFiltersApplyAction()),'form' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getFiltersForm()),'layout' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($filtersLayout),'max-height' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getFiltersFormMaxHeight()),'trigger-action' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($filtersTriggerAction),'width' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getFiltersFormWidth())]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal067a65195e5146173dca4799c8ccf123)): ?>
+<?php $attributes = $__attributesOriginal067a65195e5146173dca4799c8ccf123; ?>
+<?php unset($__attributesOriginal067a65195e5146173dca4799c8ccf123); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal067a65195e5146173dca4799c8ccf123)): ?>
+<?php $component = $__componentOriginal067a65195e5146173dca4799c8ccf123; ?>
+<?php unset($__componentOriginal067a65195e5146173dca4799c8ccf123); ?>
+<?php endif; ?>
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                            <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\Tables\View\TablesRenderHook::TOOLBAR_TOGGLE_COLUMN_TRIGGER_BEFORE, scopes: static::class)); ?>
+
+
+                            <!--[if BLOCK]><![endif]--><?php if($hasColumnToggleDropdown): ?>
+                                <?php if (isset($component)) { $__componentOriginal819b24f9f8a080df7cdd61b9f97a96fc = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal819b24f9f8a080df7cdd61b9f97a96fc = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.column-toggle.dropdown','data' => ['form' => $getColumnToggleForm(),'maxHeight' => $getColumnToggleFormMaxHeight(),'triggerAction' => $toggleColumnsTriggerAction,'width' => $getColumnToggleFormWidth()]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::column-toggle.dropdown'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['form' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getColumnToggleForm()),'max-height' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getColumnToggleFormMaxHeight()),'trigger-action' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($toggleColumnsTriggerAction),'width' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getColumnToggleFormWidth())]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal819b24f9f8a080df7cdd61b9f97a96fc)): ?>
+<?php $attributes = $__attributesOriginal819b24f9f8a080df7cdd61b9f97a96fc; ?>
+<?php unset($__attributesOriginal819b24f9f8a080df7cdd61b9f97a96fc); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal819b24f9f8a080df7cdd61b9f97a96fc)): ?>
+<?php $component = $__componentOriginal819b24f9f8a080df7cdd61b9f97a96fc; ?>
+<?php unset($__componentOriginal819b24f9f8a080df7cdd61b9f97a96fc); ?>
+<?php endif; ?>
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                            <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\Tables\View\TablesRenderHook::TOOLBAR_TOGGLE_COLUMN_TRIGGER_AFTER, scopes: static::class)); ?>
+
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                     </div>
-                <?php endif; ?>
+                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\Tables\View\TablesRenderHook::TOOLBAR_END)); ?>
+
             </div>
         </div>
 
-        <?php if($isReordering): ?>
-            <?php if (isset($component)) { $__componentOriginal9a459b3d216a804614ab211a15955ec4 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal9a459b3d216a804614ab211a15955ec4 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.reorder.indicator','data' => ['colspan' => $columnsCount,'class' => 
-                    \Illuminate\Support\Arr::toCssClasses([
-                        'border-t',
-                        'dark:border-gray-700' => config('tables.dark_mode'),
-                    ])
-                ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::reorder.indicator'); ?>
+        <!--[if BLOCK]><![endif]--><?php if($isReordering): ?>
+            <?php if (isset($component)) { $__componentOriginal9544fb8e3a33805419fe3af6ca5104a0 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9544fb8e3a33805419fe3af6ca5104a0 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.reorder.indicator','data' => ['colspan' => $columnsCount]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::reorder.indicator'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['colspan' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columnsCount),'class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
-                    \Illuminate\Support\Arr::toCssClasses([
-                        'border-t',
-                        'dark:border-gray-700' => config('tables.dark_mode'),
-                    ])
-                )]); ?>
+<?php $component->withAttributes(['colspan' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columnsCount)]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal9a459b3d216a804614ab211a15955ec4)): ?>
-<?php $attributes = $__attributesOriginal9a459b3d216a804614ab211a15955ec4; ?>
-<?php unset($__attributesOriginal9a459b3d216a804614ab211a15955ec4); ?>
+<?php if (isset($__attributesOriginal9544fb8e3a33805419fe3af6ca5104a0)): ?>
+<?php $attributes = $__attributesOriginal9544fb8e3a33805419fe3af6ca5104a0; ?>
+<?php unset($__attributesOriginal9544fb8e3a33805419fe3af6ca5104a0); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal9a459b3d216a804614ab211a15955ec4)): ?>
-<?php $component = $__componentOriginal9a459b3d216a804614ab211a15955ec4; ?>
-<?php unset($__componentOriginal9a459b3d216a804614ab211a15955ec4); ?>
+<?php if (isset($__componentOriginal9544fb8e3a33805419fe3af6ca5104a0)): ?>
+<?php $component = $__componentOriginal9544fb8e3a33805419fe3af6ca5104a0; ?>
+<?php unset($__componentOriginal9544fb8e3a33805419fe3af6ca5104a0); ?>
 <?php endif; ?>
         <?php elseif($isSelectionEnabled && $isLoaded): ?>
-            <?php if (isset($component)) { $__componentOriginalec4e40df6f0d418ae452b0cfbf7e0938 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalec4e40df6f0d418ae452b0cfbf7e0938 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.selection-indicator','data' => ['allSelectableRecordsCount' => $allSelectableRecordsCount,'colspan' => $columnsCount,'xShow' => 'selectedRecords.length','class' => 
-                    \Illuminate\Support\Arr::toCssClasses([
-                        'border-t',
-                        'dark:border-gray-700' => config('tables.dark_mode'),
-                    ])
-                ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::selection-indicator'); ?>
+            <?php if (isset($component)) { $__componentOriginal351cd8fd9541a7f7d30623e7253eb988 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal351cd8fd9541a7f7d30623e7253eb988 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.selection.indicator','data' => ['allSelectableRecordsCount' => $allSelectableRecordsCount,'colspan' => $columnsCount,'page' => $page,'selectCurrentPageOnly' => $selectsCurrentPageOnly,'xBind:hidden' => '! selectedRecords.length','xShow' => 'selectedRecords.length']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::selection.indicator'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['all-selectable-records-count' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($allSelectableRecordsCount),'colspan' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columnsCount),'x-show' => 'selectedRecords.length','class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
-                    \Illuminate\Support\Arr::toCssClasses([
-                        'border-t',
-                        'dark:border-gray-700' => config('tables.dark_mode'),
-                    ])
-                )]); ?>
-                 <?php $__env->slot('selectedRecordsCount', null, []); ?> 
-                    <span x-text="selectedRecords.length"></span>
-                 <?php $__env->endSlot(); ?>
-             <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalec4e40df6f0d418ae452b0cfbf7e0938)): ?>
-<?php $attributes = $__attributesOriginalec4e40df6f0d418ae452b0cfbf7e0938; ?>
-<?php unset($__attributesOriginalec4e40df6f0d418ae452b0cfbf7e0938); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalec4e40df6f0d418ae452b0cfbf7e0938)): ?>
-<?php $component = $__componentOriginalec4e40df6f0d418ae452b0cfbf7e0938; ?>
-<?php unset($__componentOriginalec4e40df6f0d418ae452b0cfbf7e0938); ?>
-<?php endif; ?>
-        <?php endif; ?>
-
-        <?php if (isset($component)) { $__componentOriginal7dd593227f23104fb8f7af508dd8da51 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal7dd593227f23104fb8f7af508dd8da51 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.filters.indicators','data' => ['indicators' => $filterIndicators,'class' => 
-                \Illuminate\Support\Arr::toCssClasses([
-                    'border-t',
-                    'dark:border-gray-700' => config('tables.dark_mode'),
-                ])
-            ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::filters.indicators'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['indicators' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($filterIndicators),'class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
-                \Illuminate\Support\Arr::toCssClasses([
-                    'border-t',
-                    'dark:border-gray-700' => config('tables.dark_mode'),
-                ])
-            )]); ?>
+<?php $component->withAttributes(['all-selectable-records-count' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($allSelectableRecordsCount),'colspan' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columnsCount),'page' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($page),'select-current-page-only' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($selectsCurrentPageOnly),'x-bind:hidden' => '! selectedRecords.length','x-show' => 'selectedRecords.length']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal7dd593227f23104fb8f7af508dd8da51)): ?>
-<?php $attributes = $__attributesOriginal7dd593227f23104fb8f7af508dd8da51; ?>
-<?php unset($__attributesOriginal7dd593227f23104fb8f7af508dd8da51); ?>
+<?php if (isset($__attributesOriginal351cd8fd9541a7f7d30623e7253eb988)): ?>
+<?php $attributes = $__attributesOriginal351cd8fd9541a7f7d30623e7253eb988; ?>
+<?php unset($__attributesOriginal351cd8fd9541a7f7d30623e7253eb988); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal7dd593227f23104fb8f7af508dd8da51)): ?>
-<?php $component = $__componentOriginal7dd593227f23104fb8f7af508dd8da51; ?>
-<?php unset($__componentOriginal7dd593227f23104fb8f7af508dd8da51); ?>
+<?php if (isset($__componentOriginal351cd8fd9541a7f7d30623e7253eb988)): ?>
+<?php $component = $__componentOriginal351cd8fd9541a7f7d30623e7253eb988; ?>
+<?php unset($__componentOriginal351cd8fd9541a7f7d30623e7253eb988); ?>
 <?php endif; ?>
+        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+        <!--[if BLOCK]><![endif]--><?php if(count($filterIndicators)): ?>
+            <?php if (isset($component)) { $__componentOriginal5726bbe65accd879ed70a6baa694294d = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal5726bbe65accd879ed70a6baa694294d = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.filters.indicators','data' => ['indicators' => $filterIndicators]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::filters.indicators'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['indicators' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($filterIndicators)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal5726bbe65accd879ed70a6baa694294d)): ?>
+<?php $attributes = $__attributesOriginal5726bbe65accd879ed70a6baa694294d; ?>
+<?php unset($__attributesOriginal5726bbe65accd879ed70a6baa694294d); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal5726bbe65accd879ed70a6baa694294d)): ?>
+<?php $component = $__componentOriginal5726bbe65accd879ed70a6baa694294d; ?>
+<?php unset($__componentOriginal5726bbe65accd879ed70a6baa694294d); ?>
+<?php endif; ?>
+        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
         <div
             <?php if($pollingInterval = $getPollingInterval()): ?>
@@ -570,19 +447,12 @@
 
             <?php endif; ?>
             class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                'filament-tables-table-container relative overflow-x-auto',
-                'dark:border-gray-700' => config('tables.dark_mode'),
-                'overflow-x-auto' => $content || $hasColumnsLayout,
-                'rounded-t-xl' => ! $renderHeader,
-                'border-t' => $renderHeader,
+                'fi-ta-content relative divide-y divide-gray-200 overflow-x-auto dark:divide-white/10 dark:border-t-white/10',
+                '!border-t-0' => ! $hasHeader,
             ]); ?>"
-            x-bind:class="{
-                'rounded-t-xl': ! hasHeader,
-                'border-t': hasHeader,
-            }"
         >
-            <?php if(($content || $hasColumnsLayout) && ($records !== null) && count($records)): ?>
-                <?php if(($content || $hasColumnsLayout) && (! $isReordering)): ?>
+            <!--[if BLOCK]><![endif]--><?php if(($content || $hasColumnsLayout) && ($records !== null) && count($records)): ?>
+                <!--[if BLOCK]><![endif]--><?php if(! $isReordering): ?>
                     <?php
                         $sortableColumns = array_filter(
                             $columns,
@@ -590,514 +460,829 @@
                         );
                     ?>
 
-                    <div
-                        class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                            'flex items-center gap-4 border-b bg-gray-500/5 px-4',
-                            'dark:border-gray-700' => config('tables.dark_mode'),
-                            'hidden' => (! $isSelectionEnabled) && (! count($sortableColumns)),
-                        ]); ?>"
-                    >
-                        <?php if($isSelectionEnabled): ?>
-                            <?php if (isset($component)) { $__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.checkbox.index','data' => ['label' => __('tables::table.fields.bulk_select_page.label'),'xOn:click' => 'toggleSelectRecordsOnPage','xBind:checked' => '
-                                    let recordsOnPage = getRecordsOnPage()
+                    <!--[if BLOCK]><![endif]--><?php if($isSelectionEnabled || count($sortableColumns)): ?>
+                        <div
+                            class="flex items-center gap-4 gap-x-6 bg-gray-50 px-4 dark:bg-white/5 sm:px-6"
+                        >
+                            <!--[if BLOCK]><![endif]--><?php if($isSelectionEnabled && (! $isReordering)): ?>
+                                <?php if (isset($component)) { $__componentOriginal36f68fca2c6625d1435d035c49146213 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal36f68fca2c6625d1435d035c49146213 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.selection.checkbox','data' => ['wire:key' => $this->getId() . '.table.bulk-select-page.checkbox.' . Str::random(),'label' => __('filament-tables::table.fields.bulk_select_page.label'),'xBind:checked' => '
+                                        const recordsOnPage = getRecordsOnPage()
 
-                                    if (recordsOnPage.length && areRecordsSelected(recordsOnPage)) {
-                                        $el.checked = true
+                                        if (recordsOnPage.length && areRecordsSelected(recordsOnPage)) {
+                                            $el.checked = true
 
-                                        return \'checked\'
-                                    }
+                                            return \'checked\'
+                                        }
 
-                                    $el.checked = false
+                                        $el.checked = false
 
-                                    return null
-                                ','class' => 
-                                    \Illuminate\Support\Arr::toCssClasses([
-                                        'hidden' => $isReordering,
-                                    ])
-                                ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::checkbox'); ?>
+                                        return null
+                                    ','xOn:click' => 'toggleSelectRecordsOnPage','class' => 'my-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::selection.checkbox'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('tables::table.fields.bulk_select_page.label')),'x-on:click' => 'toggleSelectRecordsOnPage','x-bind:checked' => '
-                                    let recordsOnPage = getRecordsOnPage()
+<?php $component->withAttributes(['wire:key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($this->getId() . '.table.bulk-select-page.checkbox.' . Str::random()),'label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('filament-tables::table.fields.bulk_select_page.label')),'x-bind:checked' => '
+                                        const recordsOnPage = getRecordsOnPage()
 
-                                    if (recordsOnPage.length && areRecordsSelected(recordsOnPage)) {
-                                        $el.checked = true
+                                        if (recordsOnPage.length && areRecordsSelected(recordsOnPage)) {
+                                            $el.checked = true
 
-                                        return \'checked\'
-                                    }
+                                            return \'checked\'
+                                        }
 
-                                    $el.checked = false
+                                        $el.checked = false
 
-                                    return null
-                                ','class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
-                                    \Illuminate\Support\Arr::toCssClasses([
-                                        'hidden' => $isReordering,
-                                    ])
-                                )]); ?>
+                                        return null
+                                    ','x-on:click' => 'toggleSelectRecordsOnPage','class' => 'my-4']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409)): ?>
-<?php $attributes = $__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409; ?>
-<?php unset($__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409); ?>
+<?php if (isset($__attributesOriginal36f68fca2c6625d1435d035c49146213)): ?>
+<?php $attributes = $__attributesOriginal36f68fca2c6625d1435d035c49146213; ?>
+<?php unset($__attributesOriginal36f68fca2c6625d1435d035c49146213); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409)): ?>
-<?php $component = $__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409; ?>
-<?php unset($__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409); ?>
+<?php if (isset($__componentOriginal36f68fca2c6625d1435d035c49146213)): ?>
+<?php $component = $__componentOriginal36f68fca2c6625d1435d035c49146213; ?>
+<?php unset($__componentOriginal36f68fca2c6625d1435d035c49146213); ?>
 <?php endif; ?>
-                        <?php endif; ?>
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-                        <?php if(count($sortableColumns)): ?>
-                            <div
-                                x-data="{
-                                    column: $wire.entangle('tableSortColumn'),
-                                    direction: $wire.entangle('tableSortDirection'),
-                                }"
-                                x-init="
-                                    $watch('column', function (newColumn, oldColumn) {
-                                        if (! newColumn) {
-                                            direction = null
+                            <!--[if BLOCK]><![endif]--><?php if(count($sortableColumns)): ?>
+                                <div
+                                    x-data="{
+                                        column: $wire.$entangle('tableSortColumn', true),
+                                        direction: $wire.$entangle('tableSortDirection', true),
+                                    }"
+                                    x-init="
+                                        $watch('column', function (newColumn, oldColumn) {
+                                            if (! newColumn) {
+                                                direction = null
 
-                                            return
-                                        }
+                                                return
+                                            }
 
-                                        if (oldColumn) {
-                                            return
-                                        }
+                                            if (oldColumn) {
+                                                return
+                                            }
 
-                                        direction = 'asc'
-                                    })
-                                "
-                                class="flex flex-wrap items-center gap-1 py-1 text-xs sm:text-sm"
-                            >
-                                <label>
-                                    <span class="mr-1 font-medium">
-                                        <?php echo e(__('tables::table.sorting.fields.column.label')); ?>
+                                            direction = 'asc'
+                                        })
+                                    "
+                                    class="flex gap-x-3 py-3"
+                                >
+                                    <label>
+                                        <?php if (isset($component)) { $__componentOriginal505efd9768415fdb4543e8c564dad437 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal505efd9768415fdb4543e8c564dad437 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.input.wrapper','data' => ['prefix' => __('filament-tables::table.sorting.fields.column.label')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament::input.wrapper'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['prefix' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('filament-tables::table.sorting.fields.column.label'))]); ?>
+                                            <?php if (isset($component)) { $__componentOriginal97dc683fe4ff7acce9e296503563dd85 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal97dc683fe4ff7acce9e296503563dd85 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.input.select','data' => ['xModel' => 'column']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament::input.select'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['x-model' => 'column']); ?>
+                                                <option value="">-</option>
 
-                                    </span>
+                                                <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $sortableColumns; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $column): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                    <option
+                                                        value="<?php echo e($column->getName()); ?>"
+                                                    >
+                                                        <?php echo e($column->getLabel()); ?>
 
-                                    <select
-                                        x-model="column"
-                                        style="
-                                            background-position: right 0.2rem
-                                                center;
-                                        "
-                                        class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                                            'rounded-lg border-0 border-gray-300 bg-gray-500/5 py-1 pl-2 pr-6 text-xs font-medium focus:border-primary-500 focus:ring-0 focus:ring-primary-500 sm:text-sm',
-                                            'dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-primary-500' => config('tables.dark_mode'),
-                                        ]); ?>"
-                                    >
-                                        <option value="">-</option>
+                                                    </option>
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                                             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal97dc683fe4ff7acce9e296503563dd85)): ?>
+<?php $attributes = $__attributesOriginal97dc683fe4ff7acce9e296503563dd85; ?>
+<?php unset($__attributesOriginal97dc683fe4ff7acce9e296503563dd85); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal97dc683fe4ff7acce9e296503563dd85)): ?>
+<?php $component = $__componentOriginal97dc683fe4ff7acce9e296503563dd85; ?>
+<?php unset($__componentOriginal97dc683fe4ff7acce9e296503563dd85); ?>
+<?php endif; ?>
+                                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal505efd9768415fdb4543e8c564dad437)): ?>
+<?php $attributes = $__attributesOriginal505efd9768415fdb4543e8c564dad437; ?>
+<?php unset($__attributesOriginal505efd9768415fdb4543e8c564dad437); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal505efd9768415fdb4543e8c564dad437)): ?>
+<?php $component = $__componentOriginal505efd9768415fdb4543e8c564dad437; ?>
+<?php unset($__componentOriginal505efd9768415fdb4543e8c564dad437); ?>
+<?php endif; ?>
+                                    </label>
 
-                                        <?php $__currentLoopData = $sortableColumns; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $column): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <option
-                                                value="<?php echo e($column->getName()); ?>"
-                                            >
-                                                <?php echo e($column->getLabel()); ?>
+                                    <label x-cloak x-show="column">
+                                        <span class="sr-only">
+                                            <?php echo e(__('filament-tables::table.sorting.fields.direction.label')); ?>
 
-                                            </option>
-                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                    </select>
-                                </label>
+                                        </span>
 
-                                <label>
-                                    <span class="sr-only">
-                                        <?php echo e(__('tables::table.sorting.fields.direction.label')); ?>
+                                        <?php if (isset($component)) { $__componentOriginal505efd9768415fdb4543e8c564dad437 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal505efd9768415fdb4543e8c564dad437 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.input.wrapper','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament::input.wrapper'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                                            <?php if (isset($component)) { $__componentOriginal97dc683fe4ff7acce9e296503563dd85 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal97dc683fe4ff7acce9e296503563dd85 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.input.select','data' => ['xModel' => 'direction']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament::input.select'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['x-model' => 'direction']); ?>
+                                                <option value="asc">
+                                                    <?php echo e(__('filament-tables::table.sorting.fields.direction.options.asc')); ?>
 
-                                    </span>
+                                                </option>
 
-                                    <select
-                                        x-show="column"
-                                        x-model="direction"
-                                        style="
-                                            background-position: right 0.2rem
-                                                center;
-                                        "
-                                        class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                                            'rounded-lg border-0 border-gray-300 bg-gray-500/5 py-1 pl-2 pr-6 text-xs font-medium focus:border-primary-500 focus:ring-0 focus:ring-primary-500 sm:text-sm',
-                                            'dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-primary-500' => config('tables.dark_mode'),
-                                        ]); ?>"
-                                    >
-                                        <option value="asc">
-                                            <?php echo e(__('tables::table.sorting.fields.direction.options.asc')); ?>
+                                                <option value="desc">
+                                                    <?php echo e(__('filament-tables::table.sorting.fields.direction.options.desc')); ?>
 
-                                        </option>
+                                                </option>
+                                             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal97dc683fe4ff7acce9e296503563dd85)): ?>
+<?php $attributes = $__attributesOriginal97dc683fe4ff7acce9e296503563dd85; ?>
+<?php unset($__attributesOriginal97dc683fe4ff7acce9e296503563dd85); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal97dc683fe4ff7acce9e296503563dd85)): ?>
+<?php $component = $__componentOriginal97dc683fe4ff7acce9e296503563dd85; ?>
+<?php unset($__componentOriginal97dc683fe4ff7acce9e296503563dd85); ?>
+<?php endif; ?>
+                                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal505efd9768415fdb4543e8c564dad437)): ?>
+<?php $attributes = $__attributesOriginal505efd9768415fdb4543e8c564dad437; ?>
+<?php unset($__attributesOriginal505efd9768415fdb4543e8c564dad437); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal505efd9768415fdb4543e8c564dad437)): ?>
+<?php $component = $__componentOriginal505efd9768415fdb4543e8c564dad437; ?>
+<?php unset($__componentOriginal505efd9768415fdb4543e8c564dad437); ?>
+<?php endif; ?>
+                                    </label>
+                                </div>
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                        </div>
+                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-                                        <option value="desc">
-                                            <?php echo e(__('tables::table.sorting.fields.direction.options.desc')); ?>
-
-                                        </option>
-                                    </select>
-                                </label>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                <?php endif; ?>
-
-                <?php if($content): ?>
+                <!--[if BLOCK]><![endif]--><?php if($content): ?>
                     <?php echo e($content->with(['records' => $records])); ?>
 
                 <?php else: ?>
-                    <?php if (isset($component)) { $__componentOriginal619b5702a4dba2316335176c43ec06a2 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal619b5702a4dba2316335176c43ec06a2 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-support::components.grid.index','data' => ['wire:sortable' => true,'wire:end.stop' => 'reorderTable($event.target.sortable.toArray())','wire:sortable.options' => '{ animation: 100 }','default' => $contentGrid['default'] ?? 1,'sm' => $contentGrid['sm'] ?? null,'md' => $contentGrid['md'] ?? null,'lg' => $contentGrid['lg'] ?? null,'xl' => $contentGrid['xl'] ?? null,'twoXl' => $contentGrid['2xl'] ?? null,'class' => 
-                            \Illuminate\Support\Arr::toCssClasses([
-                                'divide-y' => ! $contentGrid,
-                                'p-2 gap-2' => $contentGrid,
-                                'dark:divide-gray-700' => config('tables.dark_mode'),
-                            ])
-                        ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('filament-support::grid'); ?>
+                    <?php if (isset($component)) { $__componentOriginal30dbd75eb120a380110a2b340cd88f46 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal30dbd75eb120a380110a2b340cd88f46 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.grid.index','data' => ['default' => $contentGrid['default'] ?? 1,'sm' => $contentGrid['sm'] ?? null,'md' => $contentGrid['md'] ?? null,'lg' => $contentGrid['lg'] ?? null,'xl' => $contentGrid['xl'] ?? null,'twoXl' => $contentGrid['2xl'] ?? null,'xOn:end.stop' => '$wire.reorderTable($event.target.sortable.toArray())','xSortable' => true,'dataSortableAnimationDuration' => $getReorderAnimationDuration(),'class' => \Illuminate\Support\Arr::toCssClasses([
+                            'fi-ta-content-grid gap-4 p-4 sm:px-6' => $contentGrid,
+                            'pt-0' => $contentGrid && $this->getTableGrouping(),
+                            'gap-y-px bg-gray-200 dark:bg-white/5' => ! $contentGrid,
+                        ])]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament::grid'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['wire:sortable' => true,'wire:end.stop' => 'reorderTable($event.target.sortable.toArray())','wire:sortable.options' => '{ animation: 100 }','default' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($contentGrid['default'] ?? 1),'sm' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($contentGrid['sm'] ?? null),'md' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($contentGrid['md'] ?? null),'lg' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($contentGrid['lg'] ?? null),'xl' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($contentGrid['xl'] ?? null),'two-xl' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($contentGrid['2xl'] ?? null),'class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
-                            \Illuminate\Support\Arr::toCssClasses([
-                                'divide-y' => ! $contentGrid,
-                                'p-2 gap-2' => $contentGrid,
-                                'dark:divide-gray-700' => config('tables.dark_mode'),
-                            ])
-                        )]); ?>
-                        <?php $__currentLoopData = $records; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $record): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+<?php $component->withAttributes(['default' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($contentGrid['default'] ?? 1),'sm' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($contentGrid['sm'] ?? null),'md' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($contentGrid['md'] ?? null),'lg' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($contentGrid['lg'] ?? null),'xl' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($contentGrid['xl'] ?? null),'two-xl' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($contentGrid['2xl'] ?? null),'x-on:end.stop' => '$wire.reorderTable($event.target.sortable.toArray())','x-sortable' => true,'data-sortable-animation-duration' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getReorderAnimationDuration()),'class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssClasses([
+                            'fi-ta-content-grid gap-4 p-4 sm:px-6' => $contentGrid,
+                            'pt-0' => $contentGrid && $this->getTableGrouping(),
+                            'gap-y-px bg-gray-200 dark:bg-white/5' => ! $contentGrid,
+                        ]))]); ?>
+                        <?php
+                            $previousRecord = null;
+                            $previousRecordGroupKey = null;
+                            $previousRecordGroupTitle = null;
+                        ?>
+
+                        <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $records; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $record): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <?php
                                 $recordAction = $getRecordAction($record);
                                 $recordKey = $getRecordKey($record);
                                 $recordUrl = $getRecordUrl($record);
+                                $openRecordUrlInNewTab = $shouldOpenRecordUrlInNewTab($record);
+                                $recordGroupKey = $group?->getStringKey($record);
+                                $recordGroupTitle = $group?->getTitle($record);
 
                                 $collapsibleColumnsLayout?->record($record);
-                                $hasCollapsibleColumnsLayout = $collapsibleColumnsLayout && (! $collapsibleColumnsLayout->isHidden());
+                                $hasCollapsibleColumnsLayout = (bool) $collapsibleColumnsLayout?->isVisible();
                             ?>
+
+                            <!--[if BLOCK]><![endif]--><?php if($recordGroupTitle !== $previousRecordGroupTitle): ?>
+                                <!--[if BLOCK]><![endif]--><?php if($hasSummary && (! $isReordering) && filled($previousRecordGroupTitle)): ?>
+                                    <?php if (isset($component)) { $__componentOriginalce46e569391542b4e56f032ac7380f79 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalce46e569391542b4e56f032ac7380f79 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.table','data' => ['class' => 'col-span-full']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::table'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'col-span-full']); ?>
+                                        <?php if (isset($component)) { $__componentOriginala3ad14087ab6b316cf1e1d1a634acbeb = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginala3ad14087ab6b316cf1e1d1a634acbeb = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.summary.row','data' => ['columns' => $columns,'extraHeadingColumn' => true,'heading' => 
+                                                __('filament-tables::table.summary.subheadings.group', [
+                                                    'group' => $previousRecordGroupTitle,
+                                                    'label' => $pluralModelLabel,
+                                                ])
+                                            ,'placeholderColumns' => false,'query' => $group->scopeQuery($this->getAllTableSummaryQuery(), $previousRecord),'selectedState' => $groupedSummarySelectedState[$previousRecordGroupKey] ?? []]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::summary.row'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['columns' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columns),'extra-heading-column' => true,'heading' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
+                                                __('filament-tables::table.summary.subheadings.group', [
+                                                    'group' => $previousRecordGroupTitle,
+                                                    'label' => $pluralModelLabel,
+                                                ])
+                                            ),'placeholder-columns' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(false),'query' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($group->scopeQuery($this->getAllTableSummaryQuery(), $previousRecord)),'selected-state' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($groupedSummarySelectedState[$previousRecordGroupKey] ?? [])]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginala3ad14087ab6b316cf1e1d1a634acbeb)): ?>
+<?php $attributes = $__attributesOriginala3ad14087ab6b316cf1e1d1a634acbeb; ?>
+<?php unset($__attributesOriginala3ad14087ab6b316cf1e1d1a634acbeb); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginala3ad14087ab6b316cf1e1d1a634acbeb)): ?>
+<?php $component = $__componentOriginala3ad14087ab6b316cf1e1d1a634acbeb; ?>
+<?php unset($__componentOriginala3ad14087ab6b316cf1e1d1a634acbeb); ?>
+<?php endif; ?>
+                                     <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalce46e569391542b4e56f032ac7380f79)): ?>
+<?php $attributes = $__attributesOriginalce46e569391542b4e56f032ac7380f79; ?>
+<?php unset($__attributesOriginalce46e569391542b4e56f032ac7380f79); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalce46e569391542b4e56f032ac7380f79)): ?>
+<?php $component = $__componentOriginalce46e569391542b4e56f032ac7380f79; ?>
+<?php unset($__componentOriginalce46e569391542b4e56f032ac7380f79); ?>
+<?php endif; ?>
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                                <?php if (isset($component)) { $__componentOriginal751169a5d74d7c8401df85650564cafc = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal751169a5d74d7c8401df85650564cafc = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.group.header','data' => ['collapsible' => $group->isCollapsible(),'description' => $group->getDescription($record, $recordGroupTitle),'label' => $group->isTitlePrefixedWithLabel() ? $group->getLabel() : null,'title' => $recordGroupTitle,'class' => \Illuminate\Support\Arr::toCssClasses([
+                                        'col-span-full',
+                                        '-mx-4 w-[calc(100%+2rem)] border-y border-gray-200 first:border-t-0 dark:border-white/5 sm:-mx-6 sm:w-[calc(100%+3rem)]' => $contentGrid,
+                                    ]),'xBind:class' => $hasSummary ? null : '{ \'-mb-4 border-b-0\': isGroupCollapsed(' . \Illuminate\Support\Js::from($recordGroupTitle) . ') }']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::group.header'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['collapsible' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($group->isCollapsible()),'description' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($group->getDescription($record, $recordGroupTitle)),'label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($group->isTitlePrefixedWithLabel() ? $group->getLabel() : null),'title' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordGroupTitle),'class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssClasses([
+                                        'col-span-full',
+                                        '-mx-4 w-[calc(100%+2rem)] border-y border-gray-200 first:border-t-0 dark:border-white/5 sm:-mx-6 sm:w-[calc(100%+3rem)]' => $contentGrid,
+                                    ])),'x-bind:class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($hasSummary ? null : '{ \'-mb-4 border-b-0\': isGroupCollapsed(' . \Illuminate\Support\Js::from($recordGroupTitle) . ') }')]); ?>
+                                    <!--[if BLOCK]><![endif]--><?php if($isSelectionEnabled): ?>
+                                         <?php $__env->slot('start', null, []); ?> 
+                                            <div class="px-3">
+                                                <?php if (isset($component)) { $__componentOriginal1d4fa51bf7f7ed15068efea290223e8e = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal1d4fa51bf7f7ed15068efea290223e8e = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.selection.group-checkbox','data' => ['page' => $page,'key' => $recordGroupKey,'title' => $recordGroupTitle]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::selection.group-checkbox'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['page' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($page),'key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordGroupKey),'title' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordGroupTitle)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal1d4fa51bf7f7ed15068efea290223e8e)): ?>
+<?php $attributes = $__attributesOriginal1d4fa51bf7f7ed15068efea290223e8e; ?>
+<?php unset($__attributesOriginal1d4fa51bf7f7ed15068efea290223e8e); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal1d4fa51bf7f7ed15068efea290223e8e)): ?>
+<?php $component = $__componentOriginal1d4fa51bf7f7ed15068efea290223e8e; ?>
+<?php unset($__componentOriginal1d4fa51bf7f7ed15068efea290223e8e); ?>
+<?php endif; ?>
+                                            </div>
+                                         <?php $__env->endSlot(); ?>
+                                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                 <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal751169a5d74d7c8401df85650564cafc)): ?>
+<?php $attributes = $__attributesOriginal751169a5d74d7c8401df85650564cafc; ?>
+<?php unset($__attributesOriginal751169a5d74d7c8401df85650564cafc); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal751169a5d74d7c8401df85650564cafc)): ?>
+<?php $component = $__componentOriginal751169a5d74d7c8401df85650564cafc; ?>
+<?php unset($__componentOriginal751169a5d74d7c8401df85650564cafc); ?>
+<?php endif; ?>
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
                             <div
                                 <?php if($hasCollapsibleColumnsLayout): ?>
                                     x-data="{ isCollapsed: <?php echo \Illuminate\Support\Js::from($collapsibleColumnsLayout->isCollapsed())->toHtml() ?> }"
                                     x-init="$dispatch('collapsible-table-row-initialized')"
-                                    x-on:expand-all-table-rows.window="isCollapsed = false"
                                     x-on:collapse-all-table-rows.window="isCollapsed = true"
+                                    x-on:expand-all-table-rows.window="isCollapsed = false"
+                                    x-bind:class="isCollapsed && 'fi-collapsed'"
                                 <?php endif; ?>
-                                wire:key="<?php echo e($this->id); ?>.table.records.<?php echo e($recordKey); ?>"
+                                wire:key="<?php echo e($this->getId()); ?>.table.records.<?php echo e($recordKey); ?>"
                                 <?php if($isReordering): ?>
-                                    wire:sortable.item="<?php echo e($recordKey); ?>"
-                                    wire:sortable.handle
+                                    x-sortable-item="<?php echo e($recordKey); ?>"
+                                    x-sortable-handle
                                 <?php endif; ?>
+                                class="<?php echo \Illuminate\Support\Arr::toCssClasses([
+                                    'fi-ta-record relative h-full bg-white transition duration-75 dark:bg-gray-900',
+                                    'hover:bg-gray-50 dark:hover:bg-white/5' => ($recordUrl || $recordAction) && (! $contentGrid),
+                                    'hover:bg-gray-50 dark:hover:bg-white/10 dark:hover:ring-white/20' => ($recordUrl || $recordAction) && $contentGrid,
+                                    'rounded-xl shadow-sm ring-1 ring-gray-950/5 dark:bg-white/5 dark:ring-white/10' => $contentGrid,
+                                    ...$getRecordClasses($record),
+                                ]); ?>"
+                                x-bind:class="{
+                                    'hidden':
+                                        <?php echo e($group?->isCollapsible() ? 'true' : 'false'); ?> &&
+                                        isGroupCollapsed(
+                                            <?php echo e(\Illuminate\Support\Js::from($recordGroupTitle)); ?>,
+                                        ),
+                                    <?php echo e(($contentGrid ? '\'bg-gray-50 dark:bg-white/10 dark:ring-white/20\'' : '\'bg-gray-50 dark:bg-white/5 before:absolute before:start-0 before:inset-y-0 before:w-0.5 before:bg-primary-600 dark:before:bg-primary-500\'') . ': isRecordSelected(\'' . $recordKey . '\')'); ?>,
+                                    <?php echo e($contentGrid ? '\'bg-white dark:bg-white/5 dark:ring-white/10\': ! isRecordSelected(\'' . $recordKey . '\')' : '\'\':\'\''); ?>,
+                                }"
                             >
+                                <?php
+                                    $hasItemBeforeRecordContent = $isReordering || ($isSelectionEnabled && $isRecordSelectable($record));
+                                    $isRecordCollapsible = $hasCollapsibleColumnsLayout && (! $isReordering);
+                                    $hasItemAfterRecordContent = $isRecordCollapsible;
+                                    $recordHasActions = count($actions) && (! $isReordering);
+
+                                    $recordContentHorizontalPaddingClasses = \Illuminate\Support\Arr::toCssClasses([
+                                        'ps-3' => (! $contentGrid) && $hasItemBeforeRecordContent,
+                                        'ps-4 sm:ps-6' => (! $contentGrid) && (! $hasItemBeforeRecordContent),
+                                        'pe-3' => (! $contentGrid) && $hasItemAfterRecordContent,
+                                        'pe-4 sm:pe-6' => (! $contentGrid) && (! $hasItemAfterRecordContent),
+                                        'ps-2' => $contentGrid && $hasItemBeforeRecordContent,
+                                        'ps-4' => $contentGrid && (! $hasItemBeforeRecordContent),
+                                        'pe-2' => $contentGrid && $hasItemAfterRecordContent,
+                                        'pe-4' => $contentGrid && (! $hasItemAfterRecordContent),
+                                    ]);
+
+                                    $recordActionsClasses = \Illuminate\Support\Arr::toCssClasses([
+                                        'md:ps-3' => (! $contentGrid),
+                                        'order-first' => $actionsPosition === ActionsPosition::BeforeColumns,
+                                        'ps-3' => (! $contentGrid) && $hasItemBeforeRecordContent,
+                                        'ps-4 sm:ps-6' => (! $contentGrid) && (! $hasItemBeforeRecordContent),
+                                        'pe-3' => (! $contentGrid) && $hasItemAfterRecordContent,
+                                        'pe-4 sm:pe-6' => (! $contentGrid) && (! $hasItemAfterRecordContent),
+                                        'ps-2' => $contentGrid && $hasItemBeforeRecordContent,
+                                        'ps-4' => $contentGrid && (! $hasItemBeforeRecordContent),
+                                        'pe-2' => $contentGrid && $hasItemAfterRecordContent,
+                                        'pe-4' => $contentGrid && (! $hasItemAfterRecordContent),
+                                    ]);
+                                ?>
+
                                 <div
-                                    x-bind:class="{
-                                        'bg-gray-50 <?php echo e(config('tables.dark_mode') ? 'dark:bg-gray-500/10' : ''); ?>':
-                                            isRecordSelected('<?php echo e($recordKey); ?>'),
-                                    }"
-                                    class="<?php echo \Illuminate\Support\Arr::toCssClasses(array_merge(
-                                        [
-                                            'relative h-full px-4 transition',
-                                            'hover:bg-gray-50' => $recordUrl || $recordAction,
-                                            'dark:hover:bg-gray-500/10' => ($recordUrl || $recordAction) && config('tables.dark_mode'),
-                                            'dark:border-gray-600' => (! $contentGrid) && config('tables.dark_mode'),
-                                            'group' => $isReordering,
-                                            'rounded-xl border border-gray-200 shadow-sm' => $contentGrid,
-                                            'dark:border-gray-700 dark:bg-gray-700/40' => $contentGrid && config('tables.dark_mode'),
-                                        ],
-                                        $getRecordClasses($record),
-                                    )); ?>"
+                                    class="<?php echo \Illuminate\Support\Arr::toCssClasses([
+                                        'flex items-center',
+                                        'ps-1 sm:ps-3' => (! $contentGrid) && $hasItemBeforeRecordContent,
+                                        'pe-1 sm:pe-3' => (! $contentGrid) && $hasItemAfterRecordContent,
+                                        'ps-1' => $contentGrid && $hasItemBeforeRecordContent,
+                                        'pe-1' => $contentGrid && $hasItemAfterRecordContent,
+                                    ]); ?>"
                                 >
+                                    <!--[if BLOCK]><![endif]--><?php if($isReordering): ?>
+                                        <?php if (isset($component)) { $__componentOriginal642b587c9495f7dd9ec654aae03995e8 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal642b587c9495f7dd9ec654aae03995e8 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.reorder.handle','data' => ['class' => 'mx-1 my-2']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::reorder.handle'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'mx-1 my-2']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal642b587c9495f7dd9ec654aae03995e8)): ?>
+<?php $attributes = $__attributesOriginal642b587c9495f7dd9ec654aae03995e8; ?>
+<?php unset($__attributesOriginal642b587c9495f7dd9ec654aae03995e8); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal642b587c9495f7dd9ec654aae03995e8)): ?>
+<?php $component = $__componentOriginal642b587c9495f7dd9ec654aae03995e8; ?>
+<?php unset($__componentOriginal642b587c9495f7dd9ec654aae03995e8); ?>
+<?php endif; ?>
+                                    <?php elseif($isSelectionEnabled && $isRecordSelectable($record)): ?>
+                                        <?php if (isset($component)) { $__componentOriginal36f68fca2c6625d1435d035c49146213 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal36f68fca2c6625d1435d035c49146213 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.selection.checkbox','data' => ['label' => __('filament-tables::table.fields.bulk_select_record.label', ['key' => $recordKey]),'value' => $recordKey,'xModel' => 'selectedRecords','dataGroup' => $recordGroupKey,'class' => 'fi-ta-record-checkbox mx-3 my-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::selection.checkbox'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('filament-tables::table.fields.bulk_select_record.label', ['key' => $recordKey])),'value' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordKey),'x-model' => 'selectedRecords','data-group' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordGroupKey),'class' => 'fi-ta-record-checkbox mx-3 my-4']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal36f68fca2c6625d1435d035c49146213)): ?>
+<?php $attributes = $__attributesOriginal36f68fca2c6625d1435d035c49146213; ?>
+<?php unset($__attributesOriginal36f68fca2c6625d1435d035c49146213); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal36f68fca2c6625d1435d035c49146213)): ?>
+<?php $component = $__componentOriginal36f68fca2c6625d1435d035c49146213; ?>
+<?php unset($__componentOriginal36f68fca2c6625d1435d035c49146213); ?>
+<?php endif; ?>
+                                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                                    <?php
+                                        $recordContentClasses = \Illuminate\Support\Arr::toCssClasses([
+                                            $recordContentHorizontalPaddingClasses,
+                                            'block w-full',
+                                        ]);
+                                    ?>
+
                                     <div
                                         class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                                            'items-center gap-4 md:mr-0 md:flex rtl:md:ml-0' => (! $contentGrid),
-                                            'mr-6 rtl:ml-6 rtl:mr-0' => $isSelectionEnabled || $hasCollapsibleColumnsLayout || $isReordering,
+                                            'flex w-full flex-col gap-y-3 py-4',
+                                            'md:flex-row md:items-center' => ! $contentGrid,
                                         ]); ?>"
                                     >
-                                        <?php if (isset($component)) { $__componentOriginal14cbf6a08ae3fc068141590b309751c7 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal14cbf6a08ae3fc068141590b309751c7 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.reorder.handle','data' => ['class' => 
-                                                \Illuminate\Support\Arr::toCssClasses([
-                                                    'absolute top-3 right-3 rtl:right-auto rtl:left-3',
-                                                    'md:relative md:top-0 md:right-0 rtl:md:left-0' => ! $contentGrid,
-                                                    'hidden' => ! $isReordering,
-                                                ])
-                                            ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::reorder.handle'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
-                                                \Illuminate\Support\Arr::toCssClasses([
-                                                    'absolute top-3 right-3 rtl:right-auto rtl:left-3',
-                                                    'md:relative md:top-0 md:right-0 rtl:md:left-0' => ! $contentGrid,
-                                                    'hidden' => ! $isReordering,
-                                                ])
-                                            )]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal14cbf6a08ae3fc068141590b309751c7)): ?>
-<?php $attributes = $__attributesOriginal14cbf6a08ae3fc068141590b309751c7; ?>
-<?php unset($__attributesOriginal14cbf6a08ae3fc068141590b309751c7); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal14cbf6a08ae3fc068141590b309751c7)): ?>
-<?php $component = $__componentOriginal14cbf6a08ae3fc068141590b309751c7; ?>
-<?php unset($__componentOriginal14cbf6a08ae3fc068141590b309751c7); ?>
-<?php endif; ?>
+                                        <div class="flex-1">
+                                            <!--[if BLOCK]><![endif]--><?php if($recordUrl): ?>
+                                                <a
+                                                    <?php echo e(\Filament\Support\generate_href_html($recordUrl, $openRecordUrlInNewTab)); ?>
 
-                                        <?php if($isSelectionEnabled): ?>
-                                            <?php if (isset($component)) { $__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.checkbox.index','data' => ['xModel' => 'selectedRecords','value' => $recordKey,'label' => __('tables::table.fields.bulk_select_record.label', ['key' => $recordKey]),'class' => 
-                                                    \Illuminate\Support\Arr::toCssClasses([
-                                                        'filament-tables-record-checkbox absolute top-3 right-3 rtl:right-auto rtl:left-3',
-                                                        'md:relative md:top-0 md:right-0 rtl:md:left-0' => ! $contentGrid,
-                                                        'hidden' => $isReordering,
-                                                    ])
-                                                ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::checkbox'); ?>
+                                                    class="<?php echo e($recordContentClasses); ?>"
+                                                >
+                                                    <?php if (isset($component)) { $__componentOriginalb4a47f3f1d204ce572aba77586ad2030 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb4a47f3f1d204ce572aba77586ad2030 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.columns.layout','data' => ['components' => $columnsLayout,'record' => $record,'recordKey' => $recordKey,'rowLoop' => $loop]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::columns.layout'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['x-model' => 'selectedRecords','value' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordKey),'label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('tables::table.fields.bulk_select_record.label', ['key' => $recordKey])),'class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
-                                                    \Illuminate\Support\Arr::toCssClasses([
-                                                        'filament-tables-record-checkbox absolute top-3 right-3 rtl:right-auto rtl:left-3',
-                                                        'md:relative md:top-0 md:right-0 rtl:md:left-0' => ! $contentGrid,
-                                                        'hidden' => $isReordering,
-                                                    ])
-                                                )]); ?>
+<?php $component->withAttributes(['components' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columnsLayout),'record' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($record),'record-key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordKey),'row-loop' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($loop)]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409)): ?>
-<?php $attributes = $__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409; ?>
-<?php unset($__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409); ?>
+<?php if (isset($__attributesOriginalb4a47f3f1d204ce572aba77586ad2030)): ?>
+<?php $attributes = $__attributesOriginalb4a47f3f1d204ce572aba77586ad2030; ?>
+<?php unset($__attributesOriginalb4a47f3f1d204ce572aba77586ad2030); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409)): ?>
-<?php $component = $__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409; ?>
-<?php unset($__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409); ?>
+<?php if (isset($__componentOriginalb4a47f3f1d204ce572aba77586ad2030)): ?>
+<?php $component = $__componentOriginalb4a47f3f1d204ce572aba77586ad2030; ?>
+<?php unset($__componentOriginalb4a47f3f1d204ce572aba77586ad2030); ?>
 <?php endif; ?>
-                                        <?php endif; ?>
+                                                </a>
+                                            <?php elseif($recordAction): ?>
+                                                <?php
+                                                    $recordWireClickAction = $getAction($recordAction)
+                                                        ? "mountTableAction('{$recordAction}', '{$recordKey}')"
+                                                        : $recordWireClickAction = "{$recordAction}('{$recordKey}')";
+                                                ?>
 
-                                        <?php if($hasCollapsibleColumnsLayout): ?>
-                                            <div
-                                                class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                                                    'absolute right-1 rtl:left-1 rtl:right-auto',
-                                                    'top-10' => $isSelectionEnabled,
-                                                    'top-1' => ! $isSelectionEnabled,
-                                                    'md:relative md:right-0 md:top-0 rtl:md:left-0' => ! $contentGrid,
-                                                    'hidden' => $isReordering,
-                                                ]); ?>"
-                                            >
-                                                <?php if (isset($component)) { $__componentOriginalefe22f8cc3ec165cd36d597b30b8510b = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalefe22f8cc3ec165cd36d597b30b8510b = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.icon-button','data' => ['icon' => 'heroicon-s-chevron-down','color' => 'secondary','size' => 'sm','xOn:click' => 'isCollapsed = ! isCollapsed','xBind:class' => 'isCollapsed || \'-rotate-180\'','class' => 'transition']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::icon-button'); ?>
+                                                <button
+                                                    type="button"
+                                                    wire:click="<?php echo e($recordWireClickAction); ?>"
+                                                    wire:loading.attr="disabled"
+                                                    wire:target="<?php echo e($recordWireClickAction); ?>"
+                                                    class="<?php echo e($recordContentClasses); ?>"
+                                                >
+                                                    <?php if (isset($component)) { $__componentOriginalb4a47f3f1d204ce572aba77586ad2030 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb4a47f3f1d204ce572aba77586ad2030 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.columns.layout','data' => ['components' => $columnsLayout,'record' => $record,'recordKey' => $recordKey,'rowLoop' => $loop]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::columns.layout'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'heroicon-s-chevron-down','color' => 'secondary','size' => 'sm','x-on:click' => 'isCollapsed = ! isCollapsed','x-bind:class' => 'isCollapsed || \'-rotate-180\'','class' => 'transition']); ?>
+<?php $component->withAttributes(['components' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columnsLayout),'record' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($record),'record-key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordKey),'row-loop' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($loop)]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginalefe22f8cc3ec165cd36d597b30b8510b)): ?>
-<?php $attributes = $__attributesOriginalefe22f8cc3ec165cd36d597b30b8510b; ?>
-<?php unset($__attributesOriginalefe22f8cc3ec165cd36d597b30b8510b); ?>
+<?php if (isset($__attributesOriginalb4a47f3f1d204ce572aba77586ad2030)): ?>
+<?php $attributes = $__attributesOriginalb4a47f3f1d204ce572aba77586ad2030; ?>
+<?php unset($__attributesOriginalb4a47f3f1d204ce572aba77586ad2030); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginalefe22f8cc3ec165cd36d597b30b8510b)): ?>
-<?php $component = $__componentOriginalefe22f8cc3ec165cd36d597b30b8510b; ?>
-<?php unset($__componentOriginalefe22f8cc3ec165cd36d597b30b8510b); ?>
+<?php if (isset($__componentOriginalb4a47f3f1d204ce572aba77586ad2030)): ?>
+<?php $component = $__componentOriginalb4a47f3f1d204ce572aba77586ad2030; ?>
+<?php unset($__componentOriginalb4a47f3f1d204ce572aba77586ad2030); ?>
 <?php endif; ?>
-                                            </div>
-                                        <?php endif; ?>
+                                                </button>
+                                            <?php else: ?>
+                                                <div
+                                                    class="<?php echo e($recordContentClasses); ?>"
+                                                >
+                                                    <?php if (isset($component)) { $__componentOriginalb4a47f3f1d204ce572aba77586ad2030 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb4a47f3f1d204ce572aba77586ad2030 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.columns.layout','data' => ['components' => $columnsLayout,'record' => $record,'recordKey' => $recordKey,'rowLoop' => $loop]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::columns.layout'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['components' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columnsLayout),'record' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($record),'record-key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordKey),'row-loop' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($loop)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb4a47f3f1d204ce572aba77586ad2030)): ?>
+<?php $attributes = $__attributesOriginalb4a47f3f1d204ce572aba77586ad2030; ?>
+<?php unset($__attributesOriginalb4a47f3f1d204ce572aba77586ad2030); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb4a47f3f1d204ce572aba77586ad2030)): ?>
+<?php $component = $__componentOriginalb4a47f3f1d204ce572aba77586ad2030; ?>
+<?php unset($__componentOriginalb4a47f3f1d204ce572aba77586ad2030); ?>
+<?php endif; ?>
+                                                </div>
+                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-                                        <?php if($recordUrl): ?>
-                                            <a
-                                                href="<?php echo e($recordUrl); ?>"
-                                                class="filament-tables-record-url-link block flex-1 py-3"
-                                            >
-                                                <?php if (isset($component)) { $__componentOriginald1b6d0c0005f6495fd81d3884781d290 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginald1b6d0c0005f6495fd81d3884781d290 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.columns.layout','data' => ['components' => $getColumnsLayout(),'record' => $record,'recordKey' => $recordKey,'rowLoop' => $loop]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::columns.layout'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['components' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getColumnsLayout()),'record' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($record),'record-key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordKey),'row-loop' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($loop)]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginald1b6d0c0005f6495fd81d3884781d290)): ?>
-<?php $attributes = $__attributesOriginald1b6d0c0005f6495fd81d3884781d290; ?>
-<?php unset($__attributesOriginald1b6d0c0005f6495fd81d3884781d290); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginald1b6d0c0005f6495fd81d3884781d290)): ?>
-<?php $component = $__componentOriginald1b6d0c0005f6495fd81d3884781d290; ?>
-<?php unset($__componentOriginald1b6d0c0005f6495fd81d3884781d290); ?>
-<?php endif; ?>
-                                            </a>
-                                        <?php elseif($recordAction): ?>
-                                            <?php
-                                                if ($this->getCachedTableAction($recordAction)) {
-                                                    $recordWireClickAction = "mountTableAction('{$recordAction}', '{$recordKey}')";
-                                                } else {
-                                                    $recordWireClickAction = "{$recordAction}('{$recordKey}')";
-                                                }
-                                            ?>
+                                            <!--[if BLOCK]><![endif]--><?php if($hasCollapsibleColumnsLayout && (! $isReordering)): ?>
+                                                <div
+                                                    x-collapse
+                                                    x-show="! isCollapsed"
+                                                    class="<?php echo e($recordContentHorizontalPaddingClasses); ?> mt-3"
+                                                >
+                                                    <?php echo e($collapsibleColumnsLayout->viewData(['recordKey' => $recordKey])); ?>
 
-                                            <button
-                                                wire:click="<?php echo e($recordWireClickAction); ?>"
-                                                wire:target="<?php echo e($recordWireClickAction); ?>"
-                                                wire:loading.attr="disabled"
-                                                wire:loading.class="cursor-wait opacity-70"
-                                                type="button"
-                                                class="filament-tables-record-action-button block flex-1 py-3"
-                                            >
-                                                <?php if (isset($component)) { $__componentOriginald1b6d0c0005f6495fd81d3884781d290 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginald1b6d0c0005f6495fd81d3884781d290 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.columns.layout','data' => ['components' => $getColumnsLayout(),'record' => $record,'recordKey' => $recordKey,'rowLoop' => $loop]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::columns.layout'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['components' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getColumnsLayout()),'record' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($record),'record-key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordKey),'row-loop' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($loop)]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginald1b6d0c0005f6495fd81d3884781d290)): ?>
-<?php $attributes = $__attributesOriginald1b6d0c0005f6495fd81d3884781d290; ?>
-<?php unset($__attributesOriginald1b6d0c0005f6495fd81d3884781d290); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginald1b6d0c0005f6495fd81d3884781d290)): ?>
-<?php $component = $__componentOriginald1b6d0c0005f6495fd81d3884781d290; ?>
-<?php unset($__componentOriginald1b6d0c0005f6495fd81d3884781d290); ?>
-<?php endif; ?>
-                                            </button>
-                                        <?php else: ?>
-                                            <div class="flex-1 py-3">
-                                                <?php if (isset($component)) { $__componentOriginald1b6d0c0005f6495fd81d3884781d290 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginald1b6d0c0005f6495fd81d3884781d290 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.columns.layout','data' => ['components' => $getColumnsLayout(),'record' => $record,'recordKey' => $recordKey,'rowLoop' => $loop]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::columns.layout'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['components' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getColumnsLayout()),'record' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($record),'record-key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordKey),'row-loop' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($loop)]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginald1b6d0c0005f6495fd81d3884781d290)): ?>
-<?php $attributes = $__attributesOriginald1b6d0c0005f6495fd81d3884781d290; ?>
-<?php unset($__attributesOriginald1b6d0c0005f6495fd81d3884781d290); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginald1b6d0c0005f6495fd81d3884781d290)): ?>
-<?php $component = $__componentOriginald1b6d0c0005f6495fd81d3884781d290; ?>
-<?php unset($__componentOriginald1b6d0c0005f6495fd81d3884781d290); ?>
-<?php endif; ?>
-                                            </div>
-                                        <?php endif; ?>
+                                                </div>
+                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                        </div>
 
-                                        <?php if(count($actions)): ?>
-                                            <?php if (isset($component)) { $__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.actions.index','data' => ['actions' => $actions,'alignment' => $actionsPosition === ActionsPosition::AfterContent ? 'left' : 'left md:right','record' => $record,'wrap' => '-md','class' => 
-                                                    \Illuminate\Support\Arr::toCssClasses([
-                                                        'absolute bottom-1 right-1 rtl:right-auto rtl:left-1' => $actionsPosition === ActionsPosition::BottomCorner,
-                                                        'md:relative md:bottom-0 md:right-0 rtl:md:left-0' => $actionsPosition === ActionsPosition::BottomCorner && (! $contentGrid),
-                                                        'mb-3' => $actionsPosition === ActionsPosition::AfterContent,
-                                                        'md:mb-0' => $actionsPosition === ActionsPosition::AfterContent && (! $contentGrid),
-                                                        'hidden' => $isReordering,
-                                                    ])
-                                                ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::actions'); ?>
+                                        <!--[if BLOCK]><![endif]--><?php if($recordHasActions): ?>
+                                            <?php if (isset($component)) { $__componentOriginal32a2358b99de73a2a27625c392d6fe38 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal32a2358b99de73a2a27625c392d6fe38 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.actions','data' => ['actions' => $actions,'alignment' => (! $contentGrid) ? 'start md:end' : Alignment::Start,'record' => $record,'wrap' => '-sm','class' => $recordActionsClasses]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::actions'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actions),'alignment' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actionsPosition === ActionsPosition::AfterContent ? 'left' : 'left md:right'),'record' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($record),'wrap' => '-md','class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
-                                                    \Illuminate\Support\Arr::toCssClasses([
-                                                        'absolute bottom-1 right-1 rtl:right-auto rtl:left-1' => $actionsPosition === ActionsPosition::BottomCorner,
-                                                        'md:relative md:bottom-0 md:right-0 rtl:md:left-0' => $actionsPosition === ActionsPosition::BottomCorner && (! $contentGrid),
-                                                        'mb-3' => $actionsPosition === ActionsPosition::AfterContent,
-                                                        'md:mb-0' => $actionsPosition === ActionsPosition::AfterContent && (! $contentGrid),
-                                                        'hidden' => $isReordering,
-                                                    ])
-                                                )]); ?>
+<?php $component->withAttributes(['actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actions),'alignment' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute((! $contentGrid) ? 'start md:end' : Alignment::Start),'record' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($record),'wrap' => '-sm','class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordActionsClasses)]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94)): ?>
-<?php $attributes = $__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94; ?>
-<?php unset($__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94); ?>
+<?php if (isset($__attributesOriginal32a2358b99de73a2a27625c392d6fe38)): ?>
+<?php $attributes = $__attributesOriginal32a2358b99de73a2a27625c392d6fe38; ?>
+<?php unset($__attributesOriginal32a2358b99de73a2a27625c392d6fe38); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94)): ?>
-<?php $component = $__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94; ?>
-<?php unset($__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94); ?>
+<?php if (isset($__componentOriginal32a2358b99de73a2a27625c392d6fe38)): ?>
+<?php $component = $__componentOriginal32a2358b99de73a2a27625c392d6fe38; ?>
+<?php unset($__componentOriginal32a2358b99de73a2a27625c392d6fe38); ?>
 <?php endif; ?>
-                                        <?php endif; ?>
+                                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                     </div>
 
-                                    <?php if($hasCollapsibleColumnsLayout): ?>
-                                        <div
-                                            x-show="! isCollapsed"
-                                            x-collapse
-                                            x-cloak
-                                            class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                                                '-mx-2 pb-2',
-                                                'md:pl-20 rtl:md:pl-0 rtl:md:pr-20' => (! $contentGrid) && $isSelectionEnabled,
-                                                'md:pl-12 rtl:md:pl-0 rtl:md:pr-12' => (! $contentGrid) && (! $isSelectionEnabled),
-                                                'hidden' => $isReordering,
-                                            ]); ?>"
-                                        >
-                                            <?php echo e($collapsibleColumnsLayout->viewData(['recordKey' => $recordKey])); ?>
-
-                                        </div>
-                                    <?php endif; ?>
+                                    <!--[if BLOCK]><![endif]--><?php if($isRecordCollapsible): ?>
+                                        <?php if (isset($component)) { $__componentOriginalf0029cce6d19fd6d472097ff06a800a1 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf0029cce6d19fd6d472097ff06a800a1 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.icon-button','data' => ['color' => 'gray','iconAlias' => 'tables::columns.collapse-button','icon' => 'heroicon-m-chevron-down','xOn:click' => 'isCollapsed = ! isCollapsed','class' => 'mx-1 my-2 shrink-0','xBind:class' => '{ \'rotate-180\': isCollapsed }']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament::icon-button'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['color' => 'gray','icon-alias' => 'tables::columns.collapse-button','icon' => 'heroicon-m-chevron-down','x-on:click' => 'isCollapsed = ! isCollapsed','class' => 'mx-1 my-2 shrink-0','x-bind:class' => '{ \'rotate-180\': isCollapsed }']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf0029cce6d19fd6d472097ff06a800a1)): ?>
+<?php $attributes = $__attributesOriginalf0029cce6d19fd6d472097ff06a800a1; ?>
+<?php unset($__attributesOriginalf0029cce6d19fd6d472097ff06a800a1); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf0029cce6d19fd6d472097ff06a800a1)): ?>
+<?php $component = $__componentOriginalf0029cce6d19fd6d472097ff06a800a1; ?>
+<?php unset($__componentOriginalf0029cce6d19fd6d472097ff06a800a1); ?>
+<?php endif; ?>
+                                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                 </div>
                             </div>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                            <?php
+                                $previousRecordGroupKey = $recordGroupKey;
+                                $previousRecordGroupTitle = $recordGroupTitle;
+                                $previousRecord = $record;
+                            ?>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+
+                        <?php if($hasSummary && (! $isReordering) && filled($previousRecordGroupTitle) && ((! $records instanceof \Illuminate\Contracts\Pagination\Paginator) || (! $records->hasMorePages()))): ?>
+                            <?php if (isset($component)) { $__componentOriginalce46e569391542b4e56f032ac7380f79 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalce46e569391542b4e56f032ac7380f79 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.table','data' => ['class' => 'col-span-full']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::table'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'col-span-full']); ?>
+                                <?php if (isset($component)) { $__componentOriginala3ad14087ab6b316cf1e1d1a634acbeb = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginala3ad14087ab6b316cf1e1d1a634acbeb = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.summary.row','data' => ['columns' => $columns,'extraHeadingColumn' => true,'heading' => __('filament-tables::table.summary.subheadings.group', ['group' => $previousRecordGroupTitle, 'label' => $pluralModelLabel]),'placeholderColumns' => false,'query' => $group->scopeQuery($this->getAllTableSummaryQuery(), $previousRecord),'selectedState' => $groupedSummarySelectedState[$previousRecordGroupKey] ?? []]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::summary.row'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['columns' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columns),'extra-heading-column' => true,'heading' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('filament-tables::table.summary.subheadings.group', ['group' => $previousRecordGroupTitle, 'label' => $pluralModelLabel])),'placeholder-columns' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(false),'query' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($group->scopeQuery($this->getAllTableSummaryQuery(), $previousRecord)),'selected-state' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($groupedSummarySelectedState[$previousRecordGroupKey] ?? [])]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginala3ad14087ab6b316cf1e1d1a634acbeb)): ?>
+<?php $attributes = $__attributesOriginala3ad14087ab6b316cf1e1d1a634acbeb; ?>
+<?php unset($__attributesOriginala3ad14087ab6b316cf1e1d1a634acbeb); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginala3ad14087ab6b316cf1e1d1a634acbeb)): ?>
+<?php $component = $__componentOriginala3ad14087ab6b316cf1e1d1a634acbeb; ?>
+<?php unset($__componentOriginala3ad14087ab6b316cf1e1d1a634acbeb); ?>
+<?php endif; ?>
+                             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalce46e569391542b4e56f032ac7380f79)): ?>
+<?php $attributes = $__attributesOriginalce46e569391542b4e56f032ac7380f79; ?>
+<?php unset($__attributesOriginalce46e569391542b4e56f032ac7380f79); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalce46e569391542b4e56f032ac7380f79)): ?>
+<?php $component = $__componentOriginalce46e569391542b4e56f032ac7380f79; ?>
+<?php unset($__componentOriginalce46e569391542b4e56f032ac7380f79); ?>
+<?php endif; ?>
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                      <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal619b5702a4dba2316335176c43ec06a2)): ?>
-<?php $attributes = $__attributesOriginal619b5702a4dba2316335176c43ec06a2; ?>
-<?php unset($__attributesOriginal619b5702a4dba2316335176c43ec06a2); ?>
+<?php if (isset($__attributesOriginal30dbd75eb120a380110a2b340cd88f46)): ?>
+<?php $attributes = $__attributesOriginal30dbd75eb120a380110a2b340cd88f46; ?>
+<?php unset($__attributesOriginal30dbd75eb120a380110a2b340cd88f46); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal619b5702a4dba2316335176c43ec06a2)): ?>
-<?php $component = $__componentOriginal619b5702a4dba2316335176c43ec06a2; ?>
-<?php unset($__componentOriginal619b5702a4dba2316335176c43ec06a2); ?>
+<?php if (isset($__componentOriginal30dbd75eb120a380110a2b340cd88f46)): ?>
+<?php $component = $__componentOriginal30dbd75eb120a380110a2b340cd88f46; ?>
+<?php unset($__componentOriginal30dbd75eb120a380110a2b340cd88f46); ?>
 <?php endif; ?>
-                <?php endif; ?>
+                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
                 <?php if(($content || $hasColumnsLayout) && $contentFooter): ?>
-                    <?php echo e($contentFooter->with(['columns' => $columns, 'records' => $records])); ?>
+                    <?php echo e($contentFooter->with([
+                            'columns' => $columns,
+                            'records' => $records,
+                        ])); ?>
 
-                <?php endif; ?>
-            <?php elseif(($records !== null) && count($records)): ?>
-                <?php if (isset($component)) { $__componentOriginale8791752ab9231dc4280afc867183d68 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginale8791752ab9231dc4280afc867183d68 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.table','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::table'); ?>
+                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                <?php if($hasSummary && (! $isReordering)): ?>
+                    <?php if (isset($component)) { $__componentOriginalce46e569391542b4e56f032ac7380f79 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalce46e569391542b4e56f032ac7380f79 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.table','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::table'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
+                        <?php if (isset($component)) { $__componentOriginala8bb2de295dfa9cddf00151a9ea585e7 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginala8bb2de295dfa9cddf00151a9ea585e7 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.summary.index','data' => ['columns' => $columns,'extraHeadingColumn' => true,'placeholderColumns' => false,'pluralModelLabel' => $pluralModelLabel,'records' => $records]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::summary'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['columns' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columns),'extra-heading-column' => true,'placeholder-columns' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(false),'plural-model-label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($pluralModelLabel),'records' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($records)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginala8bb2de295dfa9cddf00151a9ea585e7)): ?>
+<?php $attributes = $__attributesOriginala8bb2de295dfa9cddf00151a9ea585e7; ?>
+<?php unset($__attributesOriginala8bb2de295dfa9cddf00151a9ea585e7); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginala8bb2de295dfa9cddf00151a9ea585e7)): ?>
+<?php $component = $__componentOriginala8bb2de295dfa9cddf00151a9ea585e7; ?>
+<?php unset($__componentOriginala8bb2de295dfa9cddf00151a9ea585e7); ?>
+<?php endif; ?>
+                     <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalce46e569391542b4e56f032ac7380f79)): ?>
+<?php $attributes = $__attributesOriginalce46e569391542b4e56f032ac7380f79; ?>
+<?php unset($__attributesOriginalce46e569391542b4e56f032ac7380f79); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalce46e569391542b4e56f032ac7380f79)): ?>
+<?php $component = $__componentOriginalce46e569391542b4e56f032ac7380f79; ?>
+<?php unset($__componentOriginalce46e569391542b4e56f032ac7380f79); ?>
+<?php endif; ?>
+                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+            <?php elseif(($records !== null) && count($records)): ?>
+                <?php if (isset($component)) { $__componentOriginalce46e569391542b4e56f032ac7380f79 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalce46e569391542b4e56f032ac7380f79 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.table','data' => ['reorderable' => $isReorderable,'reorderAnimationDuration' => $getReorderAnimationDuration()]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::table'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['reorderable' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isReorderable),'reorder-animation-duration' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getReorderAnimationDuration())]); ?>
+                    <!--[if BLOCK]><![endif]--><?php if($hasColumnGroups): ?>
+                         <?php $__env->slot('headerGroups', null, []); ?> 
+                            <!--[if BLOCK]><![endif]--><?php if($isReordering): ?>
+                                <th></th>
+                            <?php else: ?>
+                                <!--[if BLOCK]><![endif]--><?php if(count($actions) && in_array($actionsPosition, [ActionsPosition::BeforeCells, ActionsPosition::BeforeColumns])): ?>
+                                    <th></th>
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                                <!--[if BLOCK]><![endif]--><?php if($isSelectionEnabled && $recordCheckboxPosition === RecordCheckboxPosition::BeforeCells): ?>
+                                    <th></th>
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                            <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $columnsLayout; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $columnGroup): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <!--[if BLOCK]><![endif]--><?php if($columnGroup instanceof Column): ?>
+                                    <!--[if BLOCK]><![endif]--><?php if($columnGroup->isVisible() && (! $columnGroup->isToggledHidden())): ?>
+                                        <th></th>
+                                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                <?php elseif($columnGroup instanceof ColumnGroup): ?>
+                                    <?php
+                                        $columnGroupAlignment = $columnGroup->getAlignment();
+                                        $columnGroupColumnsCount = count($columnGroup->getVisibleColumns());
+                                        $isColumnGroupHeaderWrapped = $columnGroup->isHeaderWrapped();
+                                    ?>
+
+                                    <!--[if BLOCK]><![endif]--><?php if($columnGroupColumnsCount): ?>
+                                        <th
+                                            colspan="<?php echo e($columnGroupColumnsCount); ?>"
+                                            <?php echo e($columnGroup->getExtraHeaderAttributeBag()->class([
+                                                    'fi-table-header-group-cell border-gray-200 px-3 py-2 dark:border-white/5 sm:first-of-type:ps-6 sm:last-of-type:pe-6 [&:not(:first-of-type)]:border-s [&:not(:last-of-type)]:border-e',
+                                                ])); ?>
+
+                                        >
+                                            <div
+                                                class="<?php echo \Illuminate\Support\Arr::toCssClasses([
+                                                    'flex w-full items-center',
+                                                    'whitespace-nowrap' => ! $isColumnGroupHeaderWrapped,
+                                                    'whitespace-normal' => $isColumnGroupHeaderWrapped,
+                                                    match ($columnGroupAlignment) {
+                                                        Alignment::Start => 'justify-start',
+                                                        Alignment::Center => 'justify-center',
+                                                        Alignment::End => 'justify-end',
+                                                        Alignment::Left => 'justify-start rtl:flex-row-reverse',
+                                                        Alignment::Right => 'justify-end rtl:flex-row-reverse',
+                                                        Alignment::Justify, Alignment::Between => 'justify-between',
+                                                        default => $columnGroupAlignment,
+                                                    },
+                                                    $getHiddenClasses($columnGroup),
+                                                ]); ?>"
+                                            >
+                                                <span
+                                                    class="text-sm font-semibold text-gray-950 dark:text-white"
+                                                >
+                                                    <?php echo e($columnGroup->getLabel()); ?>
+
+                                                </span>
+                                            </div>
+                                        </th>
+                                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+
+                            <!--[if BLOCK]><![endif]--><?php if(! $isReordering): ?>
+                                <?php if(count($actions) && in_array($actionsPosition, [ActionsPosition::AfterColumns, ActionsPosition::AfterCells])): ?>
+                                    <th></th>
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                                <!--[if BLOCK]><![endif]--><?php if($isSelectionEnabled && $recordCheckboxPosition === RecordCheckboxPosition::AfterCells): ?>
+                                    <th></th>
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                         <?php $__env->endSlot(); ?>
+                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
                      <?php $__env->slot('header', null, []); ?> 
-                        <?php if($isReordering): ?>
+                        <!--[if BLOCK]><![endif]--><?php if($isReordering): ?>
                             <th></th>
                         <?php else: ?>
                             <?php if(count($actions) && $actionsPosition === ActionsPosition::BeforeCells): ?>
-                                <?php if($actionsColumnLabel): ?>
-                                    <?php if (isset($component)) { $__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.header-cell','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::header-cell'); ?>
+                                <!--[if BLOCK]><![endif]--><?php if($actionsColumnLabel): ?>
+                                    <?php if (isset($component)) { $__componentOriginalc946417715b60679750e91f5abf4cc2e = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalc946417715b60679750e91f5abf4cc2e = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.header-cell','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::header-cell'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
@@ -1108,34 +1293,34 @@
 
                                      <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b)): ?>
-<?php $attributes = $__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b; ?>
-<?php unset($__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b); ?>
+<?php if (isset($__attributesOriginalc946417715b60679750e91f5abf4cc2e)): ?>
+<?php $attributes = $__attributesOriginalc946417715b60679750e91f5abf4cc2e; ?>
+<?php unset($__attributesOriginalc946417715b60679750e91f5abf4cc2e); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b)): ?>
-<?php $component = $__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b; ?>
-<?php unset($__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b); ?>
+<?php if (isset($__componentOriginalc946417715b60679750e91f5abf4cc2e)): ?>
+<?php $component = $__componentOriginalc946417715b60679750e91f5abf4cc2e; ?>
+<?php unset($__componentOriginalc946417715b60679750e91f5abf4cc2e); ?>
 <?php endif; ?>
                                 <?php else: ?>
-                                    <th class="w-5"></th>
-                                <?php endif; ?>
-                            <?php endif; ?>
+                                    <th class="w-1"></th>
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-                            <?php if($isSelectionEnabled && $recordCheckboxPosition === RecordCheckboxPosition::BeforeCells): ?>
-                                <?php if (isset($component)) { $__componentOriginalc41e0c64e80f29562171958a154e5195 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalc41e0c64e80f29562171958a154e5195 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.checkbox.cell','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::checkbox.cell'); ?>
+                            <!--[if BLOCK]><![endif]--><?php if($isSelectionEnabled && $recordCheckboxPosition === RecordCheckboxPosition::BeforeCells): ?>
+                                <?php if (isset($component)) { $__componentOriginal07ac246849ddb88fbe4391e1bdc4df73 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal07ac246849ddb88fbe4391e1bdc4df73 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.selection.cell','data' => ['tag' => 'th']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::selection.cell'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes([]); ?>
-                                    <?php if (isset($component)) { $__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.checkbox.index','data' => ['label' => __('tables::table.fields.bulk_select_page.label'),'xOn:click' => 'toggleSelectRecordsOnPage','xBind:checked' => '
-                                            let recordsOnPage = getRecordsOnPage()
+<?php $component->withAttributes(['tag' => 'th']); ?>
+                                    <?php if (isset($component)) { $__componentOriginal36f68fca2c6625d1435d035c49146213 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal36f68fca2c6625d1435d035c49146213 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.selection.checkbox','data' => ['wire:key' => $this->getId() . '.table.bulk-select-page.checkbox.' . Str::random(),'label' => __('filament-tables::table.fields.bulk_select_page.label'),'xBind:checked' => '
+                                            const recordsOnPage = getRecordsOnPage()
 
                                             if (recordsOnPage.length && areRecordsSelected(recordsOnPage)) {
                                                 $el.checked = true
@@ -1146,15 +1331,15 @@
                                             $el.checked = false
 
                                             return null
-                                        ']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::checkbox'); ?>
+                                        ','xOn:click' => 'toggleSelectRecordsOnPage']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::selection.checkbox'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('tables::table.fields.bulk_select_page.label')),'x-on:click' => 'toggleSelectRecordsOnPage','x-bind:checked' => '
-                                            let recordsOnPage = getRecordsOnPage()
+<?php $component->withAttributes(['wire:key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($this->getId() . '.table.bulk-select-page.checkbox.' . Str::random()),'label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('filament-tables::table.fields.bulk_select_page.label')),'x-bind:checked' => '
+                                            const recordsOnPage = getRecordsOnPage()
 
                                             if (recordsOnPage.length && areRecordsSelected(recordsOnPage)) {
                                                 $el.checked = true
@@ -1165,35 +1350,35 @@
                                             $el.checked = false
 
                                             return null
-                                        ']); ?>
+                                        ','x-on:click' => 'toggleSelectRecordsOnPage']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409)): ?>
-<?php $attributes = $__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409; ?>
-<?php unset($__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409); ?>
+<?php if (isset($__attributesOriginal36f68fca2c6625d1435d035c49146213)): ?>
+<?php $attributes = $__attributesOriginal36f68fca2c6625d1435d035c49146213; ?>
+<?php unset($__attributesOriginal36f68fca2c6625d1435d035c49146213); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409)): ?>
-<?php $component = $__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409; ?>
-<?php unset($__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409); ?>
+<?php if (isset($__componentOriginal36f68fca2c6625d1435d035c49146213)): ?>
+<?php $component = $__componentOriginal36f68fca2c6625d1435d035c49146213; ?>
+<?php unset($__componentOriginal36f68fca2c6625d1435d035c49146213); ?>
 <?php endif; ?>
                                  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginalc41e0c64e80f29562171958a154e5195)): ?>
-<?php $attributes = $__attributesOriginalc41e0c64e80f29562171958a154e5195; ?>
-<?php unset($__attributesOriginalc41e0c64e80f29562171958a154e5195); ?>
+<?php if (isset($__attributesOriginal07ac246849ddb88fbe4391e1bdc4df73)): ?>
+<?php $attributes = $__attributesOriginal07ac246849ddb88fbe4391e1bdc4df73; ?>
+<?php unset($__attributesOriginal07ac246849ddb88fbe4391e1bdc4df73); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginalc41e0c64e80f29562171958a154e5195)): ?>
-<?php $component = $__componentOriginalc41e0c64e80f29562171958a154e5195; ?>
-<?php unset($__componentOriginalc41e0c64e80f29562171958a154e5195); ?>
+<?php if (isset($__componentOriginal07ac246849ddb88fbe4391e1bdc4df73)): ?>
+<?php $component = $__componentOriginal07ac246849ddb88fbe4391e1bdc4df73; ?>
+<?php unset($__componentOriginal07ac246849ddb88fbe4391e1bdc4df73); ?>
 <?php endif; ?>
-                            <?php endif; ?>
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
                             <?php if(count($actions) && $actionsPosition === ActionsPosition::BeforeColumns): ?>
-                                <?php if($actionsColumnLabel): ?>
-                                    <?php if (isset($component)) { $__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.header-cell','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::header-cell'); ?>
+                                <!--[if BLOCK]><![endif]--><?php if($actionsColumnLabel): ?>
+                                    <?php if (isset($component)) { $__componentOriginalc946417715b60679750e91f5abf4cc2e = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalc946417715b60679750e91f5abf4cc2e = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.header-cell','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::header-cell'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
@@ -1204,90 +1389,116 @@
 
                                      <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b)): ?>
-<?php $attributes = $__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b; ?>
-<?php unset($__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b); ?>
+<?php if (isset($__attributesOriginalc946417715b60679750e91f5abf4cc2e)): ?>
+<?php $attributes = $__attributesOriginalc946417715b60679750e91f5abf4cc2e; ?>
+<?php unset($__attributesOriginalc946417715b60679750e91f5abf4cc2e); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b)): ?>
-<?php $component = $__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b; ?>
-<?php unset($__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b); ?>
+<?php if (isset($__componentOriginalc946417715b60679750e91f5abf4cc2e)): ?>
+<?php $component = $__componentOriginalc946417715b60679750e91f5abf4cc2e; ?>
+<?php unset($__componentOriginalc946417715b60679750e91f5abf4cc2e); ?>
 <?php endif; ?>
                                 <?php else: ?>
-                                    <th class="w-5"></th>
-                                <?php endif; ?>
-                            <?php endif; ?>
-                        <?php endif; ?>
+                                    <th class="w-1"></th>
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-                        <?php $__currentLoopData = $columns; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $column): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <?php if (isset($component)) { $__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.header-cell','data' => ['extraAttributes' => $column->getExtraHeaderAttributes(),'isSortColumn' => $getSortColumn() === $column->getName(),'name' => $column->getName(),'alignment' => $column->getAlignment(),'sortable' => $column->isSortable() && (! $isReordering),'sortDirection' => $getSortDirection(),'class' => 'filament-table-header-cell-'.e(\Illuminate\Support\Str::of($column->getName())->camel()->kebab()).' '.e($getHiddenClasses($column)).'']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::header-cell'); ?>
+                        <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $columns; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $column): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php
+                                $columnWidth = $column->getWidth();
+                            ?>
+
+                            <?php if (isset($component)) { $__componentOriginalc946417715b60679750e91f5abf4cc2e = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalc946417715b60679750e91f5abf4cc2e = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.header-cell','data' => ['activelySorted' => $getSortColumn() === $column->getName(),'alignment' => $column->getAlignment(),'name' => $column->getName(),'sortable' => $column->isSortable() && (! $isReordering),'sortDirection' => $getSortDirection(),'wrap' => $column->isHeaderWrapped(),'attributes' => 
+                                    \Filament\Support\prepare_inherited_attributes($column->getExtraHeaderAttributeBag())
+                                        ->class([
+                                            'fi-table-header-cell-' . str($column->getName())->camel()->kebab(),
+                                            'w-full' => blank($columnWidth) && $column->canGrow(default: false),
+                                            '[&:not(:first-of-type)]:border-s [&:not(:last-of-type)]:border-e border-gray-200 dark:border-white/5' => $column->getGroup(),
+                                            $getHiddenClasses($column),
+                                        ])
+                                        ->style([
+                                            ('width: ' . $columnWidth) => filled($columnWidth),
+                                        ])
+                                ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::header-cell'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['extra-attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($column->getExtraHeaderAttributes()),'is-sort-column' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getSortColumn() === $column->getName()),'name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($column->getName()),'alignment' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($column->getAlignment()),'sortable' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($column->isSortable() && (! $isReordering)),'sort-direction' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getSortDirection()),'class' => 'filament-table-header-cell-'.e(\Illuminate\Support\Str::of($column->getName())->camel()->kebab()).' '.e($getHiddenClasses($column)).'']); ?>
+<?php $component->withAttributes(['actively-sorted' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getSortColumn() === $column->getName()),'alignment' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($column->getAlignment()),'name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($column->getName()),'sortable' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($column->isSortable() && (! $isReordering)),'sort-direction' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getSortDirection()),'wrap' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($column->isHeaderWrapped()),'attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
+                                    \Filament\Support\prepare_inherited_attributes($column->getExtraHeaderAttributeBag())
+                                        ->class([
+                                            'fi-table-header-cell-' . str($column->getName())->camel()->kebab(),
+                                            'w-full' => blank($columnWidth) && $column->canGrow(default: false),
+                                            '[&:not(:first-of-type)]:border-s [&:not(:last-of-type)]:border-e border-gray-200 dark:border-white/5' => $column->getGroup(),
+                                            $getHiddenClasses($column),
+                                        ])
+                                        ->style([
+                                            ('width: ' . $columnWidth) => filled($columnWidth),
+                                        ])
+                                )]); ?>
                                 <?php echo e($column->getLabel()); ?>
 
                              <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b)): ?>
-<?php $attributes = $__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b; ?>
-<?php unset($__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b); ?>
+<?php if (isset($__attributesOriginalc946417715b60679750e91f5abf4cc2e)): ?>
+<?php $attributes = $__attributesOriginalc946417715b60679750e91f5abf4cc2e; ?>
+<?php unset($__attributesOriginalc946417715b60679750e91f5abf4cc2e); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b)): ?>
-<?php $component = $__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b; ?>
-<?php unset($__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b); ?>
+<?php if (isset($__componentOriginalc946417715b60679750e91f5abf4cc2e)): ?>
+<?php $component = $__componentOriginalc946417715b60679750e91f5abf4cc2e; ?>
+<?php unset($__componentOriginalc946417715b60679750e91f5abf4cc2e); ?>
 <?php endif; ?>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
 
-                        <?php if(! $isReordering): ?>
+                        <!--[if BLOCK]><![endif]--><?php if(! $isReordering): ?>
                             <?php if(count($actions) && $actionsPosition === ActionsPosition::AfterColumns): ?>
-                                <?php if($actionsColumnLabel): ?>
-                                    <?php if (isset($component)) { $__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.header-cell','data' => ['alignment' => 'right']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::header-cell'); ?>
+                                <!--[if BLOCK]><![endif]--><?php if($actionsColumnLabel): ?>
+                                    <?php if (isset($component)) { $__componentOriginalc946417715b60679750e91f5abf4cc2e = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalc946417715b60679750e91f5abf4cc2e = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.header-cell','data' => ['alignment' => Alignment::Right]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::header-cell'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['alignment' => 'right']); ?>
+<?php $component->withAttributes(['alignment' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(Alignment::Right)]); ?>
                                         <?php echo e($actionsColumnLabel); ?>
 
                                      <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b)): ?>
-<?php $attributes = $__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b; ?>
-<?php unset($__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b); ?>
+<?php if (isset($__attributesOriginalc946417715b60679750e91f5abf4cc2e)): ?>
+<?php $attributes = $__attributesOriginalc946417715b60679750e91f5abf4cc2e; ?>
+<?php unset($__attributesOriginalc946417715b60679750e91f5abf4cc2e); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b)): ?>
-<?php $component = $__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b; ?>
-<?php unset($__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b); ?>
+<?php if (isset($__componentOriginalc946417715b60679750e91f5abf4cc2e)): ?>
+<?php $component = $__componentOriginalc946417715b60679750e91f5abf4cc2e; ?>
+<?php unset($__componentOriginalc946417715b60679750e91f5abf4cc2e); ?>
 <?php endif; ?>
                                 <?php else: ?>
-                                    <th class="w-5"></th>
-                                <?php endif; ?>
-                            <?php endif; ?>
+                                    <th class="w-1"></th>
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-                            <?php if($isSelectionEnabled && $recordCheckboxPosition === RecordCheckboxPosition::AfterCells): ?>
-                                <?php if (isset($component)) { $__componentOriginalc41e0c64e80f29562171958a154e5195 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalc41e0c64e80f29562171958a154e5195 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.checkbox.cell','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::checkbox.cell'); ?>
+                            <!--[if BLOCK]><![endif]--><?php if($isSelectionEnabled && $recordCheckboxPosition === RecordCheckboxPosition::AfterCells): ?>
+                                <?php if (isset($component)) { $__componentOriginal07ac246849ddb88fbe4391e1bdc4df73 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal07ac246849ddb88fbe4391e1bdc4df73 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.selection.cell','data' => ['tag' => 'th']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::selection.cell'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes([]); ?>
-                                    <?php if (isset($component)) { $__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.checkbox.index','data' => ['label' => __('tables::table.fields.bulk_select_page.label'),'xOn:click' => 'toggleSelectRecordsOnPage','xBind:checked' => '
-                                            let recordsOnPage = getRecordsOnPage()
+<?php $component->withAttributes(['tag' => 'th']); ?>
+                                    <?php if (isset($component)) { $__componentOriginal36f68fca2c6625d1435d035c49146213 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal36f68fca2c6625d1435d035c49146213 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.selection.checkbox','data' => ['wire:key' => $this->getId() . '.table.bulk-select-page.checkbox.' . Str::random(),'label' => __('filament-tables::table.fields.bulk_select_page.label'),'xBind:checked' => '
+                                            const recordsOnPage = getRecordsOnPage()
 
                                             if (recordsOnPage.length && areRecordsSelected(recordsOnPage)) {
                                                 $el.checked = true
@@ -1298,15 +1509,15 @@
                                             $el.checked = false
 
                                             return null
-                                        ']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::checkbox'); ?>
+                                        ','xOn:click' => 'toggleSelectRecordsOnPage']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::selection.checkbox'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('tables::table.fields.bulk_select_page.label')),'x-on:click' => 'toggleSelectRecordsOnPage','x-bind:checked' => '
-                                            let recordsOnPage = getRecordsOnPage()
+<?php $component->withAttributes(['wire:key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($this->getId() . '.table.bulk-select-page.checkbox.' . Str::random()),'label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('filament-tables::table.fields.bulk_select_page.label')),'x-bind:checked' => '
+                                            const recordsOnPage = getRecordsOnPage()
 
                                             if (recordsOnPage.length && areRecordsSelected(recordsOnPage)) {
                                                 $el.checked = true
@@ -1317,208 +1528,390 @@
                                             $el.checked = false
 
                                             return null
-                                        ']); ?>
+                                        ','x-on:click' => 'toggleSelectRecordsOnPage']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409)): ?>
-<?php $attributes = $__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409; ?>
-<?php unset($__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409); ?>
+<?php if (isset($__attributesOriginal36f68fca2c6625d1435d035c49146213)): ?>
+<?php $attributes = $__attributesOriginal36f68fca2c6625d1435d035c49146213; ?>
+<?php unset($__attributesOriginal36f68fca2c6625d1435d035c49146213); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409)): ?>
-<?php $component = $__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409; ?>
-<?php unset($__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409); ?>
+<?php if (isset($__componentOriginal36f68fca2c6625d1435d035c49146213)): ?>
+<?php $component = $__componentOriginal36f68fca2c6625d1435d035c49146213; ?>
+<?php unset($__componentOriginal36f68fca2c6625d1435d035c49146213); ?>
 <?php endif; ?>
                                  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginalc41e0c64e80f29562171958a154e5195)): ?>
-<?php $attributes = $__attributesOriginalc41e0c64e80f29562171958a154e5195; ?>
-<?php unset($__attributesOriginalc41e0c64e80f29562171958a154e5195); ?>
+<?php if (isset($__attributesOriginal07ac246849ddb88fbe4391e1bdc4df73)): ?>
+<?php $attributes = $__attributesOriginal07ac246849ddb88fbe4391e1bdc4df73; ?>
+<?php unset($__attributesOriginal07ac246849ddb88fbe4391e1bdc4df73); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginalc41e0c64e80f29562171958a154e5195)): ?>
-<?php $component = $__componentOriginalc41e0c64e80f29562171958a154e5195; ?>
-<?php unset($__componentOriginalc41e0c64e80f29562171958a154e5195); ?>
+<?php if (isset($__componentOriginal07ac246849ddb88fbe4391e1bdc4df73)): ?>
+<?php $component = $__componentOriginal07ac246849ddb88fbe4391e1bdc4df73; ?>
+<?php unset($__componentOriginal07ac246849ddb88fbe4391e1bdc4df73); ?>
 <?php endif; ?>
-                            <?php endif; ?>
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
                             <?php if(count($actions) && $actionsPosition === ActionsPosition::AfterCells): ?>
-                                <?php if($actionsColumnLabel): ?>
-                                    <?php if (isset($component)) { $__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.header-cell','data' => ['alignment' => 'right']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::header-cell'); ?>
+                                <!--[if BLOCK]><![endif]--><?php if($actionsColumnLabel): ?>
+                                    <?php if (isset($component)) { $__componentOriginalc946417715b60679750e91f5abf4cc2e = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalc946417715b60679750e91f5abf4cc2e = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.header-cell','data' => ['alignment' => Alignment::Right]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::header-cell'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['alignment' => 'right']); ?>
+<?php $component->withAttributes(['alignment' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(Alignment::Right)]); ?>
                                         <?php echo e($actionsColumnLabel); ?>
 
                                      <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b)): ?>
-<?php $attributes = $__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b; ?>
-<?php unset($__attributesOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b); ?>
+<?php if (isset($__attributesOriginalc946417715b60679750e91f5abf4cc2e)): ?>
+<?php $attributes = $__attributesOriginalc946417715b60679750e91f5abf4cc2e; ?>
+<?php unset($__attributesOriginalc946417715b60679750e91f5abf4cc2e); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b)): ?>
-<?php $component = $__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b; ?>
-<?php unset($__componentOriginal8ce2b21d94be4b2ac32ad24ff6dfc93b); ?>
+<?php if (isset($__componentOriginalc946417715b60679750e91f5abf4cc2e)): ?>
+<?php $component = $__componentOriginalc946417715b60679750e91f5abf4cc2e; ?>
+<?php unset($__componentOriginalc946417715b60679750e91f5abf4cc2e); ?>
 <?php endif; ?>
                                 <?php else: ?>
-                                    <th class="w-5"></th>
-                                <?php endif; ?>
-                            <?php endif; ?>
-                        <?php endif; ?>
+                                    <th class="w-1"></th>
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                      <?php $__env->endSlot(); ?>
 
-                    <?php if($isColumnSearchVisible): ?>
-                        <?php if (isset($component)) { $__componentOriginal919ddf55d1edf7e6d8ca3bedc1e9b76c = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal919ddf55d1edf7e6d8ca3bedc1e9b76c = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.row','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::row'); ?>
+                    <!--[if BLOCK]><![endif]--><?php if($isColumnSearchVisible): ?>
+                        <?php if (isset($component)) { $__componentOriginalb06932e913f01497313cb0ed448cecad = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb06932e913f01497313cb0ed448cecad = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.row','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::row'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
-                            <?php if($isReordering): ?>
+                            <!--[if BLOCK]><![endif]--><?php if($isReordering): ?>
                                 <td></td>
                             <?php else: ?>
-                                <?php if(count($actions) && in_array($actionsPosition, [ActionsPosition::BeforeCells, ActionsPosition::BeforeColumns])): ?>
+                                <!--[if BLOCK]><![endif]--><?php if(count($actions) && in_array($actionsPosition, [ActionsPosition::BeforeCells, ActionsPosition::BeforeColumns])): ?>
                                     <td></td>
-                                <?php endif; ?>
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-                                <?php if($isSelectionEnabled && $recordCheckboxPosition === RecordCheckboxPosition::BeforeCells): ?>
+                                <!--[if BLOCK]><![endif]--><?php if($isSelectionEnabled && $recordCheckboxPosition === RecordCheckboxPosition::BeforeCells): ?>
                                     <td></td>
-                                <?php endif; ?>
-                            <?php endif; ?>
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-                            <?php $__currentLoopData = $columns; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $column): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <?php if (isset($component)) { $__componentOriginalfb906351acaa93ff5a874f5e70fd8ff6 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalfb906351acaa93ff5a874f5e70fd8ff6 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.cell','data' => ['class' => 'filament-table-individual-search-cell-'.e(\Illuminate\Support\Str::of($column->getName())->camel()->kebab()).' px-4 py-1']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::cell'); ?>
+                            <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $columns; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $column): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php if (isset($component)) { $__componentOriginal0582040fe960eff09c1461f7f86a8187 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal0582040fe960eff09c1461f7f86a8187 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.cell','data' => ['class' => \Illuminate\Support\Arr::toCssClasses([
+                                        'fi-table-individual-search-cell-' . str($column->getName())->camel()->kebab(),
+                                        'px-3 py-2',
+                                    ])]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::cell'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['class' => 'filament-table-individual-search-cell-'.e(\Illuminate\Support\Str::of($column->getName())->camel()->kebab()).' px-4 py-1']); ?>
-                                    <?php if($column->isIndividuallySearchable()): ?>
-                                        <?php if (isset($component)) { $__componentOriginal4b04fa758b77ab5f3a62cdb93e6ff6e9 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal4b04fa758b77ab5f3a62cdb93e6ff6e9 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.search-input','data' => ['wireModel' => 'tableColumnSearchQueries.'.e($column->getName()).'']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::search-input'); ?>
+<?php $component->withAttributes(['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssClasses([
+                                        'fi-table-individual-search-cell-' . str($column->getName())->camel()->kebab(),
+                                        'px-3 py-2',
+                                    ]))]); ?>
+                                    <!--[if BLOCK]><![endif]--><?php if($column->isIndividuallySearchable()): ?>
+                                        <?php if (isset($component)) { $__componentOriginal7ccc00a3eaa8946ec9c0ec17f5ab229b = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal7ccc00a3eaa8946ec9c0ec17f5ab229b = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.search-field','data' => ['debounce' => $searchDebounce,'onBlur' => $isSearchOnBlur,'wireModel' => 'tableColumnSearches.'.e($column->getName()).'']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::search-field'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['wire-model' => 'tableColumnSearchQueries.'.e($column->getName()).'']); ?>
+<?php $component->withAttributes(['debounce' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($searchDebounce),'on-blur' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isSearchOnBlur),'wire-model' => 'tableColumnSearches.'.e($column->getName()).'']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal4b04fa758b77ab5f3a62cdb93e6ff6e9)): ?>
-<?php $attributes = $__attributesOriginal4b04fa758b77ab5f3a62cdb93e6ff6e9; ?>
-<?php unset($__attributesOriginal4b04fa758b77ab5f3a62cdb93e6ff6e9); ?>
+<?php if (isset($__attributesOriginal7ccc00a3eaa8946ec9c0ec17f5ab229b)): ?>
+<?php $attributes = $__attributesOriginal7ccc00a3eaa8946ec9c0ec17f5ab229b; ?>
+<?php unset($__attributesOriginal7ccc00a3eaa8946ec9c0ec17f5ab229b); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal4b04fa758b77ab5f3a62cdb93e6ff6e9)): ?>
-<?php $component = $__componentOriginal4b04fa758b77ab5f3a62cdb93e6ff6e9; ?>
-<?php unset($__componentOriginal4b04fa758b77ab5f3a62cdb93e6ff6e9); ?>
+<?php if (isset($__componentOriginal7ccc00a3eaa8946ec9c0ec17f5ab229b)): ?>
+<?php $component = $__componentOriginal7ccc00a3eaa8946ec9c0ec17f5ab229b; ?>
+<?php unset($__componentOriginal7ccc00a3eaa8946ec9c0ec17f5ab229b); ?>
 <?php endif; ?>
-                                    <?php endif; ?>
+                                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginalfb906351acaa93ff5a874f5e70fd8ff6)): ?>
-<?php $attributes = $__attributesOriginalfb906351acaa93ff5a874f5e70fd8ff6; ?>
-<?php unset($__attributesOriginalfb906351acaa93ff5a874f5e70fd8ff6); ?>
+<?php if (isset($__attributesOriginal0582040fe960eff09c1461f7f86a8187)): ?>
+<?php $attributes = $__attributesOriginal0582040fe960eff09c1461f7f86a8187; ?>
+<?php unset($__attributesOriginal0582040fe960eff09c1461f7f86a8187); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginalfb906351acaa93ff5a874f5e70fd8ff6)): ?>
-<?php $component = $__componentOriginalfb906351acaa93ff5a874f5e70fd8ff6; ?>
-<?php unset($__componentOriginalfb906351acaa93ff5a874f5e70fd8ff6); ?>
+<?php if (isset($__componentOriginal0582040fe960eff09c1461f7f86a8187)): ?>
+<?php $component = $__componentOriginal0582040fe960eff09c1461f7f86a8187; ?>
+<?php unset($__componentOriginal0582040fe960eff09c1461f7f86a8187); ?>
 <?php endif; ?>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
 
-                            <?php if(! $isReordering): ?>
+                            <!--[if BLOCK]><![endif]--><?php if(! $isReordering): ?>
                                 <?php if(count($actions) && in_array($actionsPosition, [ActionsPosition::AfterColumns, ActionsPosition::AfterCells])): ?>
                                     <td></td>
-                                <?php endif; ?>
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-                                <?php if($isSelectionEnabled && $recordCheckboxPosition === RecordCheckboxPosition::AfterCells): ?>
+                                <!--[if BLOCK]><![endif]--><?php if($isSelectionEnabled && $recordCheckboxPosition === RecordCheckboxPosition::AfterCells): ?>
                                     <td></td>
-                                <?php endif; ?>
-                            <?php endif; ?>
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                          <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal919ddf55d1edf7e6d8ca3bedc1e9b76c)): ?>
-<?php $attributes = $__attributesOriginal919ddf55d1edf7e6d8ca3bedc1e9b76c; ?>
-<?php unset($__attributesOriginal919ddf55d1edf7e6d8ca3bedc1e9b76c); ?>
+<?php if (isset($__attributesOriginalb06932e913f01497313cb0ed448cecad)): ?>
+<?php $attributes = $__attributesOriginalb06932e913f01497313cb0ed448cecad; ?>
+<?php unset($__attributesOriginalb06932e913f01497313cb0ed448cecad); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal919ddf55d1edf7e6d8ca3bedc1e9b76c)): ?>
-<?php $component = $__componentOriginal919ddf55d1edf7e6d8ca3bedc1e9b76c; ?>
-<?php unset($__componentOriginal919ddf55d1edf7e6d8ca3bedc1e9b76c); ?>
+<?php if (isset($__componentOriginalb06932e913f01497313cb0ed448cecad)): ?>
+<?php $component = $__componentOriginalb06932e913f01497313cb0ed448cecad; ?>
+<?php unset($__componentOriginalb06932e913f01497313cb0ed448cecad); ?>
 <?php endif; ?>
-                    <?php endif; ?>
+                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-                    <?php if(($records !== null) && count($records)): ?>
-                        <?php $__currentLoopData = $records; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $record): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <!--[if BLOCK]><![endif]--><?php if(($records !== null) && count($records)): ?>
+                        <?php
+                            $isRecordRowStriped = false;
+                            $previousRecord = null;
+                            $previousRecordGroupKey = null;
+                            $previousRecordGroupTitle = null;
+                        ?>
+
+                        <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $records; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $record): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <?php
                                 $recordAction = $getRecordAction($record);
                                 $recordKey = $getRecordKey($record);
                                 $recordUrl = $getRecordUrl($record);
+                                $openRecordUrlInNewTab = $shouldOpenRecordUrlInNewTab($record);
+                                $recordGroupKey = $group?->getStringKey($record);
+                                $recordGroupTitle = $group?->getTitle($record);
                             ?>
 
-                            <?php if (isset($component)) { $__componentOriginal919ddf55d1edf7e6d8ca3bedc1e9b76c = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal919ddf55d1edf7e6d8ca3bedc1e9b76c = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.row','data' => ['recordAction' => $recordAction,'recordUrl' => $recordUrl,'wire:key' => $this->id . '.table.records.' . $recordKey,'wire:sortable.item' => $isReordering ? $recordKey : null,'wire:sortable.handle' => $isReordering,'striped' => $isStriped,'xBind:class' => '{
-                                    \'bg-gray-50 '.e(config('tables.dark_mode') ? 'dark:bg-gray-500/10' : '').'\': isRecordSelected(\''.e($recordKey).'\'),
-                                }','class' => 
-                                    \Illuminate\Support\Arr::toCssClasses(array_merge(
-                                        [
-                                            'group cursor-move' => $isReordering,
-                                        ],
-                                        $getRecordClasses($record),
-                                    ))
-                                ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::row'); ?>
+                            <!--[if BLOCK]><![endif]--><?php if($recordGroupTitle !== $previousRecordGroupTitle): ?>
+                                <!--[if BLOCK]><![endif]--><?php if($hasSummary && (! $isReordering) && filled($previousRecordGroupTitle)): ?>
+                                    <?php if (isset($component)) { $__componentOriginala3ad14087ab6b316cf1e1d1a634acbeb = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginala3ad14087ab6b316cf1e1d1a634acbeb = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.summary.row','data' => ['actions' => count($actions),'actionsPosition' => $actionsPosition,'columns' => $columns,'groupColumn' => $group?->getColumn(),'groupsOnly' => $isGroupsOnly,'heading' => $isGroupsOnly ? $previousRecordGroupTitle : __('filament-tables::table.summary.subheadings.group', ['group' => $previousRecordGroupTitle, 'label' => $pluralModelLabel]),'query' => $group->scopeQuery($this->getAllTableSummaryQuery(), $previousRecord),'recordCheckboxPosition' => $recordCheckboxPosition,'selectedState' => $groupedSummarySelectedState[$previousRecordGroupKey] ?? [],'selectionEnabled' => $isSelectionEnabled]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::summary.row'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['record-action' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordAction),'record-url' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordUrl),'wire:key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($this->id . '.table.records.' . $recordKey),'wire:sortable.item' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isReordering ? $recordKey : null),'wire:sortable.handle' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isReordering),'striped' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isStriped),'x-bind:class' => '{
-                                    \'bg-gray-50 '.e(config('tables.dark_mode') ? 'dark:bg-gray-500/10' : '').'\': isRecordSelected(\''.e($recordKey).'\'),
-                                }','class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
-                                    \Illuminate\Support\Arr::toCssClasses(array_merge(
-                                        [
-                                            'group cursor-move' => $isReordering,
-                                        ],
-                                        $getRecordClasses($record),
-                                    ))
-                                )]); ?>
-                                <?php if (isset($component)) { $__componentOriginal45695ae72a548a93b3cb755c034d3bee = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal45695ae72a548a93b3cb755c034d3bee = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.reorder.cell','data' => ['class' => 
-                                        \Illuminate\Support\Arr::toCssClasses([
-                                            'hidden' => ! $isReordering,
-                                        ])
-                                    ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::reorder.cell'); ?>
+<?php $component->withAttributes(['actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(count($actions)),'actions-position' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actionsPosition),'columns' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columns),'group-column' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($group?->getColumn()),'groups-only' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isGroupsOnly),'heading' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isGroupsOnly ? $previousRecordGroupTitle : __('filament-tables::table.summary.subheadings.group', ['group' => $previousRecordGroupTitle, 'label' => $pluralModelLabel])),'query' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($group->scopeQuery($this->getAllTableSummaryQuery(), $previousRecord)),'record-checkbox-position' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordCheckboxPosition),'selected-state' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($groupedSummarySelectedState[$previousRecordGroupKey] ?? []),'selection-enabled' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isSelectionEnabled)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginala3ad14087ab6b316cf1e1d1a634acbeb)): ?>
+<?php $attributes = $__attributesOriginala3ad14087ab6b316cf1e1d1a634acbeb; ?>
+<?php unset($__attributesOriginala3ad14087ab6b316cf1e1d1a634acbeb); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginala3ad14087ab6b316cf1e1d1a634acbeb)): ?>
+<?php $component = $__componentOriginala3ad14087ab6b316cf1e1d1a634acbeb; ?>
+<?php unset($__componentOriginala3ad14087ab6b316cf1e1d1a634acbeb); ?>
+<?php endif; ?>
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                                <!--[if BLOCK]><![endif]--><?php if(! $isGroupsOnly): ?>
+                                    <?php if (isset($component)) { $__componentOriginalb06932e913f01497313cb0ed448cecad = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb06932e913f01497313cb0ed448cecad = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.row','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::row'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
-                                        \Illuminate\Support\Arr::toCssClasses([
-                                            'hidden' => ! $isReordering,
-                                        ])
-                                    )]); ?>
-                                    <?php if($isReordering): ?>
-                                        <?php if (isset($component)) { $__componentOriginal14cbf6a08ae3fc068141590b309751c7 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal14cbf6a08ae3fc068141590b309751c7 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.reorder.handle','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::reorder.handle'); ?>
+<?php $component->withAttributes([]); ?>
+                                        <?php
+                                            $groupHeaderColspan = $columnsCount;
+
+                                            if ($isSelectionEnabled) {
+                                                $groupHeaderColspan--;
+
+                                                if (
+                                                    ($recordCheckboxPosition === RecordCheckboxPosition::BeforeCells) &&
+                                                    count($actions) &&
+                                                    ($actionsPosition === ActionsPosition::BeforeCells)
+                                                ) {
+                                                    $groupHeaderColspan--;
+                                                }
+                                            }
+                                        ?>
+
+                                        <!--[if BLOCK]><![endif]--><?php if($isSelectionEnabled && $recordCheckboxPosition === RecordCheckboxPosition::BeforeCells): ?>
+                                            <?php if(count($actions) && $actionsPosition === ActionsPosition::BeforeCells): ?>
+                                                <td
+                                                    class="bg-gray-50 dark:bg-white/5"
+                                                ></td>
+                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                                            <?php if (isset($component)) { $__componentOriginala04fd2d12a1a3e3b0d02513168388c6b = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginala04fd2d12a1a3e3b0d02513168388c6b = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.selection.group-cell','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::selection.group-cell'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                                                <?php if (isset($component)) { $__componentOriginal1d4fa51bf7f7ed15068efea290223e8e = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal1d4fa51bf7f7ed15068efea290223e8e = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.selection.group-checkbox','data' => ['page' => $page,'key' => $recordGroupKey,'title' => $recordGroupTitle]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::selection.group-checkbox'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['page' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($page),'key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordGroupKey),'title' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordGroupTitle)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal1d4fa51bf7f7ed15068efea290223e8e)): ?>
+<?php $attributes = $__attributesOriginal1d4fa51bf7f7ed15068efea290223e8e; ?>
+<?php unset($__attributesOriginal1d4fa51bf7f7ed15068efea290223e8e); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal1d4fa51bf7f7ed15068efea290223e8e)): ?>
+<?php $component = $__componentOriginal1d4fa51bf7f7ed15068efea290223e8e; ?>
+<?php unset($__componentOriginal1d4fa51bf7f7ed15068efea290223e8e); ?>
+<?php endif; ?>
+                                             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginala04fd2d12a1a3e3b0d02513168388c6b)): ?>
+<?php $attributes = $__attributesOriginala04fd2d12a1a3e3b0d02513168388c6b; ?>
+<?php unset($__attributesOriginala04fd2d12a1a3e3b0d02513168388c6b); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginala04fd2d12a1a3e3b0d02513168388c6b)): ?>
+<?php $component = $__componentOriginala04fd2d12a1a3e3b0d02513168388c6b; ?>
+<?php unset($__componentOriginala04fd2d12a1a3e3b0d02513168388c6b); ?>
+<?php endif; ?>
+                                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                                        <td
+                                            colspan="<?php echo e($groupHeaderColspan); ?>"
+                                            class="p-0"
+                                        >
+                                            <?php if (isset($component)) { $__componentOriginal751169a5d74d7c8401df85650564cafc = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal751169a5d74d7c8401df85650564cafc = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.group.header','data' => ['collapsible' => $group->isCollapsible(),'description' => $group->getDescription($record, $recordGroupTitle),'label' => $group->isTitlePrefixedWithLabel() ? $group->getLabel() : null,'title' => $recordGroupTitle]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::group.header'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['collapsible' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($group->isCollapsible()),'description' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($group->getDescription($record, $recordGroupTitle)),'label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($group->isTitlePrefixedWithLabel() ? $group->getLabel() : null),'title' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordGroupTitle)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal751169a5d74d7c8401df85650564cafc)): ?>
+<?php $attributes = $__attributesOriginal751169a5d74d7c8401df85650564cafc; ?>
+<?php unset($__attributesOriginal751169a5d74d7c8401df85650564cafc); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal751169a5d74d7c8401df85650564cafc)): ?>
+<?php $component = $__componentOriginal751169a5d74d7c8401df85650564cafc; ?>
+<?php unset($__componentOriginal751169a5d74d7c8401df85650564cafc); ?>
+<?php endif; ?>
+                                        </td>
+
+                                        <!--[if BLOCK]><![endif]--><?php if($isSelectionEnabled && $recordCheckboxPosition === RecordCheckboxPosition::AfterCells): ?>
+                                            <?php if (isset($component)) { $__componentOriginala04fd2d12a1a3e3b0d02513168388c6b = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginala04fd2d12a1a3e3b0d02513168388c6b = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.selection.group-cell','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::selection.group-cell'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                                                <?php if (isset($component)) { $__componentOriginal1d4fa51bf7f7ed15068efea290223e8e = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal1d4fa51bf7f7ed15068efea290223e8e = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.selection.group-checkbox','data' => ['page' => $page,'key' => $recordGroupKey,'title' => $recordGroupTitle]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::selection.group-checkbox'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['page' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($page),'key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordGroupKey),'title' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordGroupTitle)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal1d4fa51bf7f7ed15068efea290223e8e)): ?>
+<?php $attributes = $__attributesOriginal1d4fa51bf7f7ed15068efea290223e8e; ?>
+<?php unset($__attributesOriginal1d4fa51bf7f7ed15068efea290223e8e); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal1d4fa51bf7f7ed15068efea290223e8e)): ?>
+<?php $component = $__componentOriginal1d4fa51bf7f7ed15068efea290223e8e; ?>
+<?php unset($__componentOriginal1d4fa51bf7f7ed15068efea290223e8e); ?>
+<?php endif; ?>
+                                             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginala04fd2d12a1a3e3b0d02513168388c6b)): ?>
+<?php $attributes = $__attributesOriginala04fd2d12a1a3e3b0d02513168388c6b; ?>
+<?php unset($__attributesOriginala04fd2d12a1a3e3b0d02513168388c6b); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginala04fd2d12a1a3e3b0d02513168388c6b)): ?>
+<?php $component = $__componentOriginala04fd2d12a1a3e3b0d02513168388c6b; ?>
+<?php unset($__componentOriginala04fd2d12a1a3e3b0d02513168388c6b); ?>
+<?php endif; ?>
+                                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                     <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb06932e913f01497313cb0ed448cecad)): ?>
+<?php $attributes = $__attributesOriginalb06932e913f01497313cb0ed448cecad; ?>
+<?php unset($__attributesOriginalb06932e913f01497313cb0ed448cecad); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb06932e913f01497313cb0ed448cecad)): ?>
+<?php $component = $__componentOriginalb06932e913f01497313cb0ed448cecad; ?>
+<?php unset($__componentOriginalb06932e913f01497313cb0ed448cecad); ?>
+<?php endif; ?>
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                                <?php
+                                    $isRecordRowStriped = false;
+                                ?>
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                            <!--[if BLOCK]><![endif]--><?php if(! $isGroupsOnly): ?>
+                                <?php if (isset($component)) { $__componentOriginalb06932e913f01497313cb0ed448cecad = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb06932e913f01497313cb0ed448cecad = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.row','data' => ['alpineHidden' => ($group?->isCollapsible() ? 'true' : 'false') . ' && isGroupCollapsed(' . \Illuminate\Support\Js::from($recordGroupTitle) . ')','alpineSelected' => 'isRecordSelected(\'' . $recordKey . '\')','recordAction' => $recordAction,'recordUrl' => $recordUrl,'striped' => $isStriped && $isRecordRowStriped,'wire:key' => $this->getId() . '.table.records.' . $recordKey,'xSortableHandle' => $isReordering,'xSortableItem' => $isReordering ? $recordKey : null,'class' => \Illuminate\Support\Arr::toCssClasses([
+                                        'group cursor-move' => $isReordering,
+                                        ...$getRecordClasses($record),
+                                    ])]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::row'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['alpine-hidden' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(($group?->isCollapsible() ? 'true' : 'false') . ' && isGroupCollapsed(' . \Illuminate\Support\Js::from($recordGroupTitle) . ')'),'alpine-selected' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute('isRecordSelected(\'' . $recordKey . '\')'),'record-action' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordAction),'record-url' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordUrl),'striped' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isStriped && $isRecordRowStriped),'wire:key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($this->getId() . '.table.records.' . $recordKey),'x-sortable-handle' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isReordering),'x-sortable-item' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isReordering ? $recordKey : null),'class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssClasses([
+                                        'group cursor-move' => $isReordering,
+                                        ...$getRecordClasses($record),
+                                    ]))]); ?>
+                                    <!--[if BLOCK]><![endif]--><?php if($isReordering): ?>
+                                        <?php if (isset($component)) { $__componentOriginal9c6f3a3a23c38bf2a2648e925d56d579 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9c6f3a3a23c38bf2a2648e925d56d579 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.reorder.cell','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::reorder.cell'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                                            <?php if (isset($component)) { $__componentOriginal642b587c9495f7dd9ec654aae03995e8 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal642b587c9495f7dd9ec654aae03995e8 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.reorder.handle','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::reorder.handle'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
@@ -1527,927 +1920,558 @@
 <?php $component->withAttributes([]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal14cbf6a08ae3fc068141590b309751c7)): ?>
-<?php $attributes = $__attributesOriginal14cbf6a08ae3fc068141590b309751c7; ?>
-<?php unset($__attributesOriginal14cbf6a08ae3fc068141590b309751c7); ?>
+<?php if (isset($__attributesOriginal642b587c9495f7dd9ec654aae03995e8)): ?>
+<?php $attributes = $__attributesOriginal642b587c9495f7dd9ec654aae03995e8; ?>
+<?php unset($__attributesOriginal642b587c9495f7dd9ec654aae03995e8); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal14cbf6a08ae3fc068141590b309751c7)): ?>
-<?php $component = $__componentOriginal14cbf6a08ae3fc068141590b309751c7; ?>
-<?php unset($__componentOriginal14cbf6a08ae3fc068141590b309751c7); ?>
+<?php if (isset($__componentOriginal642b587c9495f7dd9ec654aae03995e8)): ?>
+<?php $component = $__componentOriginal642b587c9495f7dd9ec654aae03995e8; ?>
+<?php unset($__componentOriginal642b587c9495f7dd9ec654aae03995e8); ?>
 <?php endif; ?>
-                                    <?php endif; ?>
+                                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal9c6f3a3a23c38bf2a2648e925d56d579)): ?>
+<?php $attributes = $__attributesOriginal9c6f3a3a23c38bf2a2648e925d56d579; ?>
+<?php unset($__attributesOriginal9c6f3a3a23c38bf2a2648e925d56d579); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal9c6f3a3a23c38bf2a2648e925d56d579)): ?>
+<?php $component = $__componentOriginal9c6f3a3a23c38bf2a2648e925d56d579; ?>
+<?php unset($__componentOriginal9c6f3a3a23c38bf2a2648e925d56d579); ?>
+<?php endif; ?>
+                                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                                    <?php if(count($actions) && $actionsPosition === ActionsPosition::BeforeCells && (! $isReordering)): ?>
+                                        <?php if (isset($component)) { $__componentOriginalc950258a370e70f1827bd55e98c3ced8 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalc950258a370e70f1827bd55e98c3ced8 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.actions.cell','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::actions.cell'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                                            <?php if (isset($component)) { $__componentOriginal32a2358b99de73a2a27625c392d6fe38 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal32a2358b99de73a2a27625c392d6fe38 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.actions','data' => ['actions' => $actions,'alignment' => $actionsAlignment,'record' => $record]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::actions'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actions),'alignment' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actionsAlignment),'record' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($record)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal32a2358b99de73a2a27625c392d6fe38)): ?>
+<?php $attributes = $__attributesOriginal32a2358b99de73a2a27625c392d6fe38; ?>
+<?php unset($__attributesOriginal32a2358b99de73a2a27625c392d6fe38); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal32a2358b99de73a2a27625c392d6fe38)): ?>
+<?php $component = $__componentOriginal32a2358b99de73a2a27625c392d6fe38; ?>
+<?php unset($__componentOriginal32a2358b99de73a2a27625c392d6fe38); ?>
+<?php endif; ?>
+                                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalc950258a370e70f1827bd55e98c3ced8)): ?>
+<?php $attributes = $__attributesOriginalc950258a370e70f1827bd55e98c3ced8; ?>
+<?php unset($__attributesOriginalc950258a370e70f1827bd55e98c3ced8); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc950258a370e70f1827bd55e98c3ced8)): ?>
+<?php $component = $__componentOriginalc950258a370e70f1827bd55e98c3ced8; ?>
+<?php unset($__componentOriginalc950258a370e70f1827bd55e98c3ced8); ?>
+<?php endif; ?>
+                                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                                    <!--[if BLOCK]><![endif]--><?php if($isSelectionEnabled && ($recordCheckboxPosition === RecordCheckboxPosition::BeforeCells) && (! $isReordering)): ?>
+                                        <?php if (isset($component)) { $__componentOriginal07ac246849ddb88fbe4391e1bdc4df73 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal07ac246849ddb88fbe4391e1bdc4df73 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.selection.cell','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::selection.cell'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                                            <!--[if BLOCK]><![endif]--><?php if($isRecordSelectable($record)): ?>
+                                                <?php if (isset($component)) { $__componentOriginal36f68fca2c6625d1435d035c49146213 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal36f68fca2c6625d1435d035c49146213 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.selection.checkbox','data' => ['label' => __('filament-tables::table.fields.bulk_select_record.label', ['key' => $recordKey]),'value' => $recordKey,'xModel' => 'selectedRecords','dataGroup' => $recordGroupKey,'class' => 'fi-ta-record-checkbox']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::selection.checkbox'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('filament-tables::table.fields.bulk_select_record.label', ['key' => $recordKey])),'value' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordKey),'x-model' => 'selectedRecords','data-group' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordGroupKey),'class' => 'fi-ta-record-checkbox']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal36f68fca2c6625d1435d035c49146213)): ?>
+<?php $attributes = $__attributesOriginal36f68fca2c6625d1435d035c49146213; ?>
+<?php unset($__attributesOriginal36f68fca2c6625d1435d035c49146213); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal36f68fca2c6625d1435d035c49146213)): ?>
+<?php $component = $__componentOriginal36f68fca2c6625d1435d035c49146213; ?>
+<?php unset($__componentOriginal36f68fca2c6625d1435d035c49146213); ?>
+<?php endif; ?>
+                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal07ac246849ddb88fbe4391e1bdc4df73)): ?>
+<?php $attributes = $__attributesOriginal07ac246849ddb88fbe4391e1bdc4df73; ?>
+<?php unset($__attributesOriginal07ac246849ddb88fbe4391e1bdc4df73); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal07ac246849ddb88fbe4391e1bdc4df73)): ?>
+<?php $component = $__componentOriginal07ac246849ddb88fbe4391e1bdc4df73; ?>
+<?php unset($__componentOriginal07ac246849ddb88fbe4391e1bdc4df73); ?>
+<?php endif; ?>
+                                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                                    <?php if(count($actions) && $actionsPosition === ActionsPosition::BeforeColumns && (! $isReordering)): ?>
+                                        <?php if (isset($component)) { $__componentOriginalc950258a370e70f1827bd55e98c3ced8 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalc950258a370e70f1827bd55e98c3ced8 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.actions.cell','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::actions.cell'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                                            <?php if (isset($component)) { $__componentOriginal32a2358b99de73a2a27625c392d6fe38 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal32a2358b99de73a2a27625c392d6fe38 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.actions','data' => ['actions' => $actions,'alignment' => $actionsAlignment,'record' => $record]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::actions'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actions),'alignment' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actionsAlignment),'record' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($record)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal32a2358b99de73a2a27625c392d6fe38)): ?>
+<?php $attributes = $__attributesOriginal32a2358b99de73a2a27625c392d6fe38; ?>
+<?php unset($__attributesOriginal32a2358b99de73a2a27625c392d6fe38); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal32a2358b99de73a2a27625c392d6fe38)): ?>
+<?php $component = $__componentOriginal32a2358b99de73a2a27625c392d6fe38; ?>
+<?php unset($__componentOriginal32a2358b99de73a2a27625c392d6fe38); ?>
+<?php endif; ?>
+                                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalc950258a370e70f1827bd55e98c3ced8)): ?>
+<?php $attributes = $__attributesOriginalc950258a370e70f1827bd55e98c3ced8; ?>
+<?php unset($__attributesOriginalc950258a370e70f1827bd55e98c3ced8); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc950258a370e70f1827bd55e98c3ced8)): ?>
+<?php $component = $__componentOriginalc950258a370e70f1827bd55e98c3ced8; ?>
+<?php unset($__componentOriginalc950258a370e70f1827bd55e98c3ced8); ?>
+<?php endif; ?>
+                                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                                    <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $columns; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $column): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <?php
+                                            $column->record($record);
+                                            $column->rowLoop($loop->parent);
+                                        ?>
+
+                                        <?php if (isset($component)) { $__componentOriginal0582040fe960eff09c1461f7f86a8187 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal0582040fe960eff09c1461f7f86a8187 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.cell','data' => ['wire:key' => $this->getId() . '.table.record.' . $recordKey . '.column.' . $column->getName(),'attributes' => 
+                                                \Filament\Support\prepare_inherited_attributes($column->getExtraCellAttributeBag())
+                                                    ->class([
+                                                        'fi-table-cell-' . str($column->getName())->camel()->kebab(),
+                                                        match ($column->getVerticalAlignment()) {
+                                                            VerticalAlignment::Start => 'align-top',
+                                                            VerticalAlignment::Center => 'align-middle',
+                                                            VerticalAlignment::End => 'align-bottom',
+                                                            default => null,
+                                                        },
+                                                        $getHiddenClasses($column),
+                                                    ])
+                                            ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::cell'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['wire:key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($this->getId() . '.table.record.' . $recordKey . '.column.' . $column->getName()),'attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
+                                                \Filament\Support\prepare_inherited_attributes($column->getExtraCellAttributeBag())
+                                                    ->class([
+                                                        'fi-table-cell-' . str($column->getName())->camel()->kebab(),
+                                                        match ($column->getVerticalAlignment()) {
+                                                            VerticalAlignment::Start => 'align-top',
+                                                            VerticalAlignment::Center => 'align-middle',
+                                                            VerticalAlignment::End => 'align-bottom',
+                                                            default => null,
+                                                        },
+                                                        $getHiddenClasses($column),
+                                                    ])
+                                            )]); ?>
+                                            <?php if (isset($component)) { $__componentOriginal9e6c25ad176a3fd7bc1fa75b239c0fc8 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9e6c25ad176a3fd7bc1fa75b239c0fc8 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.columns.column','data' => ['column' => $column,'isClickDisabled' => $column->isClickDisabled() || $isReordering,'record' => $record,'recordAction' => $recordAction,'recordKey' => $recordKey,'recordUrl' => $recordUrl,'shouldOpenRecordUrlInNewTab' => $openRecordUrlInNewTab]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::columns.column'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['column' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($column),'is-click-disabled' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($column->isClickDisabled() || $isReordering),'record' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($record),'record-action' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordAction),'record-key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordKey),'record-url' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordUrl),'should-open-record-url-in-new-tab' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($openRecordUrlInNewTab)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal9e6c25ad176a3fd7bc1fa75b239c0fc8)): ?>
+<?php $attributes = $__attributesOriginal9e6c25ad176a3fd7bc1fa75b239c0fc8; ?>
+<?php unset($__attributesOriginal9e6c25ad176a3fd7bc1fa75b239c0fc8); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal9e6c25ad176a3fd7bc1fa75b239c0fc8)): ?>
+<?php $component = $__componentOriginal9e6c25ad176a3fd7bc1fa75b239c0fc8; ?>
+<?php unset($__componentOriginal9e6c25ad176a3fd7bc1fa75b239c0fc8); ?>
+<?php endif; ?>
+                                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal0582040fe960eff09c1461f7f86a8187)): ?>
+<?php $attributes = $__attributesOriginal0582040fe960eff09c1461f7f86a8187; ?>
+<?php unset($__attributesOriginal0582040fe960eff09c1461f7f86a8187); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal0582040fe960eff09c1461f7f86a8187)): ?>
+<?php $component = $__componentOriginal0582040fe960eff09c1461f7f86a8187; ?>
+<?php unset($__componentOriginal0582040fe960eff09c1461f7f86a8187); ?>
+<?php endif; ?>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+
+                                    <?php if(count($actions) && $actionsPosition === ActionsPosition::AfterColumns && (! $isReordering)): ?>
+                                        <?php if (isset($component)) { $__componentOriginalc950258a370e70f1827bd55e98c3ced8 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalc950258a370e70f1827bd55e98c3ced8 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.actions.cell','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::actions.cell'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                                            <?php if (isset($component)) { $__componentOriginal32a2358b99de73a2a27625c392d6fe38 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal32a2358b99de73a2a27625c392d6fe38 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.actions','data' => ['actions' => $actions,'alignment' => $actionsAlignment ?? Alignment::End,'record' => $record]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::actions'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actions),'alignment' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actionsAlignment ?? Alignment::End),'record' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($record)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal32a2358b99de73a2a27625c392d6fe38)): ?>
+<?php $attributes = $__attributesOriginal32a2358b99de73a2a27625c392d6fe38; ?>
+<?php unset($__attributesOriginal32a2358b99de73a2a27625c392d6fe38); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal32a2358b99de73a2a27625c392d6fe38)): ?>
+<?php $component = $__componentOriginal32a2358b99de73a2a27625c392d6fe38; ?>
+<?php unset($__componentOriginal32a2358b99de73a2a27625c392d6fe38); ?>
+<?php endif; ?>
+                                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalc950258a370e70f1827bd55e98c3ced8)): ?>
+<?php $attributes = $__attributesOriginalc950258a370e70f1827bd55e98c3ced8; ?>
+<?php unset($__attributesOriginalc950258a370e70f1827bd55e98c3ced8); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc950258a370e70f1827bd55e98c3ced8)): ?>
+<?php $component = $__componentOriginalc950258a370e70f1827bd55e98c3ced8; ?>
+<?php unset($__componentOriginalc950258a370e70f1827bd55e98c3ced8); ?>
+<?php endif; ?>
+                                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                                    <!--[if BLOCK]><![endif]--><?php if($isSelectionEnabled && $recordCheckboxPosition === RecordCheckboxPosition::AfterCells && (! $isReordering)): ?>
+                                        <?php if (isset($component)) { $__componentOriginal07ac246849ddb88fbe4391e1bdc4df73 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal07ac246849ddb88fbe4391e1bdc4df73 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.selection.cell','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::selection.cell'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                                            <!--[if BLOCK]><![endif]--><?php if($isRecordSelectable($record)): ?>
+                                                <?php if (isset($component)) { $__componentOriginal36f68fca2c6625d1435d035c49146213 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal36f68fca2c6625d1435d035c49146213 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.selection.checkbox','data' => ['label' => __('filament-tables::table.fields.bulk_select_record.label', ['key' => $recordKey]),'value' => $recordKey,'xModel' => 'selectedRecords','dataGroup' => $recordGroupKey,'class' => 'fi-ta-record-checkbox']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::selection.checkbox'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('filament-tables::table.fields.bulk_select_record.label', ['key' => $recordKey])),'value' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordKey),'x-model' => 'selectedRecords','data-group' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordGroupKey),'class' => 'fi-ta-record-checkbox']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal36f68fca2c6625d1435d035c49146213)): ?>
+<?php $attributes = $__attributesOriginal36f68fca2c6625d1435d035c49146213; ?>
+<?php unset($__attributesOriginal36f68fca2c6625d1435d035c49146213); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal36f68fca2c6625d1435d035c49146213)): ?>
+<?php $component = $__componentOriginal36f68fca2c6625d1435d035c49146213; ?>
+<?php unset($__componentOriginal36f68fca2c6625d1435d035c49146213); ?>
+<?php endif; ?>
+                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal07ac246849ddb88fbe4391e1bdc4df73)): ?>
+<?php $attributes = $__attributesOriginal07ac246849ddb88fbe4391e1bdc4df73; ?>
+<?php unset($__attributesOriginal07ac246849ddb88fbe4391e1bdc4df73); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal07ac246849ddb88fbe4391e1bdc4df73)): ?>
+<?php $component = $__componentOriginal07ac246849ddb88fbe4391e1bdc4df73; ?>
+<?php unset($__componentOriginal07ac246849ddb88fbe4391e1bdc4df73); ?>
+<?php endif; ?>
+                                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                                    <?php if(count($actions) && $actionsPosition === ActionsPosition::AfterCells): ?>
+                                        <?php if (isset($component)) { $__componentOriginalc950258a370e70f1827bd55e98c3ced8 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalc950258a370e70f1827bd55e98c3ced8 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.actions.cell','data' => ['class' => \Illuminate\Support\Arr::toCssClasses([
+                                                'hidden' => $isReordering,
+                                            ])]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::actions.cell'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssClasses([
+                                                'hidden' => $isReordering,
+                                            ]))]); ?>
+                                            <?php if (isset($component)) { $__componentOriginal32a2358b99de73a2a27625c392d6fe38 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal32a2358b99de73a2a27625c392d6fe38 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.actions','data' => ['actions' => $actions,'alignment' => $actionsAlignment ?? Alignment::End,'record' => $record]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::actions'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actions),'alignment' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actionsAlignment ?? Alignment::End),'record' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($record)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal32a2358b99de73a2a27625c392d6fe38)): ?>
+<?php $attributes = $__attributesOriginal32a2358b99de73a2a27625c392d6fe38; ?>
+<?php unset($__attributesOriginal32a2358b99de73a2a27625c392d6fe38); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal32a2358b99de73a2a27625c392d6fe38)): ?>
+<?php $component = $__componentOriginal32a2358b99de73a2a27625c392d6fe38; ?>
+<?php unset($__componentOriginal32a2358b99de73a2a27625c392d6fe38); ?>
+<?php endif; ?>
+                                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalc950258a370e70f1827bd55e98c3ced8)): ?>
+<?php $attributes = $__attributesOriginalc950258a370e70f1827bd55e98c3ced8; ?>
+<?php unset($__attributesOriginalc950258a370e70f1827bd55e98c3ced8); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc950258a370e70f1827bd55e98c3ced8)): ?>
+<?php $component = $__componentOriginalc950258a370e70f1827bd55e98c3ced8; ?>
+<?php unset($__componentOriginalc950258a370e70f1827bd55e98c3ced8); ?>
+<?php endif; ?>
+                                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal45695ae72a548a93b3cb755c034d3bee)): ?>
-<?php $attributes = $__attributesOriginal45695ae72a548a93b3cb755c034d3bee; ?>
-<?php unset($__attributesOriginal45695ae72a548a93b3cb755c034d3bee); ?>
+<?php if (isset($__attributesOriginalb06932e913f01497313cb0ed448cecad)): ?>
+<?php $attributes = $__attributesOriginalb06932e913f01497313cb0ed448cecad; ?>
+<?php unset($__attributesOriginalb06932e913f01497313cb0ed448cecad); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal45695ae72a548a93b3cb755c034d3bee)): ?>
-<?php $component = $__componentOriginal45695ae72a548a93b3cb755c034d3bee; ?>
-<?php unset($__componentOriginal45695ae72a548a93b3cb755c034d3bee); ?>
+<?php if (isset($__componentOriginalb06932e913f01497313cb0ed448cecad)): ?>
+<?php $component = $__componentOriginalb06932e913f01497313cb0ed448cecad; ?>
+<?php unset($__componentOriginalb06932e913f01497313cb0ed448cecad); ?>
 <?php endif; ?>
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-                                <?php if(count($actions) && $actionsPosition === ActionsPosition::BeforeCells): ?>
-                                    <?php if (isset($component)) { $__componentOriginal174052115c30c7ca400e766c0151d81e = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal174052115c30c7ca400e766c0151d81e = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.actions.cell','data' => ['class' => 
-                                            \Illuminate\Support\Arr::toCssClasses([
-                                                'hidden' => $isReordering,
-                                            ])
-                                        ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::actions.cell'); ?>
+                            <?php
+                                $isRecordRowStriped = ! $isRecordRowStriped;
+                                $previousRecord = $record;
+                                $previousRecordGroupKey = $recordGroupKey;
+                                $previousRecordGroupTitle = $recordGroupTitle;
+                            ?>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+
+                        <?php if($hasSummary && (! $isReordering) && filled($previousRecordGroupTitle) && ((! $records instanceof \Illuminate\Contracts\Pagination\Paginator) || (! $records->hasMorePages()))): ?>
+                            <?php if (isset($component)) { $__componentOriginala3ad14087ab6b316cf1e1d1a634acbeb = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginala3ad14087ab6b316cf1e1d1a634acbeb = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.summary.row','data' => ['actions' => count($actions),'actionsPosition' => $actionsPosition,'columns' => $columns,'groupColumn' => $group?->getColumn(),'groupsOnly' => $isGroupsOnly,'heading' => $isGroupsOnly ? $previousRecordGroupTitle : __('filament-tables::table.summary.subheadings.group', ['group' => $previousRecordGroupTitle, 'label' => $pluralModelLabel]),'query' => $group->scopeQuery($this->getAllTableSummaryQuery(), $previousRecord),'recordCheckboxPosition' => $recordCheckboxPosition,'selectedState' => $groupedSummarySelectedState[$previousRecordGroupKey] ?? [],'selectionEnabled' => $isSelectionEnabled]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::summary.row'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
-                                            \Illuminate\Support\Arr::toCssClasses([
-                                                'hidden' => $isReordering,
-                                            ])
-                                        )]); ?>
-                                        <?php if (isset($component)) { $__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.actions.index','data' => ['actions' => $actions,'record' => $record]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::actions'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actions),'record' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($record)]); ?>
+<?php $component->withAttributes(['actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(count($actions)),'actions-position' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actionsPosition),'columns' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columns),'group-column' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($group?->getColumn()),'groups-only' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isGroupsOnly),'heading' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isGroupsOnly ? $previousRecordGroupTitle : __('filament-tables::table.summary.subheadings.group', ['group' => $previousRecordGroupTitle, 'label' => $pluralModelLabel])),'query' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($group->scopeQuery($this->getAllTableSummaryQuery(), $previousRecord)),'record-checkbox-position' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordCheckboxPosition),'selected-state' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($groupedSummarySelectedState[$previousRecordGroupKey] ?? []),'selection-enabled' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isSelectionEnabled)]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94)): ?>
-<?php $attributes = $__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94; ?>
-<?php unset($__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94); ?>
+<?php if (isset($__attributesOriginala3ad14087ab6b316cf1e1d1a634acbeb)): ?>
+<?php $attributes = $__attributesOriginala3ad14087ab6b316cf1e1d1a634acbeb; ?>
+<?php unset($__attributesOriginala3ad14087ab6b316cf1e1d1a634acbeb); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94)): ?>
-<?php $component = $__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94; ?>
-<?php unset($__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94); ?>
+<?php if (isset($__componentOriginala3ad14087ab6b316cf1e1d1a634acbeb)): ?>
+<?php $component = $__componentOriginala3ad14087ab6b316cf1e1d1a634acbeb; ?>
+<?php unset($__componentOriginala3ad14087ab6b316cf1e1d1a634acbeb); ?>
 <?php endif; ?>
-                                     <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal174052115c30c7ca400e766c0151d81e)): ?>
-<?php $attributes = $__attributesOriginal174052115c30c7ca400e766c0151d81e; ?>
-<?php unset($__attributesOriginal174052115c30c7ca400e766c0151d81e); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal174052115c30c7ca400e766c0151d81e)): ?>
-<?php $component = $__componentOriginal174052115c30c7ca400e766c0151d81e; ?>
-<?php unset($__componentOriginal174052115c30c7ca400e766c0151d81e); ?>
-<?php endif; ?>
-                                <?php endif; ?>
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-                                <?php if($isSelectionEnabled && $recordCheckboxPosition === RecordCheckboxPosition::BeforeCells): ?>
-                                    <?php if($isRecordSelectable($record)): ?>
-                                        <?php if (isset($component)) { $__componentOriginalc41e0c64e80f29562171958a154e5195 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalc41e0c64e80f29562171958a154e5195 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.checkbox.cell','data' => ['class' => 
-                                                \Illuminate\Support\Arr::toCssClasses([
-                                                    'hidden' => $isReordering,
-                                                ])
-                                            ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::checkbox.cell'); ?>
+                        <?php if($hasSummary && (! $isReordering)): ?>
+                            <?php if (isset($component)) { $__componentOriginala8bb2de295dfa9cddf00151a9ea585e7 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginala8bb2de295dfa9cddf00151a9ea585e7 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.summary.index','data' => ['actions' => count($actions),'actionsPosition' => $actionsPosition,'columns' => $columns,'groupColumn' => $group?->getColumn(),'groupsOnly' => $isGroupsOnly,'pluralModelLabel' => $pluralModelLabel,'recordCheckboxPosition' => $recordCheckboxPosition,'records' => $records,'selectionEnabled' => $isSelectionEnabled]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::summary'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
-                                                \Illuminate\Support\Arr::toCssClasses([
-                                                    'hidden' => $isReordering,
-                                                ])
-                                            )]); ?>
-                                            <?php if (isset($component)) { $__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.checkbox.index','data' => ['xModel' => 'selectedRecords','value' => $recordKey,'label' => __('tables::table.fields.bulk_select_record.label', ['key' => $recordKey]),'class' => 'filament-tables-record-checkbox']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::checkbox'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['x-model' => 'selectedRecords','value' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordKey),'label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('tables::table.fields.bulk_select_record.label', ['key' => $recordKey])),'class' => 'filament-tables-record-checkbox']); ?>
+<?php $component->withAttributes(['actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(count($actions)),'actions-position' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actionsPosition),'columns' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columns),'group-column' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($group?->getColumn()),'groups-only' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isGroupsOnly),'plural-model-label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($pluralModelLabel),'record-checkbox-position' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordCheckboxPosition),'records' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($records),'selection-enabled' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($isSelectionEnabled)]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409)): ?>
-<?php $attributes = $__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409; ?>
-<?php unset($__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409); ?>
+<?php if (isset($__attributesOriginala8bb2de295dfa9cddf00151a9ea585e7)): ?>
+<?php $attributes = $__attributesOriginala8bb2de295dfa9cddf00151a9ea585e7; ?>
+<?php unset($__attributesOriginala8bb2de295dfa9cddf00151a9ea585e7); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409)): ?>
-<?php $component = $__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409; ?>
-<?php unset($__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409); ?>
+<?php if (isset($__componentOriginala8bb2de295dfa9cddf00151a9ea585e7)): ?>
+<?php $component = $__componentOriginala8bb2de295dfa9cddf00151a9ea585e7; ?>
+<?php unset($__componentOriginala8bb2de295dfa9cddf00151a9ea585e7); ?>
 <?php endif; ?>
-                                         <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalc41e0c64e80f29562171958a154e5195)): ?>
-<?php $attributes = $__attributesOriginalc41e0c64e80f29562171958a154e5195; ?>
-<?php unset($__attributesOriginalc41e0c64e80f29562171958a154e5195); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalc41e0c64e80f29562171958a154e5195)): ?>
-<?php $component = $__componentOriginalc41e0c64e80f29562171958a154e5195; ?>
-<?php unset($__componentOriginalc41e0c64e80f29562171958a154e5195); ?>
-<?php endif; ?>
-                                    <?php else: ?>
-                                        <?php if (isset($component)) { $__componentOriginalfb906351acaa93ff5a874f5e70fd8ff6 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalfb906351acaa93ff5a874f5e70fd8ff6 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.cell','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::cell'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes([]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalfb906351acaa93ff5a874f5e70fd8ff6)): ?>
-<?php $attributes = $__attributesOriginalfb906351acaa93ff5a874f5e70fd8ff6; ?>
-<?php unset($__attributesOriginalfb906351acaa93ff5a874f5e70fd8ff6); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalfb906351acaa93ff5a874f5e70fd8ff6)): ?>
-<?php $component = $__componentOriginalfb906351acaa93ff5a874f5e70fd8ff6; ?>
-<?php unset($__componentOriginalfb906351acaa93ff5a874f5e70fd8ff6); ?>
-<?php endif; ?>
-                                    <?php endif; ?>
-                                <?php endif; ?>
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-                                <?php if(count($actions) && $actionsPosition === ActionsPosition::BeforeColumns): ?>
-                                    <?php if (isset($component)) { $__componentOriginal174052115c30c7ca400e766c0151d81e = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal174052115c30c7ca400e766c0151d81e = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.actions.cell','data' => ['class' => 
-                                            \Illuminate\Support\Arr::toCssClasses([
-                                                'hidden' => $isReordering,
-                                            ])
-                                        ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::actions.cell'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
-                                            \Illuminate\Support\Arr::toCssClasses([
-                                                'hidden' => $isReordering,
-                                            ])
-                                        )]); ?>
-                                        <?php if (isset($component)) { $__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.actions.index','data' => ['actions' => $actions,'record' => $record]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::actions'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actions),'record' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($record)]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94)): ?>
-<?php $attributes = $__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94; ?>
-<?php unset($__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94)): ?>
-<?php $component = $__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94; ?>
-<?php unset($__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94); ?>
-<?php endif; ?>
-                                     <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal174052115c30c7ca400e766c0151d81e)): ?>
-<?php $attributes = $__attributesOriginal174052115c30c7ca400e766c0151d81e; ?>
-<?php unset($__attributesOriginal174052115c30c7ca400e766c0151d81e); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal174052115c30c7ca400e766c0151d81e)): ?>
-<?php $component = $__componentOriginal174052115c30c7ca400e766c0151d81e; ?>
-<?php unset($__componentOriginal174052115c30c7ca400e766c0151d81e); ?>
-<?php endif; ?>
-                                <?php endif; ?>
-
-                                <?php $__currentLoopData = $columns; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $column): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <?php
-                                        $column->record($record);
-                                        $column->rowLoop($loop->parent);
-                                    ?>
-
-                                    <?php if (isset($component)) { $__componentOriginalfb906351acaa93ff5a874f5e70fd8ff6 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalfb906351acaa93ff5a874f5e70fd8ff6 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.cell','data' => ['wire:key' => ''.e($this->id).'.table.record.'.e($recordKey).'.column.'.e($column->getName()).'','wire:loading.remove.delay' => true,'wire:target' => ''.e(implode(',', \Filament\Tables\Table::LOADING_TARGETS)).'','class' => 'filament-table-cell-'.e(\Illuminate\Support\Str::of($column->getName())->camel()->kebab()).' '.e($getHiddenClasses($column)).'','attributes' => \Filament\Support\prepare_inherited_attributes($column->getExtraCellAttributeBag())]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::cell'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['wire:key' => ''.e($this->id).'.table.record.'.e($recordKey).'.column.'.e($column->getName()).'','wire:loading.remove.delay' => true,'wire:target' => ''.e(implode(',', \Filament\Tables\Table::LOADING_TARGETS)).'','class' => 'filament-table-cell-'.e(\Illuminate\Support\Str::of($column->getName())->camel()->kebab()).' '.e($getHiddenClasses($column)).'','attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Filament\Support\prepare_inherited_attributes($column->getExtraCellAttributeBag()))]); ?>
-                                        <?php if (isset($component)) { $__componentOriginal346e6785e5346e5a118bddf927a02e9b = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal346e6785e5346e5a118bddf927a02e9b = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.columns.column','data' => ['column' => $column,'record' => $record,'recordAction' => $recordAction,'recordKey' => $recordKey,'recordUrl' => $recordUrl,'isClickDisabled' => $column->isClickDisabled() || $isReordering]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::columns.column'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['column' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($column),'record' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($record),'record-action' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordAction),'record-key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordKey),'record-url' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordUrl),'is-click-disabled' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($column->isClickDisabled() || $isReordering)]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal346e6785e5346e5a118bddf927a02e9b)): ?>
-<?php $attributes = $__attributesOriginal346e6785e5346e5a118bddf927a02e9b; ?>
-<?php unset($__attributesOriginal346e6785e5346e5a118bddf927a02e9b); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal346e6785e5346e5a118bddf927a02e9b)): ?>
-<?php $component = $__componentOriginal346e6785e5346e5a118bddf927a02e9b; ?>
-<?php unset($__componentOriginal346e6785e5346e5a118bddf927a02e9b); ?>
-<?php endif; ?>
-                                     <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalfb906351acaa93ff5a874f5e70fd8ff6)): ?>
-<?php $attributes = $__attributesOriginalfb906351acaa93ff5a874f5e70fd8ff6; ?>
-<?php unset($__attributesOriginalfb906351acaa93ff5a874f5e70fd8ff6); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalfb906351acaa93ff5a874f5e70fd8ff6)): ?>
-<?php $component = $__componentOriginalfb906351acaa93ff5a874f5e70fd8ff6; ?>
-<?php unset($__componentOriginalfb906351acaa93ff5a874f5e70fd8ff6); ?>
-<?php endif; ?>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-
-                                <?php if(count($actions) && $actionsPosition === ActionsPosition::AfterColumns): ?>
-                                    <?php if (isset($component)) { $__componentOriginal174052115c30c7ca400e766c0151d81e = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal174052115c30c7ca400e766c0151d81e = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.actions.cell','data' => ['class' => 
-                                            \Illuminate\Support\Arr::toCssClasses([
-                                                'hidden' => $isReordering,
-                                            ])
-                                        ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::actions.cell'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
-                                            \Illuminate\Support\Arr::toCssClasses([
-                                                'hidden' => $isReordering,
-                                            ])
-                                        )]); ?>
-                                        <?php if (isset($component)) { $__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.actions.index','data' => ['actions' => $actions,'record' => $record]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::actions'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actions),'record' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($record)]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94)): ?>
-<?php $attributes = $__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94; ?>
-<?php unset($__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94)): ?>
-<?php $component = $__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94; ?>
-<?php unset($__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94); ?>
-<?php endif; ?>
-                                     <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal174052115c30c7ca400e766c0151d81e)): ?>
-<?php $attributes = $__attributesOriginal174052115c30c7ca400e766c0151d81e; ?>
-<?php unset($__attributesOriginal174052115c30c7ca400e766c0151d81e); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal174052115c30c7ca400e766c0151d81e)): ?>
-<?php $component = $__componentOriginal174052115c30c7ca400e766c0151d81e; ?>
-<?php unset($__componentOriginal174052115c30c7ca400e766c0151d81e); ?>
-<?php endif; ?>
-                                <?php endif; ?>
-
-                                <?php if($isSelectionEnabled && $recordCheckboxPosition === RecordCheckboxPosition::AfterCells): ?>
-                                    <?php if($isRecordSelectable($record)): ?>
-                                        <?php if (isset($component)) { $__componentOriginalc41e0c64e80f29562171958a154e5195 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalc41e0c64e80f29562171958a154e5195 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.checkbox.cell','data' => ['class' => 
-                                                \Illuminate\Support\Arr::toCssClasses([
-                                                    'hidden' => $isReordering,
-                                                ])
-                                            ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::checkbox.cell'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
-                                                \Illuminate\Support\Arr::toCssClasses([
-                                                    'hidden' => $isReordering,
-                                                ])
-                                            )]); ?>
-                                            <?php if (isset($component)) { $__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.checkbox.index','data' => ['xModel' => 'selectedRecords','value' => $recordKey,'label' => __('tables::table.fields.bulk_select_record.label', ['key' => $recordKey]),'class' => 'filament-tables-record-checkbox']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::checkbox'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['x-model' => 'selectedRecords','value' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($recordKey),'label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('tables::table.fields.bulk_select_record.label', ['key' => $recordKey])),'class' => 'filament-tables-record-checkbox']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409)): ?>
-<?php $attributes = $__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409; ?>
-<?php unset($__attributesOriginalcf5e41131e15ad2a36f9d4e05dd93409); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409)): ?>
-<?php $component = $__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409; ?>
-<?php unset($__componentOriginalcf5e41131e15ad2a36f9d4e05dd93409); ?>
-<?php endif; ?>
-                                         <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalc41e0c64e80f29562171958a154e5195)): ?>
-<?php $attributes = $__attributesOriginalc41e0c64e80f29562171958a154e5195; ?>
-<?php unset($__attributesOriginalc41e0c64e80f29562171958a154e5195); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalc41e0c64e80f29562171958a154e5195)): ?>
-<?php $component = $__componentOriginalc41e0c64e80f29562171958a154e5195; ?>
-<?php unset($__componentOriginalc41e0c64e80f29562171958a154e5195); ?>
-<?php endif; ?>
-                                    <?php else: ?>
-                                        <?php if (isset($component)) { $__componentOriginalfb906351acaa93ff5a874f5e70fd8ff6 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalfb906351acaa93ff5a874f5e70fd8ff6 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.cell','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::cell'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes([]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalfb906351acaa93ff5a874f5e70fd8ff6)): ?>
-<?php $attributes = $__attributesOriginalfb906351acaa93ff5a874f5e70fd8ff6; ?>
-<?php unset($__attributesOriginalfb906351acaa93ff5a874f5e70fd8ff6); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalfb906351acaa93ff5a874f5e70fd8ff6)): ?>
-<?php $component = $__componentOriginalfb906351acaa93ff5a874f5e70fd8ff6; ?>
-<?php unset($__componentOriginalfb906351acaa93ff5a874f5e70fd8ff6); ?>
-<?php endif; ?>
-                                    <?php endif; ?>
-                                <?php endif; ?>
-
-                                <?php if(count($actions) && $actionsPosition === ActionsPosition::AfterCells): ?>
-                                    <?php if (isset($component)) { $__componentOriginal174052115c30c7ca400e766c0151d81e = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal174052115c30c7ca400e766c0151d81e = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.actions.cell','data' => ['class' => 
-                                            \Illuminate\Support\Arr::toCssClasses([
-                                                'hidden' => $isReordering,
-                                            ])
-                                        ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::actions.cell'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
-                                            \Illuminate\Support\Arr::toCssClasses([
-                                                'hidden' => $isReordering,
-                                            ])
-                                        )]); ?>
-                                        <?php if (isset($component)) { $__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.actions.index','data' => ['actions' => $actions,'record' => $record]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::actions'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($actions),'record' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($record)]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94)): ?>
-<?php $attributes = $__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94; ?>
-<?php unset($__attributesOriginal9a8b72bf300c2fa6dda80f8a829adc94); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94)): ?>
-<?php $component = $__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94; ?>
-<?php unset($__componentOriginal9a8b72bf300c2fa6dda80f8a829adc94); ?>
-<?php endif; ?>
-                                     <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal174052115c30c7ca400e766c0151d81e)): ?>
-<?php $attributes = $__attributesOriginal174052115c30c7ca400e766c0151d81e; ?>
-<?php unset($__attributesOriginal174052115c30c7ca400e766c0151d81e); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal174052115c30c7ca400e766c0151d81e)): ?>
-<?php $component = $__componentOriginal174052115c30c7ca400e766c0151d81e; ?>
-<?php unset($__componentOriginal174052115c30c7ca400e766c0151d81e); ?>
-<?php endif; ?>
-                                <?php endif; ?>
-
-                                <?php if (isset($component)) { $__componentOriginal356997689ee9d8d9e4fb771427222250 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal356997689ee9d8d9e4fb771427222250 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.loading-cell','data' => ['colspan' => $columnsCount,'wire:loading.class.remove.delay' => 'hidden','class' => 'hidden','wire:key' => $this->id . '.table.records.' . $recordKey . '.loading-cell','wire:target' => ''.e(implode(',', \Filament\Tables\Table::LOADING_TARGETS)).'']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::loading-cell'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['colspan' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columnsCount),'wire:loading.class.remove.delay' => 'hidden','class' => 'hidden','wire:key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($this->id . '.table.records.' . $recordKey . '.loading-cell'),'wire:target' => ''.e(implode(',', \Filament\Tables\Table::LOADING_TARGETS)).'']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal356997689ee9d8d9e4fb771427222250)): ?>
-<?php $attributes = $__attributesOriginal356997689ee9d8d9e4fb771427222250; ?>
-<?php unset($__attributesOriginal356997689ee9d8d9e4fb771427222250); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal356997689ee9d8d9e4fb771427222250)): ?>
-<?php $component = $__componentOriginal356997689ee9d8d9e4fb771427222250; ?>
-<?php unset($__componentOriginal356997689ee9d8d9e4fb771427222250); ?>
-<?php endif; ?>
-                             <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal919ddf55d1edf7e6d8ca3bedc1e9b76c)): ?>
-<?php $attributes = $__attributesOriginal919ddf55d1edf7e6d8ca3bedc1e9b76c; ?>
-<?php unset($__attributesOriginal919ddf55d1edf7e6d8ca3bedc1e9b76c); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal919ddf55d1edf7e6d8ca3bedc1e9b76c)): ?>
-<?php $component = $__componentOriginal919ddf55d1edf7e6d8ca3bedc1e9b76c; ?>
-<?php unset($__componentOriginal919ddf55d1edf7e6d8ca3bedc1e9b76c); ?>
-<?php endif; ?>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-
-                        <?php if($contentFooter): ?>
+                        <!--[if BLOCK]><![endif]--><?php if($contentFooter): ?>
                              <?php $__env->slot('footer', null, []); ?> 
-                                <?php echo e($contentFooter->with(['columns' => $columns, 'records' => $records])); ?>
+                                <?php echo e($contentFooter->with([
+                                        'columns' => $columns,
+                                        'records' => $records,
+                                    ])); ?>
 
                              <?php $__env->endSlot(); ?>
-                        <?php endif; ?>
-                    <?php endif; ?>
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginale8791752ab9231dc4280afc867183d68)): ?>
-<?php $attributes = $__attributesOriginale8791752ab9231dc4280afc867183d68; ?>
-<?php unset($__attributesOriginale8791752ab9231dc4280afc867183d68); ?>
+<?php if (isset($__attributesOriginalce46e569391542b4e56f032ac7380f79)): ?>
+<?php $attributes = $__attributesOriginalce46e569391542b4e56f032ac7380f79; ?>
+<?php unset($__attributesOriginalce46e569391542b4e56f032ac7380f79); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginale8791752ab9231dc4280afc867183d68)): ?>
-<?php $component = $__componentOriginale8791752ab9231dc4280afc867183d68; ?>
-<?php unset($__componentOriginale8791752ab9231dc4280afc867183d68); ?>
+<?php if (isset($__componentOriginalce46e569391542b4e56f032ac7380f79)): ?>
+<?php $component = $__componentOriginalce46e569391542b4e56f032ac7380f79; ?>
+<?php unset($__componentOriginalce46e569391542b4e56f032ac7380f79); ?>
 <?php endif; ?>
             <?php elseif($records === null): ?>
-                <div
-                    class="filament-tables-defer-loading-indicator flex items-center justify-center p-6"
-                >
-                    <div
-                        class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                            'flex h-16 w-16 items-center justify-center rounded-full bg-primary-50 text-primary-500',
-                            'dark:bg-gray-700' => config('tables.dark_mode'),
-                        ]); ?>"
-                    >
-                        <?php if (isset($component)) { $__componentOriginal68a3024fa61352b757a05bc2899e1852 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal68a3024fa61352b757a05bc2899e1852 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-support::components.loading-indicator','data' => ['class' => 'h-6 w-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('filament-support::loading-indicator'); ?>
+                <div class="h-32"></div>
+            <?php elseif($emptyState = $getEmptyState()): ?>
+                <?php echo e($emptyState); ?>
+
+            <?php else: ?>
+                <tr>
+                    <td colspan="<?php echo e($columnsCount); ?>">
+                        <?php if (isset($component)) { $__componentOriginal9608358ee6650b8d3d7c633eba6d028e = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9608358ee6650b8d3d7c633eba6d028e = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.empty-state.index','data' => ['actions' => $getEmptyStateActions(),'description' => $getEmptyStateDescription(),'heading' => $getEmptyStateHeading(),'icon' => $getEmptyStateIcon()]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::empty-state'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['class' => 'h-6 w-6']); ?>
+<?php $component->withAttributes(['actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getEmptyStateActions()),'description' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getEmptyStateDescription()),'heading' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getEmptyStateHeading()),'icon' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getEmptyStateIcon())]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal68a3024fa61352b757a05bc2899e1852)): ?>
-<?php $attributes = $__attributesOriginal68a3024fa61352b757a05bc2899e1852; ?>
-<?php unset($__attributesOriginal68a3024fa61352b757a05bc2899e1852); ?>
+<?php if (isset($__attributesOriginal9608358ee6650b8d3d7c633eba6d028e)): ?>
+<?php $attributes = $__attributesOriginal9608358ee6650b8d3d7c633eba6d028e; ?>
+<?php unset($__attributesOriginal9608358ee6650b8d3d7c633eba6d028e); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal68a3024fa61352b757a05bc2899e1852)): ?>
-<?php $component = $__componentOriginal68a3024fa61352b757a05bc2899e1852; ?>
-<?php unset($__componentOriginal68a3024fa61352b757a05bc2899e1852); ?>
+<?php if (isset($__componentOriginal9608358ee6650b8d3d7c633eba6d028e)): ?>
+<?php $component = $__componentOriginal9608358ee6650b8d3d7c633eba6d028e; ?>
+<?php unset($__componentOriginal9608358ee6650b8d3d7c633eba6d028e); ?>
 <?php endif; ?>
-                    </div>
-                </div>
-            <?php else: ?>
-                <?php if($emptyState = $getEmptyState()): ?>
-                    <?php echo e($emptyState); ?>
-
-                <?php else: ?>
-                    <div class="flex items-center justify-center p-4">
-                        <?php if (isset($component)) { $__componentOriginalaf605259d054ed4913ba4ce9aa727e24 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalaf605259d054ed4913ba4ce9aa727e24 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.empty-state.index','data' => ['icon' => $getEmptyStateIcon(),'actions' => $getEmptyStateActions(),'columnSearches' => $hasColumnSearches()]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::empty-state'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['icon' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getEmptyStateIcon()),'actions' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getEmptyStateActions()),'column-searches' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($hasColumnSearches())]); ?>
-                             <?php $__env->slot('heading', null, []); ?> 
-                                <?php echo e($getEmptyStateHeading()); ?>
-
-                             <?php $__env->endSlot(); ?>
-
-                             <?php $__env->slot('description', null, []); ?> 
-                                <?php echo e($getEmptyStateDescription()); ?>
-
-                             <?php $__env->endSlot(); ?>
-                         <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalaf605259d054ed4913ba4ce9aa727e24)): ?>
-<?php $attributes = $__attributesOriginalaf605259d054ed4913ba4ce9aa727e24; ?>
-<?php unset($__attributesOriginalaf605259d054ed4913ba4ce9aa727e24); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalaf605259d054ed4913ba4ce9aa727e24)): ?>
-<?php $component = $__componentOriginalaf605259d054ed4913ba4ce9aa727e24; ?>
-<?php unset($__componentOriginalaf605259d054ed4913ba4ce9aa727e24); ?>
-<?php endif; ?>
-                    </div>
-                <?php endif; ?>
-            <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
         </div>
 
-        <?php if($records instanceof \Illuminate\Contracts\Pagination\Paginator &&
-             ((! $records instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator) || $records->total())): ?>
-            <div
-                class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                    'filament-tables-pagination-container border-t p-2',
-                    'dark:border-gray-700' => config('tables.dark_mode'),
-                ]); ?>"
-            >
-                <?php if (isset($component)) { $__componentOriginale04db629476c4856f818ec08ae7d1dbe = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginale04db629476c4856f818ec08ae7d1dbe = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.pagination.index','data' => ['paginator' => $records,'recordsPerPageSelectOptions' => $getRecordsPerPageSelectOptions()]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::pagination'); ?>
+        <!--[if BLOCK]><![endif]--><?php if((($records instanceof \Illuminate\Contracts\Pagination\Paginator) || ($records instanceof \Illuminate\Contracts\Pagination\CursorPaginator)) &&
+             ((! ($records instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator)) || $records->total())): ?>
+            <?php if (isset($component)) { $__componentOriginal0c287a00f29f01c8f977078ff96faed4 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal0c287a00f29f01c8f977078ff96faed4 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.pagination.index','data' => ['extremeLinks' => $hasExtremePaginationLinks(),'pageOptions' => $getPaginationPageOptions(),'paginator' => $records,'class' => 'fi-ta-pagination px-3 py-3 sm:px-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament::pagination'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['paginator' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($records),'records-per-page-select-options' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getRecordsPerPageSelectOptions())]); ?>
+<?php $component->withAttributes(['extreme-links' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($hasExtremePaginationLinks()),'page-options' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getPaginationPageOptions()),'paginator' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($records),'class' => 'fi-ta-pagination px-3 py-3 sm:px-6']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginale04db629476c4856f818ec08ae7d1dbe)): ?>
-<?php $attributes = $__attributesOriginale04db629476c4856f818ec08ae7d1dbe; ?>
-<?php unset($__attributesOriginale04db629476c4856f818ec08ae7d1dbe); ?>
+<?php if (isset($__attributesOriginal0c287a00f29f01c8f977078ff96faed4)): ?>
+<?php $attributes = $__attributesOriginal0c287a00f29f01c8f977078ff96faed4; ?>
+<?php unset($__attributesOriginal0c287a00f29f01c8f977078ff96faed4); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginale04db629476c4856f818ec08ae7d1dbe)): ?>
-<?php $component = $__componentOriginale04db629476c4856f818ec08ae7d1dbe; ?>
-<?php unset($__componentOriginale04db629476c4856f818ec08ae7d1dbe); ?>
+<?php if (isset($__componentOriginal0c287a00f29f01c8f977078ff96faed4)): ?>
+<?php $component = $__componentOriginal0c287a00f29f01c8f977078ff96faed4; ?>
+<?php unset($__componentOriginal0c287a00f29f01c8f977078ff96faed4); ?>
 <?php endif; ?>
-            </div>
-        <?php endif; ?>
+        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-        <?php if($hasFiltersAfterContent): ?>
-            <div class="px-2 pb-2">
-                <?php if (isset($component)) { $__componentOriginal1c6b9867004d1a406262ace2c95ab783 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal1c6b9867004d1a406262ace2c95ab783 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.hr','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::hr'); ?>
+        <!--[if BLOCK]><![endif]--><?php if($hasFiltersBelowContent): ?>
+            <?php if (isset($component)) { $__componentOriginal8fcc8bb3dcedd6e3c85ec7cd95e48b39 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal8fcc8bb3dcedd6e3c85ec7cd95e48b39 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-tables::components.filters.index','data' => ['applyAction' => $getFiltersApplyAction(),'form' => $getFiltersForm(),'class' => 'fi-ta-filters-below-content p-4 sm:px-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-tables::filters'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes([]); ?>
+<?php $component->withAttributes(['apply-action' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getFiltersApplyAction()),'form' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getFiltersForm()),'class' => 'fi-ta-filters-below-content p-4 sm:px-6']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal1c6b9867004d1a406262ace2c95ab783)): ?>
-<?php $attributes = $__attributesOriginal1c6b9867004d1a406262ace2c95ab783; ?>
-<?php unset($__attributesOriginal1c6b9867004d1a406262ace2c95ab783); ?>
+<?php if (isset($__attributesOriginal8fcc8bb3dcedd6e3c85ec7cd95e48b39)): ?>
+<?php $attributes = $__attributesOriginal8fcc8bb3dcedd6e3c85ec7cd95e48b39; ?>
+<?php unset($__attributesOriginal8fcc8bb3dcedd6e3c85ec7cd95e48b39); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal1c6b9867004d1a406262ace2c95ab783)): ?>
-<?php $component = $__componentOriginal1c6b9867004d1a406262ace2c95ab783; ?>
-<?php unset($__componentOriginal1c6b9867004d1a406262ace2c95ab783); ?>
+<?php if (isset($__componentOriginal8fcc8bb3dcedd6e3c85ec7cd95e48b39)): ?>
+<?php $component = $__componentOriginal8fcc8bb3dcedd6e3c85ec7cd95e48b39; ?>
+<?php unset($__componentOriginal8fcc8bb3dcedd6e3c85ec7cd95e48b39); ?>
 <?php endif; ?>
-
-                <div class="mt-2 p-4">
-                    <?php if (isset($component)) { $__componentOriginal3b3fa8ec7d71109f7bdf00def1db315e = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal3b3fa8ec7d71109f7bdf00def1db315e = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.filters.index','data' => ['form' => $getFiltersForm()]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::filters'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['form' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getFiltersForm())]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal3b3fa8ec7d71109f7bdf00def1db315e)): ?>
-<?php $attributes = $__attributesOriginal3b3fa8ec7d71109f7bdf00def1db315e; ?>
-<?php unset($__attributesOriginal3b3fa8ec7d71109f7bdf00def1db315e); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal3b3fa8ec7d71109f7bdf00def1db315e)): ?>
-<?php $component = $__componentOriginal3b3fa8ec7d71109f7bdf00def1db315e; ?>
-<?php unset($__componentOriginal3b3fa8ec7d71109f7bdf00def1db315e); ?>
-<?php endif; ?>
-                </div>
-            </div>
-        <?php endif; ?>
+        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
      <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginaldbe408be6b5fd2d95479478edae3b0a1)): ?>
-<?php $attributes = $__attributesOriginaldbe408be6b5fd2d95479478edae3b0a1; ?>
-<?php unset($__attributesOriginaldbe408be6b5fd2d95479478edae3b0a1); ?>
+<?php if (isset($__attributesOriginal848259f0d87ae1451c78bda371b1fb91)): ?>
+<?php $attributes = $__attributesOriginal848259f0d87ae1451c78bda371b1fb91; ?>
+<?php unset($__attributesOriginal848259f0d87ae1451c78bda371b1fb91); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginaldbe408be6b5fd2d95479478edae3b0a1)): ?>
-<?php $component = $__componentOriginaldbe408be6b5fd2d95479478edae3b0a1; ?>
-<?php unset($__componentOriginaldbe408be6b5fd2d95479478edae3b0a1); ?>
+<?php if (isset($__componentOriginal848259f0d87ae1451c78bda371b1fb91)): ?>
+<?php $component = $__componentOriginal848259f0d87ae1451c78bda371b1fb91; ?>
+<?php unset($__componentOriginal848259f0d87ae1451c78bda371b1fb91); ?>
 <?php endif; ?>
 
-    <form wire:submit.prevent="callMountedTableAction">
-        <?php
-            $action = $getMountedAction();
-        ?>
-
-        <?php if (isset($component)) { $__componentOriginal80bcb2ba5ecc9d2854343e3b086e6055 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal80bcb2ba5ecc9d2854343e3b086e6055 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.modal.index','data' => ['id' => $this->id . '-table-action','wire:key' => $action ? $this->id . '.table.actions.' . $action->getName() . '.modal' : null,'visible' => filled($action),'width' => $action?->getModalWidth(),'slideOver' => $action?->isModalSlideOver(),'closeByClickingAway' => $action?->isModalClosedByClickingAway(),'displayClasses' => 'block','xInit' => 'livewire = $wire.__instance','xOn:modalClosed.stop' => '
-                if (\'mountedTableAction\' in livewire?.serverMemo.data) {
-                    livewire.set(\'mountedTableAction\', null)
-                }
-
-                if (\'mountedTableActionRecord\' in livewire?.serverMemo.data) {
-                    livewire.set(\'mountedTableActionRecord\', null)
-                }
-            ']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::modal'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['id' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($this->id . '-table-action'),'wire:key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($action ? $this->id . '.table.actions.' . $action->getName() . '.modal' : null),'visible' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(filled($action)),'width' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($action?->getModalWidth()),'slide-over' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($action?->isModalSlideOver()),'close-by-clicking-away' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($action?->isModalClosedByClickingAway()),'display-classes' => 'block','x-init' => 'livewire = $wire.__instance','x-on:modal-closed.stop' => '
-                if (\'mountedTableAction\' in livewire?.serverMemo.data) {
-                    livewire.set(\'mountedTableAction\', null)
-                }
-
-                if (\'mountedTableActionRecord\' in livewire?.serverMemo.data) {
-                    livewire.set(\'mountedTableActionRecord\', null)
-                }
-            ']); ?>
-            <?php if($action): ?>
-                <?php if($action->isModalCentered()): ?>
-                    <?php if($heading = $action->getModalHeading()): ?>
-                         <?php $__env->slot('heading', null, []); ?> 
-                            <?php echo e($heading); ?>
-
-                         <?php $__env->endSlot(); ?>
-                    <?php endif; ?>
-
-                    <?php if($subheading = $action->getModalSubheading()): ?>
-                         <?php $__env->slot('subheading', null, []); ?> 
-                            <?php echo e($subheading); ?>
-
-                         <?php $__env->endSlot(); ?>
-                    <?php endif; ?>
-                <?php else: ?>
-                     <?php $__env->slot('header', null, []); ?> 
-                        <?php if($heading = $action->getModalHeading()): ?>
-                            <?php if (isset($component)) { $__componentOriginalfec2efb2a3a6d7053c08364d8a2bccd4 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalfec2efb2a3a6d7053c08364d8a2bccd4 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.modal.heading','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::modal.heading'); ?>
+    <?php if (isset($component)) { $__componentOriginal028e05680f6c5b1e293abd7fbe5f9758 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal028e05680f6c5b1e293abd7fbe5f9758 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-actions::components.modals','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament-actions::modals'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
-                                <?php echo e($heading); ?>
-
-                             <?php echo $__env->renderComponent(); ?>
+<?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginalfec2efb2a3a6d7053c08364d8a2bccd4)): ?>
-<?php $attributes = $__attributesOriginalfec2efb2a3a6d7053c08364d8a2bccd4; ?>
-<?php unset($__attributesOriginalfec2efb2a3a6d7053c08364d8a2bccd4); ?>
+<?php if (isset($__attributesOriginal028e05680f6c5b1e293abd7fbe5f9758)): ?>
+<?php $attributes = $__attributesOriginal028e05680f6c5b1e293abd7fbe5f9758; ?>
+<?php unset($__attributesOriginal028e05680f6c5b1e293abd7fbe5f9758); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginalfec2efb2a3a6d7053c08364d8a2bccd4)): ?>
-<?php $component = $__componentOriginalfec2efb2a3a6d7053c08364d8a2bccd4; ?>
-<?php unset($__componentOriginalfec2efb2a3a6d7053c08364d8a2bccd4); ?>
+<?php if (isset($__componentOriginal028e05680f6c5b1e293abd7fbe5f9758)): ?>
+<?php $component = $__componentOriginal028e05680f6c5b1e293abd7fbe5f9758; ?>
+<?php unset($__componentOriginal028e05680f6c5b1e293abd7fbe5f9758); ?>
 <?php endif; ?>
-                        <?php endif; ?>
-
-                        <?php if($subheading = $action->getModalSubheading()): ?>
-                            <?php if (isset($component)) { $__componentOriginal8fdb4fc6d2bb857caf7ef0c59466a270 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal8fdb4fc6d2bb857caf7ef0c59466a270 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.modal.subheading','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::modal.subheading'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes([]); ?>
-                                <?php echo e($subheading); ?>
-
-                             <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal8fdb4fc6d2bb857caf7ef0c59466a270)): ?>
-<?php $attributes = $__attributesOriginal8fdb4fc6d2bb857caf7ef0c59466a270; ?>
-<?php unset($__attributesOriginal8fdb4fc6d2bb857caf7ef0c59466a270); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal8fdb4fc6d2bb857caf7ef0c59466a270)): ?>
-<?php $component = $__componentOriginal8fdb4fc6d2bb857caf7ef0c59466a270; ?>
-<?php unset($__componentOriginal8fdb4fc6d2bb857caf7ef0c59466a270); ?>
-<?php endif; ?>
-                        <?php endif; ?>
-                     <?php $__env->endSlot(); ?>
-                <?php endif; ?>
-
-                <?php echo e($action->getModalContent()); ?>
-
-
-                <?php if($action->hasFormSchema()): ?>
-                    <?php echo e($getMountedActionForm()); ?>
-
-                <?php endif; ?>
-
-                <?php echo e($action->getModalFooter()); ?>
-
-
-                <?php if(count($action->getModalActions())): ?>
-                     <?php $__env->slot('footer', null, []); ?> 
-                        <?php if (isset($component)) { $__componentOriginal5a5413fc570472af81d8170aa3892507 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal5a5413fc570472af81d8170aa3892507 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.modal.actions','data' => ['fullWidth' => $action->isModalCentered()]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::modal.actions'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['full-width' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($action->isModalCentered())]); ?>
-                            <?php $__currentLoopData = $action->getModalActions(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $modalAction): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <?php echo e($modalAction); ?>
-
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                         <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal5a5413fc570472af81d8170aa3892507)): ?>
-<?php $attributes = $__attributesOriginal5a5413fc570472af81d8170aa3892507; ?>
-<?php unset($__attributesOriginal5a5413fc570472af81d8170aa3892507); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal5a5413fc570472af81d8170aa3892507)): ?>
-<?php $component = $__componentOriginal5a5413fc570472af81d8170aa3892507; ?>
-<?php unset($__componentOriginal5a5413fc570472af81d8170aa3892507); ?>
-<?php endif; ?>
-                     <?php $__env->endSlot(); ?>
-                <?php endif; ?>
-            <?php endif; ?>
-         <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal80bcb2ba5ecc9d2854343e3b086e6055)): ?>
-<?php $attributes = $__attributesOriginal80bcb2ba5ecc9d2854343e3b086e6055; ?>
-<?php unset($__attributesOriginal80bcb2ba5ecc9d2854343e3b086e6055); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal80bcb2ba5ecc9d2854343e3b086e6055)): ?>
-<?php $component = $__componentOriginal80bcb2ba5ecc9d2854343e3b086e6055; ?>
-<?php unset($__componentOriginal80bcb2ba5ecc9d2854343e3b086e6055); ?>
-<?php endif; ?>
-    </form>
-
-    <form wire:submit.prevent="callMountedTableBulkAction">
-        <?php
-            $action = $getMountedBulkAction();
-        ?>
-
-        <?php if (isset($component)) { $__componentOriginal80bcb2ba5ecc9d2854343e3b086e6055 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal80bcb2ba5ecc9d2854343e3b086e6055 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.modal.index','data' => ['id' => $this->id . '-table-bulk-action','wire:key' => $action ? $this->id . '.table.bulk-actions.' . $action->getName() . '.modal' : null,'visible' => filled($action),'width' => $action?->getModalWidth(),'slideOver' => $action?->isModalSlideOver(),'closeByClickingAway' => $action?->isModalClosedByClickingAway(),'displayClasses' => 'block','xInit' => 'livewire = $wire.__instance','xOn:modalClosed.stop' => 'if (\'mountedTableBulkAction\' in livewire?.serverMemo.data) livewire.set(\'mountedTableBulkAction\', null)']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::modal'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['id' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($this->id . '-table-bulk-action'),'wire:key' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($action ? $this->id . '.table.bulk-actions.' . $action->getName() . '.modal' : null),'visible' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(filled($action)),'width' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($action?->getModalWidth()),'slide-over' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($action?->isModalSlideOver()),'close-by-clicking-away' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($action?->isModalClosedByClickingAway()),'display-classes' => 'block','x-init' => 'livewire = $wire.__instance','x-on:modal-closed.stop' => 'if (\'mountedTableBulkAction\' in livewire?.serverMemo.data) livewire.set(\'mountedTableBulkAction\', null)']); ?>
-            <?php if($action): ?>
-                <?php if($action->isModalCentered()): ?>
-                    <?php if($heading = $action->getModalHeading()): ?>
-                         <?php $__env->slot('heading', null, []); ?> 
-                            <?php echo e($heading); ?>
-
-                         <?php $__env->endSlot(); ?>
-                    <?php endif; ?>
-
-                    <?php if($subheading = $action->getModalSubheading()): ?>
-                         <?php $__env->slot('subheading', null, []); ?> 
-                            <?php echo e($subheading); ?>
-
-                         <?php $__env->endSlot(); ?>
-                    <?php endif; ?>
-                <?php else: ?>
-                     <?php $__env->slot('header', null, []); ?> 
-                        <?php if($heading = $action->getModalHeading()): ?>
-                            <?php if (isset($component)) { $__componentOriginalfec2efb2a3a6d7053c08364d8a2bccd4 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalfec2efb2a3a6d7053c08364d8a2bccd4 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.modal.heading','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::modal.heading'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes([]); ?>
-                                <?php echo e($heading); ?>
-
-                             <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalfec2efb2a3a6d7053c08364d8a2bccd4)): ?>
-<?php $attributes = $__attributesOriginalfec2efb2a3a6d7053c08364d8a2bccd4; ?>
-<?php unset($__attributesOriginalfec2efb2a3a6d7053c08364d8a2bccd4); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalfec2efb2a3a6d7053c08364d8a2bccd4)): ?>
-<?php $component = $__componentOriginalfec2efb2a3a6d7053c08364d8a2bccd4; ?>
-<?php unset($__componentOriginalfec2efb2a3a6d7053c08364d8a2bccd4); ?>
-<?php endif; ?>
-                        <?php endif; ?>
-
-                        <?php if($subheading = $action->getModalSubheading()): ?>
-                            <?php if (isset($component)) { $__componentOriginal8fdb4fc6d2bb857caf7ef0c59466a270 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal8fdb4fc6d2bb857caf7ef0c59466a270 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.modal.subheading','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::modal.subheading'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes([]); ?>
-                                <?php echo e($subheading); ?>
-
-                             <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal8fdb4fc6d2bb857caf7ef0c59466a270)): ?>
-<?php $attributes = $__attributesOriginal8fdb4fc6d2bb857caf7ef0c59466a270; ?>
-<?php unset($__attributesOriginal8fdb4fc6d2bb857caf7ef0c59466a270); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal8fdb4fc6d2bb857caf7ef0c59466a270)): ?>
-<?php $component = $__componentOriginal8fdb4fc6d2bb857caf7ef0c59466a270; ?>
-<?php unset($__componentOriginal8fdb4fc6d2bb857caf7ef0c59466a270); ?>
-<?php endif; ?>
-                        <?php endif; ?>
-                     <?php $__env->endSlot(); ?>
-                <?php endif; ?>
-
-                <?php echo e($action->getModalContent()); ?>
-
-
-                <?php if($action->hasFormSchema()): ?>
-                    <?php echo e($getMountedBulkActionForm()); ?>
-
-                <?php endif; ?>
-
-                <?php echo e($action->getModalFooter()); ?>
-
-
-                <?php if(count($action->getModalActions())): ?>
-                     <?php $__env->slot('footer', null, []); ?> 
-                        <?php if (isset($component)) { $__componentOriginal5a5413fc570472af81d8170aa3892507 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal5a5413fc570472af81d8170aa3892507 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'tables::components.modal.actions','data' => ['fullWidth' => $action->isModalCentered()]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('tables::modal.actions'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['full-width' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($action->isModalCentered())]); ?>
-                            <?php $__currentLoopData = $action->getModalActions(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $modalAction): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <?php echo e($modalAction); ?>
-
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                         <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal5a5413fc570472af81d8170aa3892507)): ?>
-<?php $attributes = $__attributesOriginal5a5413fc570472af81d8170aa3892507; ?>
-<?php unset($__attributesOriginal5a5413fc570472af81d8170aa3892507); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal5a5413fc570472af81d8170aa3892507)): ?>
-<?php $component = $__componentOriginal5a5413fc570472af81d8170aa3892507; ?>
-<?php unset($__componentOriginal5a5413fc570472af81d8170aa3892507); ?>
-<?php endif; ?>
-                     <?php $__env->endSlot(); ?>
-                <?php endif; ?>
-            <?php endif; ?>
-         <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal80bcb2ba5ecc9d2854343e3b086e6055)): ?>
-<?php $attributes = $__attributesOriginal80bcb2ba5ecc9d2854343e3b086e6055; ?>
-<?php unset($__attributesOriginal80bcb2ba5ecc9d2854343e3b086e6055); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal80bcb2ba5ecc9d2854343e3b086e6055)): ?>
-<?php $component = $__componentOriginal80bcb2ba5ecc9d2854343e3b086e6055; ?>
-<?php unset($__componentOriginal80bcb2ba5ecc9d2854343e3b086e6055); ?>
-<?php endif; ?>
-    </form>
-
-    <?php if(! $this instanceof \Filament\Tables\Contracts\RendersFormComponentActionModal): ?>
-        <?php echo e($this->modal); ?>
-
-    <?php endif; ?>
 </div>
 <?php /**PATH /Users/muhammadaakifraza/Herd/Portal/vendor/filament/tables/src/../resources/views/index.blade.php ENDPATH**/ ?>

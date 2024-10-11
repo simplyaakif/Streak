@@ -1,4 +1,4 @@
-<form wire:submit.prevent="submit" class="pt-3">
+<form wire:submit="submit" class="pt-3">
 
     <div class="form-group {{ $errors->has('mediaCollections.course_featured_image') ? 'invalid' : '' }}">
         <label class="form-label" for="featured_image">{{ trans('cruds.course.fields.featured_image') }}</label>
@@ -12,7 +12,7 @@
     </div>
     <div class="form-group {{ $errors->has('course.title') ? 'invalid' : '' }}">
         <label class="form-label required" for="title">{{ trans('cruds.course.fields.title') }}</label>
-        <input class="form-control" type="text" name="title" id="title" required wire:model.defer="course.title">
+        <input class="form-control" type="text" name="title" id="title" required wire:model="course.title">
         <div class="validation-message">
             {{ $errors->first('course.title') }}
         </div>
@@ -22,7 +22,7 @@
     </div>
     <div class="form-group {{ $errors->has('course.description') ? 'invalid' : '' }}">
         <label class="form-label" for="description">{{ trans('cruds.course.fields.description') }}</label>
-        <input class="form-control" type="text" name="description" id="description" wire:model.defer="course.description">
+        <input class="form-control" type="text" name="description" id="description" wire:model="course.description">
         <div class="validation-message">
             {{ $errors->first('course.description') }}
         </div>

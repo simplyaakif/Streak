@@ -6,8 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta name="theme-color" content="#000000"/>
 
-    <link rel="stylesheet" href="<?php echo e(asset('css/student.css')); ?>"/>
-    <title><?php echo e(trans('panel.site_title')); ?></title>
+
+    <link rel="stylesheet" href="<?php echo e(asset('css/app.css')); ?>"/>
+    <link rel="stylesheet" href="<?php echo e(asset('css/filament/support/support.css')); ?>"/>
+
+    <title><?php echo e(config('app.name')); ?></title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
     <meta http-equiv="Pragma" content="no-cache"/>
     <meta http-equiv="Expires" content="0"/>
@@ -16,35 +19,30 @@
     <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;700&display=swap" rel="stylesheet">
 
-
-
     <script src="<?php echo e(asset('js/components.js')); ?>"></script>
-
-
 
     <style>
         [x-cloak] { display: none !important; }
     </style>
 
-    <?php echo \Livewire\Livewire::styles(); ?>
-
+    <?php echo \Filament\Support\Facades\FilamentAsset::renderStyles() ?>
     <?php echo $__env->yieldPushContent('styles'); ?>
-    <?php echo \Livewire\Livewire::scripts(); ?>
-
+    <?php echo \Filament\Support\Facades\FilamentAsset::renderScripts() ?>
     <?php
-if (! isset($_instance)) {
-    $html = \Livewire\Livewire::mount('notifications')->html();
-} elseif ($_instance->childHasBeenRendered('PxY3uuF')) {
-    $componentId = $_instance->getRenderedChildComponentId('PxY3uuF');
-    $componentTag = $_instance->getRenderedChildComponentTagName('PxY3uuF');
-    $html = \Livewire\Livewire::dummyMount($componentId, $componentTag);
-    $_instance->preserveRenderedChild('PxY3uuF');
-} else {
-    $response = \Livewire\Livewire::mount('notifications');
-    $html = $response->html();
-    $_instance->logRenderedChild('PxY3uuF', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
-}
-echo $html;
+$__split = function ($name, $params = []) {
+    return [$name, $params];
+};
+[$__name, $__params] = $__split('notifications');
+
+$__html = app('livewire')->mount($__name, $__params, 'lw-667336964-0', $__slots ?? [], get_defined_vars());
+
+echo $__html;
+
+unset($__html);
+unset($__name);
+unset($__params);
+unset($__split);
+if (isset($__slots)) unset($__slots);
 ?>
 </head>
 
@@ -143,23 +141,7 @@ echo $html;
 </form>
 <script type="text/javascript" src="<?php echo e(asset('js/app.js')); ?>"></script>
 
-<script src="<?php echo e(mix('js/filament.js')); ?>" defer></script>
 
-<?php
-if (! isset($_instance)) {
-    $html = \Livewire\Livewire::mount('livewire-ui-spotlight')->html();
-} elseif ($_instance->childHasBeenRendered('9SGuwFf')) {
-    $componentId = $_instance->getRenderedChildComponentId('9SGuwFf');
-    $componentTag = $_instance->getRenderedChildComponentTagName('9SGuwFf');
-    $html = \Livewire\Livewire::dummyMount($componentId, $componentTag);
-    $_instance->preserveRenderedChild('9SGuwFf');
-} else {
-    $response = \Livewire\Livewire::mount('livewire-ui-spotlight');
-    $html = $response->html();
-    $_instance->logRenderedChild('9SGuwFf', $response->id(), \Livewire\Livewire::getRootElementTagName($html));
-}
-echo $html;
-?>
 <?php echo $__env->yieldContent('scripts'); ?>
 <?php echo $__env->yieldPushContent('scripts'); ?>
 

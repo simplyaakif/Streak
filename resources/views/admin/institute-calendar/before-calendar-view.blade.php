@@ -18,7 +18,7 @@
     </div>
 
     <div>
-        <x-modal.dialog wire:model="viewModal">
+        <x-modal.dialog wire:model.live="viewModal">
             <x-slot name="title">Event Details</x-slot>
             <x-slot name="content">
                 <table>
@@ -48,29 +48,29 @@
         </x-modal.dialog>
     </div>
 
-    <form wire:submit.prevent="submit()">
-        <x-modal.dialog wire:model="showModal">
+    <form wire:submit="submit()">
+        <x-modal.dialog wire:model.live="showModal">
             <x-slot name="title">
                 Add Event
             </x-slot>
             <x-slot name="content">
                 <label for="">
                     Title
-                    <x-common.data-input-text wire:model.defer="event.title"/>
+                    <x-common.data-input-text wire:model="event.title"/>
                 </label>
                 <label for="">
                     Short Description
-                    <x-common.data-input-text wire:model.defer="event.short_description"/>
+                    <x-common.data-input-text wire:model="event.short_description"/>
                 </label>
 
                 <label for="">
                     Event Date
-                    <x-common.data-input-text wire:model.defer="event.event_date" type="datetime-local"/>
+                    <x-common.data-input-text wire:model="event.event_date" type="datetime-local"/>
                 </label>
 
                 <label for="">
                     Long Description
-                    <x-common.data-textarea wire:model.defer="event.long_description" rows="10"/>
+                    <x-common.data-textarea wire:model="event.long_description" rows="10"/>
                 </label>
             </x-slot>
             <x-slot name="footer">

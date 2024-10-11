@@ -1,6 +1,6 @@
 <div wire:loading.class="opacity-50">
-    <form wire:submit.prevent="submit">
-        <x-modal.dialog wire:model="showModal">
+    <form wire:submit="submit">
+        <x-modal.dialog wire:model.live="showModal">
             <x-slot name="title">Recovery Sections</x-slot>
             <x-slot name="content">
                 <label for="">
@@ -8,14 +8,14 @@
                     <x-common.data-input-text
                         disabled
                         error="recovery.amount"
-                        wire:model="recovery.amount"/>
+                        wire:model.live="recovery.amount"/>
                 </label>
                 <div class="grid grid-cols-3 gap-2">
                     <label for="">
                         Account
                         <x-common.data-input-select
                             error="recovery.account_id"
-                            wire:model="recovery.account_id">
+                            wire:model.live="recovery.account_id">
                             @forelse($accounts as $account)
                                 <option value="{{$account->id}}">{{$account->title}}</option>
                             @empty
@@ -24,7 +24,7 @@
                     </label>
                     <label for="">
                         Transaction Id/ Slip #
-                        <x-common.data-input-text wire:model.defer="recovery.slip_number"
+                        <x-common.data-input-text wire:model="recovery.slip_number"
                                                   error="recovery.slip_number"
                         />
                     </label>
@@ -32,7 +32,7 @@
                         Date of Payment
                         <x-common.data-input-text
                             error="recovery.paid_on"
-                            type="date" wire:model="recovery.paid_on"/>
+                            type="date" wire:model.live="recovery.paid_on"/>
                     </label>
                 </div>
             </x-slot>
@@ -43,8 +43,8 @@
         </x-modal.dialog>
     </form>
 
-    <form wire:submit.prevent="updateNewRecoveries">
-        <x-modal.dialog wire:model="showEditModal">
+    <form wire:submit="updateNewRecoveries">
+        <x-modal.dialog wire:model.live="showEditModal">
             <x-slot name="title">Edit Unpaid Recoveries</x-slot>
             <x-slot name="content">
                 <x-common.table>
@@ -91,11 +91,11 @@
                 <div class="grid grid-cols-7 gap-2 items-center" wire:key="{{$k}}">
                     <label for="" class="col-span-3 text-xs">
                         Amount
-                        <x-common.data-input-text wire:model="newRecoveries.{{$k}}.amount"/>
+                        <x-common.data-input-text wire:model.live="newRecoveries.{{$k}}.amount"/>
                     </label>
                     <label for="" class="col-span-3 text-xs">
                         Due Date
-                        <x-common.data-input-text type="date" wire:model="newRecoveries.{{$k}}.due_date"/>
+                        <x-common.data-input-text type="date" wire:model.live="newRecoveries.{{$k}}.due_date"/>
                     </label>
                     <label for="" class="text-xs">
                         Remove

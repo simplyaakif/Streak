@@ -1,8 +1,8 @@
-<div x-data="{ open: @entangle('showQuery') }" class="align-middle min-w-full overflow-x-auto space-y-4 overflow-hidden
+<div x-data="{ open: @entangle('showQuery').live }" class="align-middle min-w-full overflow-x-auto space-y-4 overflow-hidden
 sm:rounded-lg">
     <div class="space-x-2 flex">
         <div class="w-1/4 ">
-            <x-common.data-input-text wire:model="filters.search" placeholder="Search Query by Name"/>
+            <x-common.data-input-text wire:model.live="filters.search" placeholder="Search Query by Name"/>
         </div>
         <button wire:click="$toggle('showFilters')">
             @if ($showFilters) Hide @endif
@@ -16,7 +16,7 @@ sm:rounded-lg">
                 <div class="flex w-full">
                     <div class="w-1/2 pr-2 space-y-4">
                         <x-common.input.group inline for="filter-status" label="Status">
-                            <x-common.data-input-select wire:model="filters.course" id="filter-status">
+                            <x-common.data-input-select wire:model.live="filters.course" id="filter-status">
                                 <option value="" disabled>Select Course...</option>
                                 @foreach($courses as $course)
                                     <option value="{{$course->id}}">{{$course->title}}</option>
@@ -29,13 +29,13 @@ sm:rounded-lg">
                     <div class="w-1/2 space-x-2  flex">
                         <x-common.input.group inline for="filter-date-min" label="Minimum Date">
                             <x-common.data-input-text
-                                wire:model="filters.date_min"
+                                wire:model.live="filters.date_min"
                                 id="filter-date-min" placeholder="MM/DD/YYYY"/>
                         </x-common.input.group>
 
                         <x-common.input.group inline for="filter-date-max" label="Maximum Date">
                             <x-common.data-input-text
-                                wire:model="filters.date_max"
+                                wire:model.live="filters.date_max"
                                 id="filter-date-max" placeholder="MM/DD/YYYY"/>
                         </x-common.input.group>
 

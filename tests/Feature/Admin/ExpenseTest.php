@@ -2,7 +2,7 @@
 
     namespace Tests\Feature\Admin;
 
-    use App\Http\Livewire\Admin\Finance\Expense\Index;
+    use App\Livewire\Admin\Finance\Expense\Index;
     use App\Models\Account;
     use App\Models\Expense;
     use Database\Seeders\AccountsTableSeeder;

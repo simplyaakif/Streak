@@ -18,130 +18,71 @@
 } ?>
 <?php unset($__defined_vars); ?>
 
-<?php if(count($indicators)): ?>
-    <div
-        <?php echo e($attributes->class(['filament-tables-filter-indicators flex gap-x-4 bg-gray-500/5 px-4 py-1 text-sm'])); ?>
+<div
+    <?php echo e($attributes->class(['fi-ta-filter-indicators flex items-start justify-between gap-x-3 bg-gray-50 px-3 py-1.5 dark:bg-white/5 sm:px-6'])); ?>
 
-    >
-        <div class="flex flex-1 flex-wrap items-center gap-x-2 gap-y-1">
-            <span class="font-medium dark:text-gray-200">
-                <?php echo e(__('tables::table.filters.indicator')); ?>
+>
+    <div class="flex flex-col gap-x-3 gap-y-1 sm:flex-row">
+        <span
+            class="whitespace-nowrap text-sm font-medium leading-6 text-gray-700 dark:text-gray-200"
+        >
+            <?php echo e(__('filament-tables::table.filters.indicator')); ?>
 
-            </span>
+        </span>
 
-            <?php $__currentLoopData = $indicators; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $filter => $filterIndicators): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <?php $__currentLoopData = $filterIndicators; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $field => $indicator): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <?php
-                        $field = is_numeric($field) ? null : $field;
-                    ?>
-
-                    <span
-                        class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                            'filament-tables-filter-indicator min-h-6 inline-flex items-center justify-center whitespace-normal rounded-xl bg-gray-500/10 px-2 py-0.5 text-xs font-medium tracking-tight text-gray-700',
-                            'dark:bg-gray-500/20 dark:text-gray-300' => config('tables.dark_mode'),
-                        ]); ?>"
-                    >
-                        <?php echo e($indicator); ?>
-
-
-                        <button
-                            wire:click="removeTableFilter('<?php echo e($filter); ?>'<?php echo e($field ? ' , \'' . $field . '\'' : null); ?>)"
-                            wire:loading.attr="disabled"
-                            wire:loading.class="cursor-wait"
-                            wire:target="removeTableFilter"
-                            type="button"
-                            class="-my-1 -mr-2 ml-1 rounded-full p-1 hover:bg-gray-500/10 rtl:-ml-2 rtl:mr-1"
-                        >
-                            <?php if (isset($component)) { $__componentOriginal643fe1b47aec0b76658e1a0200b34b2c = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal643fe1b47aec0b76658e1a0200b34b2c = $attributes; } ?>
-<?php $component = BladeUI\Icons\Components\Svg::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('heroicon-s-x'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(BladeUI\Icons\Components\Svg::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['class' => 'h-3 w-3']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal643fe1b47aec0b76658e1a0200b34b2c)): ?>
-<?php $attributes = $__attributesOriginal643fe1b47aec0b76658e1a0200b34b2c; ?>
-<?php unset($__attributesOriginal643fe1b47aec0b76658e1a0200b34b2c); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal643fe1b47aec0b76658e1a0200b34b2c)): ?>
-<?php $component = $__componentOriginal643fe1b47aec0b76658e1a0200b34b2c; ?>
-<?php unset($__componentOriginal643fe1b47aec0b76658e1a0200b34b2c); ?>
-<?php endif; ?>
-
-                            <span class="sr-only">
-                                <?php echo e(__('tables::table.filters.buttons.remove.label')); ?>
-
-                            </span>
-                        </button>
-                    </span>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-        </div>
-
-        <div class="flex-shrink-0">
-            <button
-                wire:click="removeTableFilters"
-                type="button"
-                class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                    '-mb-1.5 -mr-2 -mt-0.5 rounded-full p-1.5 text-gray-600 hover:bg-gray-500/10 hover:text-gray-700',
-                    'dark:text-gray-400 dark:hover:bg-gray-500/20 dark:hover:text-gray-300' => config('tables.dark_mode'),
-                ]); ?>"
-            >
-                <div class="flex h-5 w-5 items-center justify-center">
-                    <?php if (isset($component)) { $__componentOriginal643fe1b47aec0b76658e1a0200b34b2c = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal643fe1b47aec0b76658e1a0200b34b2c = $attributes; } ?>
-<?php $component = BladeUI\Icons\Components\Svg::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('heroicon-s-x'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(BladeUI\Icons\Components\Svg::class))->getConstructor()): ?>
-<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['x-tooltip.raw' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('tables::table.filters.buttons.remove_all.tooltip')),'wire:loading.remove.delay' => true,'wire:target' => 'removeTableFilters,removeTableFilter','class' => 'h-5 w-5']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal643fe1b47aec0b76658e1a0200b34b2c)): ?>
-<?php $attributes = $__attributesOriginal643fe1b47aec0b76658e1a0200b34b2c; ?>
-<?php unset($__attributesOriginal643fe1b47aec0b76658e1a0200b34b2c); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal643fe1b47aec0b76658e1a0200b34b2c)): ?>
-<?php $component = $__componentOriginal643fe1b47aec0b76658e1a0200b34b2c; ?>
-<?php unset($__componentOriginal643fe1b47aec0b76658e1a0200b34b2c); ?>
-<?php endif; ?>
-
-                    <?php if (isset($component)) { $__componentOriginal68a3024fa61352b757a05bc2899e1852 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal68a3024fa61352b757a05bc2899e1852 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-support::components.loading-indicator','data' => ['wire:loading.delay' => true,'wire:target' => 'removeTableFilters,removeTableFilter','class' => 'h-5 w-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('filament-support::loading-indicator'); ?>
+        <div class="flex flex-wrap gap-1.5">
+            <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $indicators; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $indicator): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php if (isset($component)) { $__componentOriginal986dce9114ddce94a270ab00ce6c273d = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal986dce9114ddce94a270ab00ce6c273d = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.badge','data' => ['color' => $indicator->getColor()]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament::badge'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['wire:loading.delay' => true,'wire:target' => 'removeTableFilters,removeTableFilter','class' => 'h-5 w-5']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal68a3024fa61352b757a05bc2899e1852)): ?>
-<?php $attributes = $__attributesOriginal68a3024fa61352b757a05bc2899e1852; ?>
-<?php unset($__attributesOriginal68a3024fa61352b757a05bc2899e1852); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal68a3024fa61352b757a05bc2899e1852)): ?>
-<?php $component = $__componentOriginal68a3024fa61352b757a05bc2899e1852; ?>
-<?php unset($__componentOriginal68a3024fa61352b757a05bc2899e1852); ?>
-<?php endif; ?>
-                </div>
+<?php $component->withAttributes(['color' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($indicator->getColor())]); ?>
+                    <?php echo e($indicator->getLabel()); ?>
 
-                <span class="sr-only">
-                    <?php echo e(__('tables::table.filters.buttons.remove_all.label')); ?>
 
-                </span>
-            </button>
+                    <!--[if BLOCK]><![endif]--><?php if($indicator->isRemovable()): ?>
+                         <?php $__env->slot('deleteButton', null, ['label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('filament-tables::table.filters.actions.remove.label')),'wire:click' => ''.e($indicator->getRemoveLivewireClickHandler()).'','wire:loading.attr' => 'disabled','wire:target' => 'removeTableFilter']); ?>  <?php $__env->endSlot(); ?>
+                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                 <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal986dce9114ddce94a270ab00ce6c273d)): ?>
+<?php $attributes = $__attributesOriginal986dce9114ddce94a270ab00ce6c273d; ?>
+<?php unset($__attributesOriginal986dce9114ddce94a270ab00ce6c273d); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal986dce9114ddce94a270ab00ce6c273d)): ?>
+<?php $component = $__componentOriginal986dce9114ddce94a270ab00ce6c273d; ?>
+<?php unset($__componentOriginal986dce9114ddce94a270ab00ce6c273d); ?>
+<?php endif; ?>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
         </div>
     </div>
+
+    <div class="mt-0.5">
+        <?php if (isset($component)) { $__componentOriginalf0029cce6d19fd6d472097ff06a800a1 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf0029cce6d19fd6d472097ff06a800a1 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.icon-button','data' => ['color' => 'gray','icon' => 'heroicon-m-x-mark','iconAlias' => 'tables::filters.remove-all-button','size' => 'sm','tooltip' => __('filament-tables::table.filters.actions.remove_all.tooltip'),'wire:click' => 'removeTableFilters','wire:target' => 'removeTableFilters,removeTableFilter']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('filament::icon-button'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
+<?php $component->withAttributes(['color' => 'gray','icon' => 'heroicon-m-x-mark','icon-alias' => 'tables::filters.remove-all-button','size' => 'sm','tooltip' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('filament-tables::table.filters.actions.remove_all.tooltip')),'wire:click' => 'removeTableFilters','wire:target' => 'removeTableFilters,removeTableFilter']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf0029cce6d19fd6d472097ff06a800a1)): ?>
+<?php $attributes = $__attributesOriginalf0029cce6d19fd6d472097ff06a800a1; ?>
+<?php unset($__attributesOriginalf0029cce6d19fd6d472097ff06a800a1); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf0029cce6d19fd6d472097ff06a800a1)): ?>
+<?php $component = $__componentOriginalf0029cce6d19fd6d472097ff06a800a1; ?>
+<?php unset($__componentOriginalf0029cce6d19fd6d472097ff06a800a1); ?>
+<?php endif; ?>
+    </div>
+</div>
 <?php /**PATH /Users/muhammadaakifraza/Herd/Portal/vendor/filament/tables/src/../resources/views/components/filters/indicators.blade.php ENDPATH**/ ?>

@@ -6,8 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta name="theme-color" content="#000000"/>
 {{--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">--}}
-    <link rel="stylesheet" href="{{ asset('css/student.css') }}"/>
-    <title>{{ trans('panel.site_title') }}</title>
+{{--    <link rel="stylesheet" href="{{ asset('css/student.css') }}"/>--}}
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('css/filament/support/support.css') }}"/>
+
+    <title>{{ config('app.name') }}</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
     <meta http-equiv="Pragma" content="no-cache"/>
     <meta http-equiv="Expires" content="0"/>
@@ -16,19 +19,15 @@
     <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;700&display=swap" rel="stylesheet">
 
-{{--    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>--}}
-{{--    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>--}}
     <script src="{{asset('js/components.js')}}"></script>
-{{--    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>--}}
-{{--    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>--}}
 
     <style>
         [x-cloak] { display: none !important; }
     </style>
 
-    @livewireStyles
+    @filamentStyles
     @stack('styles')
-    @livewireScripts
+    @filamentScripts
     @livewire('notifications')
 </head>
 
@@ -68,10 +67,8 @@
     {{ csrf_field() }}
 </form>
 <script type="text/javascript" src="{{ asset('js/app.js') }}"></script>
-{{--<script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>--}}
-<script src="{{ mix('js/filament.js') }}" defer></script>
 
-@livewire('livewire-ui-spotlight')
+{{--@livewire('livewire-ui-spotlight')--}}
 @yield('scripts')
 @stack('scripts')
 
