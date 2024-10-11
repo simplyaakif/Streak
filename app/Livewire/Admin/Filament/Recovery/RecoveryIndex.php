@@ -16,6 +16,7 @@
     use Filament\Tables\Actions\Action;
     use Filament\Tables\Columns\BooleanColumn;
     use Filament\Tables\Columns\ImageColumn;
+    use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
     use Filament\Tables\Columns\Summarizers\Sum;
     use Filament\Tables\Columns\TextColumn;
     use Filament\Tables\Concerns\InteractsWithTable;
@@ -42,7 +43,9 @@
                 return $table
                     ->query(Recovery::query())
                     ->columns([
-//                        ImageColumn::make('student')->label('DP')->toggleable()->circular(),
+                        SpatieMediaLibraryImageColumn::make('student.dp')
+                            ->collection('student_dp')
+                            ->label('DP')->toggleable()->circular(),
                     TextColumn::make('student.name')->searchable()->sortable(),
                     TextColumn::make('student.mobile')->label('Contact')->toggleable(),
                         TextColumn::make('student.father_name')->label('Father Name')->toggleable(),
