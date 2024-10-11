@@ -1,5 +1,6 @@
 <?php
     use Filament\Support\Enums\ActionSize;
+    use Filament\Support\Enums\FontWeight;
     use Filament\Support\Enums\IconPosition;
     use Filament\Support\Enums\IconSize;
 ?>
@@ -27,6 +28,7 @@
     'target' => null,
     'tooltip' => null,
     'type' => 'button',
+    'weight' => FontWeight::SemiBold,
 ]) as $__key => $__value) {
     $$__key = $$__key ?? $__value;
 } ?>
@@ -52,6 +54,7 @@
     'target' => null,
     'tooltip' => null,
     'type' => 'button',
+    'weight' => FontWeight::SemiBold,
 ]); ?>
 <?php foreach (array_filter(([
     'badge' => null,
@@ -75,6 +78,7 @@
     'target' => null,
     'tooltip' => null,
     'type' => 'button',
+    'weight' => FontWeight::SemiBold,
 ]), 'is_string', ARRAY_FILTER_USE_KEY) as $__key => $__value) {
     $$__key = $$__key ?? $__value;
 } ?>
@@ -123,22 +127,37 @@
         is_string($color) ? "fi-color-{$color}" : null,
     ]);
 
-    $labelClasses = \Illuminate\Support\Arr::toCssClasses([
-        'font-semibold group-hover/link:underline group-focus-visible/link:underline' => ! $labelSrOnly,
-        match ($size) {
-            ActionSize::ExtraSmall => 'text-xs',
-            ActionSize::Small => 'text-sm',
-            ActionSize::Medium => 'text-sm',
-            ActionSize::Large => 'text-sm',
-            ActionSize::ExtraLarge => 'text-sm',
-            default => null,
-        } => ! $labelSrOnly,
-        match ($color) {
-            'gray' => 'text-gray-700 dark:text-gray-200',
-            default => 'text-custom-600 dark:text-custom-400',
-        } => ! $labelSrOnly,
-        'sr-only' => $labelSrOnly,
-    ]);
+    if (! $labelSrOnly) {
+        $labelClasses = \Illuminate\Support\Arr::toCssClasses([
+            match ($weight) {
+                FontWeight::Thin, 'thin' => 'font-thin',
+                FontWeight::ExtraLight, 'extralight' => 'font-extralight',
+                FontWeight::Light, 'light' => 'font-light',
+                FontWeight::Medium, 'medium' => 'font-medium',
+                FontWeight::Normal, 'normal' => 'font-normal',
+                FontWeight::SemiBold, 'semibold' => 'font-semibold',
+                FontWeight::Bold, 'bold' => 'font-bold',
+                FontWeight::ExtraBold, 'extrabold' => 'font-extrabold',
+                FontWeight::Black, 'black' => 'font-black',
+                default => $weight,
+            },
+            match ($size) {
+                ActionSize::ExtraSmall => 'text-xs',
+                ActionSize::Small => 'text-sm',
+                ActionSize::Medium => 'text-sm',
+                ActionSize::Large => 'text-sm',
+                ActionSize::ExtraLarge => 'text-sm',
+                default => null,
+            },
+            match ($color) {
+                'gray' => 'text-gray-700 dark:text-gray-200',
+                default => 'text-custom-600 dark:text-custom-400',
+            },
+            'group-hover/link:underline group-focus-visible/link:underline',
+        ]);
+    } else {
+        $labelClasses = 'sr-only';
+    }
 
     $labelStyles = \Illuminate\Support\Arr::toCssStyles([
         \Filament\Support\get_color_css_variables(

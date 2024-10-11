@@ -43,7 +43,7 @@
 
 <li
     x-data="{ label: <?php echo \Illuminate\Support\Js::from($subNavigation ? "sub_navigation_{$label}" : $label)->toHtml() ?> }"
-    data-group-label="<?php echo e($label); ?>"
+    data-group-label="<?php echo e($subNavigation ? "sub_navigation_{$label}" : $label); ?>"
     <?php echo e($attributes->class([
             'fi-sidebar-group flex flex-col gap-y-1',
             'fi-active' => $active,

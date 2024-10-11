@@ -44,13 +44,16 @@
 ?>
 
 <th
+    <?php if($activelySorted): ?>
+        aria-sort="<?php echo e($sortDirection === 'asc' ? 'ascending' : 'descending'); ?>"
+    <?php endif; ?>
     <?php echo e($attributes->class(['fi-ta-header-cell px-3 py-3.5 sm:first-of-type:ps-6 sm:last-of-type:pe-6'])); ?>
 
 >
     <<?php echo e($sortable ? 'button' : 'span'); ?>
 
         <?php if($sortable): ?>
-            aria-label="<?php echo e(__('filament-tables::table.sorting.fields.column.label')); ?> <?php echo e($sortDirection === 'asc' ? __('filament-tables::table.sorting.fields.direction.options.desc') : __('filament-tables::table.sorting.fields.direction.options.asc')); ?>"
+            aria-label="<?php echo e(trim(strip_tags($slot))); ?>"
             type="button"
             wire:click="sortTable('<?php echo e($name); ?>')"
         <?php endif; ?>

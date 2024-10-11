@@ -119,9 +119,23 @@
 <?php endif; ?>
         <?php else: ?>
             <div
+                class="hidden"
+                x-data="{
+                    isDisabled: <?php echo \Illuminate\Support\Js::from($isDisabled)->toHtml() ?>,
+                    init: function () {
+                        const container = $el.nextElementSibling
+                        container.dispatchEvent(
+                            new CustomEvent('set-select-property', {
+                                detail: { isDisabled: this.isDisabled },
+                            }),
+                        )
+                    },
+                }"
+            ></div>
+            <div
                 x-ignore
                 <?php if(FilamentView::hasSpaMode()): ?>
-                    ax-load="visible"
+                    ax-load="visible || event (ax-modal-opened)"
                 <?php else: ?>
                     ax-load
                 <?php endif; ?>
@@ -164,6 +178,7 @@
                         })"
                 wire:ignore
                 x-on:keydown.esc="select.dropdown.isActive && $event.stopPropagation()"
+                x-on:set-select-property="$event.detail.isDisabled ? select.disable() : select.enable()"
                 <?php echo e($attributes
                         ->merge($getExtraAlpineAttributes(), escape: false)
                         ->class([

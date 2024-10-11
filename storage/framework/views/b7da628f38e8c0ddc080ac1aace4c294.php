@@ -1,6 +1,7 @@
 <?php
     use Filament\Support\Enums\Alignment;
     use Filament\Support\Enums\MaxWidth;
+    use Filament\Support\Facades\FilamentView;
 ?>
 
 <?php $attributes ??= new \Illuminate\View\ComponentAttributeBag; ?>
@@ -137,18 +138,20 @@
             this.$refs.modalContainer.dispatchEvent(
                 new CustomEvent('modal-closed', { id: '<?php echo e($id); ?>' }),
             )
-
-            
         },
 
         open: function () {
-            this.isOpen = true
+            this.$nextTick(() => {
+                this.isOpen = true
 
-            
+                <?php if(FilamentView::hasSpaMode()): ?>
+                    this.$dispatch('ax-modal-opened')
+                <?php endif; ?>
 
-            this.$refs.modalContainer.dispatchEvent(
-                new CustomEvent('modal-opened', { id: '<?php echo e($id); ?>' }),
-            )
+                this.$refs.modalContainer.dispatchEvent(
+                    new CustomEvent('modal-opened', { id: '<?php echo e($id); ?>' }),
+                )
+            })
         },
     }"
     <?php if($id): ?>
@@ -236,7 +239,7 @@
                         x-transition:leave-start="scale-100 opacity-100"
                         x-transition:leave-end="scale-95 opacity-0"
                     <?php endif; ?>
-                    <?php echo e(($extraModalWindowAttributeBag ?? new \Illuminate\View\ComponentAttributeBag())->class([
+                    <?php echo e(($extraModalWindowAttributeBag ?? new \Illuminate\View\ComponentAttributeBag)->class([
                             'fi-modal-window pointer-events-auto relative row-start-2 flex w-full cursor-default flex-col bg-white shadow-xl ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10',
                             'fi-modal-slide-over-window ms-auto overflow-y-auto' => $slideOver,
                             // Using an arbitrary value instead of the h-dvh class that was added in Tailwind CSS v3.4.0

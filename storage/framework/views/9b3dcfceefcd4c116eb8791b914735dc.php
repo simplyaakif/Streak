@@ -323,7 +323,7 @@
 $__split = function ($name, $params = []) {
     return [$name, $params];
 };
-[$__name, $__params] = $__split(Filament\Livewire\GlobalSearch::class, ['lazy' => true]);
+[$__name, $__params] = $__split(Filament\Livewire\GlobalSearch::class);
 
 $__html = app('livewire')->mount($__name, $__params, 'lw-1836393400-0', $__slots ?? [], get_defined_vars());
 

@@ -96,6 +96,9 @@
             ]); ?>"
         >
             <!--[if BLOCK]><![endif]--><?php if($subNavigation): ?>
+                <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::PAGE_SUB_NAVIGATION_SELECT_BEFORE, scopes: $this->getRenderHookScopes())); ?>
+
+
                 <?php if (isset($component)) { $__componentOriginal3fc6eb3fff6868bf8dfabef4dddb45c1 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal3fc6eb3fff6868bf8dfabef4dddb45c1 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-panels::components.page.sub-navigation.select','data' => ['navigation' => $subNavigation]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
@@ -117,7 +120,13 @@
 <?php unset($__componentOriginal3fc6eb3fff6868bf8dfabef4dddb45c1); ?>
 <?php endif; ?>
 
+                <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::PAGE_SUB_NAVIGATION_SELECT_AFTER, scopes: $this->getRenderHookScopes())); ?>
+
+
                 <!--[if BLOCK]><![endif]--><?php if($subNavigationPosition === SubNavigationPosition::Start): ?>
+                    <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::PAGE_SUB_NAVIGATION_START_BEFORE, scopes: $this->getRenderHookScopes())); ?>
+
+
                     <?php if (isset($component)) { $__componentOriginal57dd3516f8d124ccafb2ae72c664c7c3 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal57dd3516f8d124ccafb2ae72c664c7c3 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-panels::components.page.sub-navigation.sidebar','data' => ['navigation' => $subNavigation]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
@@ -138,9 +147,15 @@
 <?php $component = $__componentOriginal57dd3516f8d124ccafb2ae72c664c7c3; ?>
 <?php unset($__componentOriginal57dd3516f8d124ccafb2ae72c664c7c3); ?>
 <?php endif; ?>
+
+                    <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::PAGE_SUB_NAVIGATION_START_AFTER, scopes: $this->getRenderHookScopes())); ?>
+
                 <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
                 <!--[if BLOCK]><![endif]--><?php if($subNavigationPosition === SubNavigationPosition::Top): ?>
+                    <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::PAGE_SUB_NAVIGATION_TOP_BEFORE, scopes: $this->getRenderHookScopes())); ?>
+
+
                     <?php if (isset($component)) { $__componentOriginala59fd7cea3e42dfea7d868b466385a01 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginala59fd7cea3e42dfea7d868b466385a01 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-panels::components.page.sub-navigation.tabs','data' => ['navigation' => $subNavigation]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
@@ -161,6 +176,9 @@
 <?php $component = $__componentOriginala59fd7cea3e42dfea7d868b466385a01; ?>
 <?php unset($__componentOriginala59fd7cea3e42dfea7d868b466385a01); ?>
 <?php endif; ?>
+
+                    <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::PAGE_SUB_NAVIGATION_TOP_AFTER, scopes: $this->getRenderHookScopes())); ?>
+
                 <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
@@ -233,6 +251,9 @@
             </div>
 
             <!--[if BLOCK]><![endif]--><?php if($subNavigation && $subNavigationPosition === SubNavigationPosition::End): ?>
+                <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::PAGE_SUB_NAVIGATION_END_BEFORE, scopes: $this->getRenderHookScopes())); ?>
+
+
                 <?php if (isset($component)) { $__componentOriginal57dd3516f8d124ccafb2ae72c664c7c3 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal57dd3516f8d124ccafb2ae72c664c7c3 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-panels::components.page.sub-navigation.sidebar','data' => ['navigation' => $subNavigation]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
@@ -253,6 +274,9 @@
 <?php $component = $__componentOriginal57dd3516f8d124ccafb2ae72c664c7c3; ?>
 <?php unset($__componentOriginal57dd3516f8d124ccafb2ae72c664c7c3); ?>
 <?php endif; ?>
+
+                <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::PAGE_SUB_NAVIGATION_END_AFTER, scopes: $this->getRenderHookScopes())); ?>
+
             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
         </div>
 

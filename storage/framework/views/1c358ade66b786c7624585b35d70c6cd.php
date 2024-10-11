@@ -18,7 +18,7 @@
                     return
                 }
 
-                $wire.unmountAction(false)
+                $wire.unmountAction(false, false)
             ','xOn:openedFormComponentActionModal.window' => 'if ($event.detail.id === \''.e($this->getId()).'\') close()']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('filament::modal'); ?>
 <?php if ($component->shouldRender()): ?>
@@ -38,7 +38,7 @@
                     return
                 }
 
-                $wire.unmountAction(false)
+                $wire.unmountAction(false, false)
             ','x-on:opened-form-component-action-modal.window' => 'if ($event.detail.id === \''.e($this->getId()).'\') close()']); ?>
             <!--[if BLOCK]><![endif]--><?php if($action): ?>
                 <?php echo e($action->getModalContent()); ?>
@@ -92,7 +92,7 @@
                     return
                 }
 
-                $wire.unmountTableAction(false)
+                $wire.unmountTableAction(false, false)
             ','xOn:openedFormComponentActionModal.window' => 'if ($event.detail.id === \''.e($this->getId()).'\') close()']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('filament::modal'); ?>
 <?php if ($component->shouldRender()): ?>
@@ -112,7 +112,7 @@
                     return
                 }
 
-                $wire.unmountTableAction(false)
+                $wire.unmountTableAction(false, false)
             ','x-on:opened-form-component-action-modal.window' => 'if ($event.detail.id === \''.e($this->getId()).'\') close()']); ?>
             <!--[if BLOCK]><![endif]--><?php if($action): ?>
                 <?php echo e($action->getModalContent()); ?>
@@ -234,7 +234,7 @@
                     return
                 }
 
-                $wire.unmountInfolistAction(false)
+                $wire.unmountInfolistAction(false, false)
             ','xOn:openedFormComponentActionModal.window' => 'if ($event.detail.id === \''.e($this->getId()).'\') close()']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('filament::modal'); ?>
 <?php if ($component->shouldRender()): ?>
@@ -254,7 +254,7 @@
                     return
                 }
 
-                $wire.unmountInfolistAction(false)
+                $wire.unmountInfolistAction(false, false)
             ','x-on:opened-form-component-action-modal.window' => 'if ($event.detail.id === \''.e($this->getId()).'\') close()']); ?>
             <!--[if BLOCK]><![endif]--><?php if($action): ?>
                 <?php echo e($action->getModalContent()); ?>
@@ -301,7 +301,7 @@
 
 
                 if (mountedFormComponentActionShouldOpenModal) {
-                    $wire.unmountFormComponentAction(false)
+                    $wire.unmountFormComponentAction(false, false)
                 }
             ']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('filament::modal'); ?>
@@ -315,7 +315,7 @@
 
 
                 if (mountedFormComponentActionShouldOpenModal) {
-                    $wire.unmountFormComponentAction(false)
+                    $wire.unmountFormComponentAction(false, false)
                 }
             ']); ?>
             <!--[if BLOCK]><![endif]--><?php if($action): ?>

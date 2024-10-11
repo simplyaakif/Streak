@@ -69,6 +69,7 @@
     $reorderRecordsTriggerAction = $getReorderRecordsTriggerAction($isReordering);
     $toggleColumnsTriggerAction = $getToggleColumnsTriggerAction();
     $page = $this->getTablePage();
+    $defaultSortOptionLabel = $getDefaultSortOptionLabel();
 
     if (count($actions) && (! $isReordering)) {
         $columnsCount++;
@@ -140,6 +141,9 @@
             x-show="<?php echo \Illuminate\Support\Js::from($hasHeader)->toHtml() ?> || (selectedRecords.length && <?php echo \Illuminate\Support\Js::from(count($bulkActions))->toHtml() ?>)"
             class="fi-ta-header-ctn divide-y divide-gray-200 dark:divide-white/10"
         >
+            <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\Tables\View\TablesRenderHook::HEADER_BEFORE, scopes: static::class)); ?>
+
+
             <!--[if BLOCK]><![endif]--><?php if($header): ?>
                 <?php echo e($header); ?>
 
@@ -165,6 +169,9 @@
 <?php unset($__componentOriginalef9fb53ceabf567a28c14d984e5af8d7); ?>
 <?php endif; ?>
             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+            <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\Tables\View\TablesRenderHook::HEADER_AFTER, scopes: static::class)); ?>
+
 
             <!--[if BLOCK]><![endif]--><?php if($hasFiltersAboveContent): ?>
                 <div
@@ -206,6 +213,9 @@
                     <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                 </div>
             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+            <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\Tables\View\TablesRenderHook::TOOLBAR_BEFORE, scopes: static::class)); ?>
+
 
             <div
                 <?php if(! $hasHeaderToolbar): ?> x-cloak <?php endif; ?>
@@ -372,6 +382,9 @@
                 <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\Tables\View\TablesRenderHook::TOOLBAR_END)); ?>
 
             </div>
+
+            <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\Tables\View\TablesRenderHook::TOOLBAR_AFTER)); ?>
+
         </div>
 
         <!--[if BLOCK]><![endif]--><?php if($isReordering): ?>
@@ -442,7 +455,7 @@
         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
         <div
-            <?php if($pollingInterval = $getPollingInterval()): ?>
+            <?php if((! $isReordering) && ($pollingInterval = $getPollingInterval())): ?>
                 wire:poll.<?php echo e($pollingInterval); ?>
 
             <?php endif; ?>
@@ -479,7 +492,7 @@
                                         $el.checked = false
 
                                         return null
-                                    ','xOn:click' => 'toggleSelectRecordsOnPage','class' => 'my-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+                                    ','xOn:click' => 'toggleSelectRecordsOnPage','class' => 'fi-ta-page-checkbox my-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('filament-tables::selection.checkbox'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
@@ -498,7 +511,7 @@
                                         $el.checked = false
 
                                         return null
-                                    ','x-on:click' => 'toggleSelectRecordsOnPage','class' => 'my-4']); ?>
+                                    ','x-on:click' => 'toggleSelectRecordsOnPage','class' => 'fi-ta-page-checkbox my-4']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal36f68fca2c6625d1435d035c49146213)): ?>
@@ -555,7 +568,10 @@
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['x-model' => 'column']); ?>
-                                                <option value="">-</option>
+                                                <option value="">
+                                                    <?php echo e($defaultSortOptionLabel); ?>
+
+                                                </option>
 
                                                 <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $sortableColumns; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $column): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                     <option
@@ -1331,7 +1347,7 @@
                                             $el.checked = false
 
                                             return null
-                                        ','xOn:click' => 'toggleSelectRecordsOnPage']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+                                        ','xOn:click' => 'toggleSelectRecordsOnPage','class' => 'fi-ta-page-checkbox']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('filament-tables::selection.checkbox'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
@@ -1350,7 +1366,7 @@
                                             $el.checked = false
 
                                             return null
-                                        ','x-on:click' => 'toggleSelectRecordsOnPage']); ?>
+                                        ','x-on:click' => 'toggleSelectRecordsOnPage','class' => 'fi-ta-page-checkbox']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal36f68fca2c6625d1435d035c49146213)): ?>
@@ -1509,7 +1525,7 @@
                                             $el.checked = false
 
                                             return null
-                                        ','xOn:click' => 'toggleSelectRecordsOnPage']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+                                        ','xOn:click' => 'toggleSelectRecordsOnPage','class' => 'fi-ta-page-checkbox']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('filament-tables::selection.checkbox'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
@@ -1528,7 +1544,7 @@
                                             $el.checked = false
 
                                             return null
-                                        ','x-on:click' => 'toggleSelectRecordsOnPage']); ?>
+                                        ','x-on:click' => 'toggleSelectRecordsOnPage','class' => 'fi-ta-page-checkbox']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal36f68fca2c6625d1435d035c49146213)): ?>
