@@ -151,7 +151,7 @@ sm:rounded-lg">
                     <x-common.table.cell>
                         <div class="flex space-x-2 items-center">
                             @can('query_show')
-                                <a href="#" wire:click.prevent="showQuery({{$query->id}})">
+                                <a href="#" wire:click.prevent="showQueryFn('{{$query->id}}')">
                                     <x-icons.eye class="w-6 h-6  text-cyan-700"/>
                                 </a>
                                 <a href="{{route('admin.queries.show',$query->id)}}">

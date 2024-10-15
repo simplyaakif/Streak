@@ -66,7 +66,7 @@
             $model = Query::findOrFail($query);
             $model->delete();
         }
-        public function showQuery(Query $query)
+        public function showQueryFn(Query $query)
         {
             $this->showQueryDetails = $query;
             $this->showQuery = true;
