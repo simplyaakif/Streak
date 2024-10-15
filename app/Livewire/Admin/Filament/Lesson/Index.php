@@ -10,6 +10,8 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
     use Filament\Tables\Concerns\InteractsWithTable;
@@ -22,9 +24,9 @@ use Illuminate\Database\Eloquent\Builder;
     use Illuminate\Database\Eloquent\Relations\Relation;
     use Livewire\Component;
 
-class Index extends Component implements HasTable {
+class Index extends Component implements HasTable, HasForms {
 
-        use InteractsWithTable;
+        use InteractsWithTable, InteractsWithForms;
 
         public function mount()
         {

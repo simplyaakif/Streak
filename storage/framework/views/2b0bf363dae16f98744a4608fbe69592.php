@@ -348,7 +348,8 @@
 <?php unset($__componentOriginal26612d3f1018e0d4691b34c23fc8850d); ?>
 <?php endif; ?>
                     </div>
-                    <button class="btn btn-indigo" type="button" wire:click="addBatch()">Add Batch</button>
+                    <button class="py-2 px-4 border rounded-md text-sm leading-5 font-medium focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition duration-150 ease-in-out text-white bg-cyan-600 hover:bg-cyan-500 active:bg-cyan-700
+border-cyan-600" type="button" wire:click="addBatch()">Add Batch</button>
                 </div>
                 <div class="py-8 px-4">
                     <div class="divide-y ">

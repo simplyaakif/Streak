@@ -6,6 +6,8 @@
     use App\Models\Employee;
     use App\Models\StudentAttendance;
     use Filament\Forms\Components\DatePicker;
+    use Filament\Forms\Concerns\InteractsWithForms;
+    use Filament\Forms\Contracts\HasForms;
     use Filament\Tables\Columns\TextColumn;
     use Filament\Tables\Concerns\InteractsWithTable;
     use Filament\Tables\Contracts\HasTable;
@@ -18,9 +20,9 @@
     use Livewire\Component;
     use Webbingbrasil\FilamentAdvancedFilter\Filters\DateFilter;
 
-    class Index extends Component implements HasTable {
+    class Index extends Component implements HasTable, HasForms {
 
-        use InteractsWithTable;
+        use InteractsWithTable, InteractsWithForms;
 
         protected function getTableQuery(): Builder|Relation
         {

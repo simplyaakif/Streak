@@ -15,6 +15,8 @@
     use Filament\Forms\Components\Select;
     use Filament\Forms\Components\TextInput;
     use Filament\Forms\Components\Toggle;
+    use Filament\Forms\Concerns\InteractsWithForms;
+    use Filament\Forms\Contracts\HasForms;
     use Filament\Tables\Actions\Action;
     use Filament\Tables\Actions\BulkAction;
     use Filament\Tables\Columns\BooleanColumn;
@@ -31,9 +33,9 @@
     use Illuminate\Support\Collection;
     use Livewire\Component;
 
-    class Index extends Component implements HasTable {
+    class Index extends Component implements HasTable, HasForms {
 
-        use InteractsWithTable;
+        use InteractsWithTable, InteractsWithForms;
 
 //        use withPagination;
 
@@ -76,21 +78,14 @@
             return Expense::query()->with('vendor')->latest();
         }
 
-        protected function applySearchToTableQuery(Builder $query): Builder
-        {
-            if(filled($searchQuery = $this->getTableSearchQuery())) {
-                $query->search('name', $searchQuery)->search('amount', $searchQuery)->get();
-            }
 
-            return $query;
-        }
 
         protected function getTableColumns(): array
         {
             return [
                 TextColumn::make('vendor.type_human')->label('Expense Type'),
                 TextColumn::make('vendor.name')->label('Expense Type'),
-                TextColumn::make('amount')->label('Expense Amount'),
+                TextColumn::make('amount')->label('Expense Amount')->searchable(),
                 BooleanColumn::make('is_paid')->label('Paid')->trueColor('primary')->falseColor('danger'),
                 TextColumn::make('created_at')->label('Created At')->date('d-m-Y'),
                 TextColumn::make('due_date')->label('Due Date')->date('d-m-Y'),

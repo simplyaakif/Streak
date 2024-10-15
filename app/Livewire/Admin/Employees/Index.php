@@ -6,6 +6,7 @@
     use App\Models\Role;
     use App\Models\User;
     use App\Notifications\EmployeeCreateNotification;
+    use Filament\Forms\Concerns\InteractsWithForms;
     use Filament\Forms\Contracts\HasForms;
     use Filament\Tables\Actions\Action;
     use Filament\Tables\Actions\BulkAction;
@@ -18,9 +19,9 @@
     use Livewire\WithPagination;
     use Str;
 
-    class Index extends Component implements HasTable {
+    class Index extends Component implements HasTable, HasForms {
 
-        use InteractsWithTable;
+        use InteractsWithTable, InteractsWithForms;
 
         public Employee $employee;
         public User $user;
