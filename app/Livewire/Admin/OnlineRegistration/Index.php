@@ -14,8 +14,10 @@
     use Filament\Tables\Columns\TextColumn;
     use Filament\Tables\Concerns\InteractsWithTable;
     use Filament\Tables\Contracts\HasTable;
+    use Filament\Tables\Enums\FiltersLayout;
     use Filament\Tables\Filters\Layout;
     use Filament\Tables\Filters\SelectFilter;
+    use Filament\Tables\Table;
     use Illuminate\Database\Eloquent\Builder;
     use Illuminate\Database\Eloquent\Relations\Relation;
     use Livewire\Component;
@@ -24,14 +26,11 @@
         use InteractsWithTable,InteractsWithForms;
 
 
-
-        protected function getTableQuery(): Builder|Relation
+        public function table(Table $table): Table
         {
-            return OnlineRegistration::query()->with('courses')->latest();
-        }
-        protected function getTableColumns(): array
-        {
-            return [
+            return $table
+                ->query(OnlineRegistration::query()->with('courses')->latest())
+                ->columns([
                 TextColumn::make('name')->searchable(),
 //                TextColumn::make('father_name'),
                 TextColumn::make('pakistan_mobile')->label('Mobile Number'),
@@ -41,15 +40,10 @@
                 TextColumn::make('ace_reference')->label('Reference'),
                 TextColumn::make('mode_of_learning')->label('Learning Type'),
                 TextColumn::make('created_at')->since(),
-            ];
-        }
-
-        protected function getTableFilters(): array
-        {
-            return [
+            ])->filters([
                 SelectFilter::make('campus_id')
                     ->label('Campus')
-                ->options(Campus::all()->pluck('name','id')),
+                    ->options(Campus::all()->pluck('name','id')),
                 SelectFilter::make('course')
                     ->label('Course')
                     ->relationship('courses','title')
@@ -57,42 +51,27 @@
                 SelectFilter::make('mode_of_learning')
                     ->label('Mode')
                     ->options([
-                                  'In Campus'=>'On-Campus',
-                                  'Online'=>'Online'
-                              ])
-                ];
-    }
-
-    protected function getTableFiltersLayout()
-    {
-//        return Above
-    }
-
-        protected function getTableActions(): array
-        {
-
-            return [
-                Action::make('updateAuthor')
-                    ->mountUsing(fn (ComponentContainer $form, User $record) => $form->fill([
-                        'authorId' => $record->author->id,
-                    ]))
-                    ->action(function (User $record, array $data): void {
-                        $record->author()->associate($data['authorId']);
-                        $record->save();
-                    })
-                    ->form([
-                        Select::make('authorId')
-                            ->label('Author')
-                            ->options(User::query()->pluck('name', 'id'))
-                            ->required(),
-                    ]),
-            ];
-    }
-
-        protected function getTableBulkActions(): array
-        {
-            return [ ];
-    }
+                        'In Campus'=>'On-Campus',
+                        'Online'=>'Online'
+                    ])
+            ], layout: FiltersLayout::AboveContent)
+                ->actions([
+//                    Action::make('updateAuthor')
+//                        ->mountUsing(fn (ComponentContainer $form, User $record) => $form->fill([
+//                            'authorId' => $record->author->id,
+//                        ]))
+//                        ->action(function (User $record, array $data): void {
+//                            $record->author()->associate($data['authorId']);
+//                            $record->save();
+//                        })
+//                        ->form([
+//                            Select::make('authorId')
+//                                ->label('Author')
+//                                ->options(User::query()->pluck('name', 'id'))
+//                                ->required(),
+//                        ]),
+                ]);
+        }
 
         public function render()
         {

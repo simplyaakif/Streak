@@ -6,8 +6,6 @@
     use App\Models\Campus;
     use App\Models\Course;
     use App\Models\OnlineRegistration;
-    use Filament\Forms\Components\FileUpload;
-    use Filament\Forms\Components\MultiSelect;
     use Filament\Forms\Components\Select;
     use Filament\Forms\Components\Textarea;
     use Filament\Forms\Components\TextInput;
