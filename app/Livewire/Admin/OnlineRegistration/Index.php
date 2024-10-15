@@ -8,6 +8,8 @@
     use App\Models\User;
     use Filament\Forms\ComponentContainer;
     use Filament\Forms\Components\Select;
+    use Filament\Forms\Concerns\InteractsWithForms;
+    use Filament\Forms\Contracts\HasForms;
     use Filament\Tables\Actions\Action;
     use Filament\Tables\Columns\TextColumn;
     use Filament\Tables\Concerns\InteractsWithTable;
@@ -18,8 +20,8 @@
     use Illuminate\Database\Eloquent\Relations\Relation;
     use Livewire\Component;
 
-    class Index extends Component implements HasTable {
-        use InteractsWithTable;
+    class Index extends Component implements HasTable,HasForms {
+        use InteractsWithTable,InteractsWithForms;
 
 
 
@@ -50,7 +52,7 @@
                 ->options(Campus::all()->pluck('name','id')),
                 SelectFilter::make('course')
                     ->label('Course')
-                    ->relationship('courses')
+                    ->relationship('courses','title')
                     ->options(Course::all()->pluck('title','id')),
                 SelectFilter::make('mode_of_learning')
                     ->label('Mode')
@@ -61,9 +63,9 @@
                 ];
     }
 
-    protected function getTableFiltersLayout(): ?string
+    protected function getTableFiltersLayout()
     {
-        return \Filament\Tables\Enums\FiltersLayout::AboveContent;
+//        return Above
     }
 
         protected function getTableActions(): array

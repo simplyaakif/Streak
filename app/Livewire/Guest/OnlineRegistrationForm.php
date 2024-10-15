@@ -78,8 +78,9 @@
                 TextInput::make('pakistan_mobile')
                     ->label('Mobile Number (Pakistan Only)')
                     ->helperText("Fill if you have a Pakistan mobile number")
-                    ->mask(fn (TextInput\Mask $mask) => $mask->pattern('0000-0000000'))
+//                    ->mask('0000-0000000')
                 ->minLength(11),
+
                 TextInput::make('whatsapp_mobile')
                     ->label('Whatsapp Mobile Number')
                     ->helperText("Fill if you have Whatsapp number"),
@@ -87,7 +88,7 @@
                 Textarea::make('address')->label('Current Address'),
                 TextInput::make('pak_cnic')->label('CNIC #')
                 ->helperText('If from Pakistan Kindly Enter')
-                    ->mask(fn (TextInput\Mask $mask) => $mask->pattern('00000-0000000-0'))
+                    ->mask('00000-0000000-0')
 
             ];
         }

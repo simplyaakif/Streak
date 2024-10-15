@@ -1,4 +1,3 @@
-<!doctype html>
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -16,8 +15,9 @@
     <link rel="stylesheet" href="{{ asset('css/student.css') }}">
 
     <!-- Scripts -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/mask@3.x.x/dist/cdn.min.js"></script>
     @filamentScripts
-    <script src="{{ mix('js/filament.js') }}" defer></script>
+{{--    <script src="{{ asset('js/filament.js') }}" defer></script>--}}
     @stack('scripts')
 </head>
 

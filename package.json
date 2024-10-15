@@ -1,5 +1,6 @@
 {
     "private": true,
+    "type": "module",
     "scripts": {
         "dev": "mix",
         "development": "mix",
@@ -11,9 +12,9 @@
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.4.1",
-        "@tailwindcss/typography": "^0.5.13",
+        "@tailwindcss/typography": "^0.5.15",
         "alpinejs": "^3.10.2",
-        "autoprefixer": "^10.4.19",
+        "autoprefixer": "^10.4.20",
         "axios": "^0.21.1",
         "browser-sync": "^2.26.14",
         "browser-sync-webpack-plugin": "^2.3.0",
@@ -25,12 +26,12 @@
         "laravel-mix": "^6.0.18",
         "laravel-vite-plugin": "^1.0.5",
         "lodash": "^4.17.19",
-        "postcss": "^8.4.38",
+        "postcss": "^8.4.47",
         "postcss-nesting": "^12.1.5",
         "pusher-js": "^7.0.3",
         "resolve-url-loader": "^3.1.2",
         "select2": "^4.0.13",
-        "tailwindcss": "^3.4.4"
+        "tailwindcss": "^3.4.13"
     },
     "dependencies": {
         "@alpinejs/focus": "^3.10.3",
