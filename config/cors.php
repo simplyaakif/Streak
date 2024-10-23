@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['https://*.ace.org.pk','http://acev7.local'],
+    'allowed_origins' => ['https://ace.org.pk','http://acev7.local'],
 
     'allowed_origins_patterns' => [],
 
