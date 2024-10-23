@@ -59,6 +59,7 @@ class Student extends Model implements HasMedia
     protected $appends = [
         'dp',
         'documents',
+        'avatar_url'
     ];
 
     protected $dates = [
@@ -98,6 +99,9 @@ class Student extends Model implements HasMedia
     {
 
         return 'https://api.dicebear.com/7.x/initials/svg?seed=' . $this->name;
+    }
+    public function getAvatarUrlAttribute(){
+        return $this->avatarUrl();
     }
 
 //    public function student_batches()

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Admin\CourseApiController;
+use App\Http\Controllers\Api\V1\Admin\MiscApiController;
 use App\Http\Controllers\Api\V1\Admin\QueryApiController;
 use App\Http\Controllers\Api\V1\Admin\StudentApiController;
 use App\Http\Controllers\Api\V1\Admin\UserApiController;
@@ -20,6 +21,9 @@ Route::group(['prefix' => 'v1', 'as' => 'api.'], function () {
     // Student
     Route::post('students/media', [StudentApiController::class, 'storeMedia'])->name('students.store_media');
     Route::apiResource('students', StudentApiController::class);
+
+    Route::get('ar/recent-admissions',[MiscApiController::class,'recent_admissions'])
+        ->name('ar.recent_admissions');
 });
 
 
