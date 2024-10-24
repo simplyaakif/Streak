@@ -15,7 +15,11 @@ class MiscApiController extends Controller
 
     public function recent_admissions()
     {
-        $admissions = Student::with('batches')->limit(10)->latest()->get();
+        $admissions = Student::with('batches')
+            ->limit(10)
+            ->latest()
+            ->get()
+            ->makeHidden(['mobile','email','date_of_birth','nationality','father_name','cnic_passport','guardian_id','user_id','deleted_at','created_at','updated_at','documents']);
         return new StudentResource($admissions);
     }
 
@@ -27,7 +31,8 @@ class MiscApiController extends Controller
                     return $query->where("batch_status", 2)->get();
                 }
             ])
-            ->get();
+            ->get()
+            ->makeHidden(['mobile','email','date_of_birth','nationality','father_name','cnic_passport','guardian_id','user_id','deleted_at','created_at','updated_at','documents']);
         $alums = $alums->filter(function ($alum) {
            return count($alum->batches) > 0;
         });
