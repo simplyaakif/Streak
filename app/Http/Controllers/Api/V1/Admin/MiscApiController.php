@@ -25,7 +25,7 @@ class MiscApiController extends Controller
 
     public function alums()
     {
-        $alums = Student::limit(10)
+        $alums = Student::limit(20)
             ->with([
                 "batches" => function ($query) {
                     return $query->where("batch_status", 2)->get();
