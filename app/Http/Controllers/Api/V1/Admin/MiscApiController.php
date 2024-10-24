@@ -31,6 +31,7 @@ class MiscApiController extends Controller
                     return $query->where("batch_status", 2)->get();
                 }
             ])
+            ->latest()
             ->get()
             ->makeHidden(['mobile','email','date_of_birth','nationality','father_name','cnic_passport','guardian_id','user_id','deleted_at','created_at','updated_at','documents']);
         $alums = $alums->filter(function ($alum) {
