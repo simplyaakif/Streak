@@ -18,4 +18,20 @@ class MiscApiController extends Controller
         $admissions = Student::with('batches')->limit(10)->latest()->get();
         return new StudentResource($admissions);
     }
+
+    public function alums()
+    {
+        $alums = Student::limit(10)
+            ->with([
+                "batches" => function ($query) {
+                    return $query->where("batch_status", 2)->get();
+                }
+            ])
+            ->get();
+        $alums = $alums->filter(function ($alum) {
+           return count($alum->batches) > 0;
+        });
+        return new StudentResource($alums);
+
+    }
 }

@@ -24,6 +24,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.'], function () {
 
     Route::get('ar/recent-admissions',[MiscApiController::class,'recent_admissions'])
         ->name('ar.recent_admissions');
+    Route::get('ar/alums',[MiscApiController::class,'alums']);
 });
 
 
