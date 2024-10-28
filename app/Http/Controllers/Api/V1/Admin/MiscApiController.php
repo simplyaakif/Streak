@@ -17,7 +17,11 @@ class MiscApiController extends Controller
 
     public function recent_admissions()
     {
-        $admissions = Student::with('batches')
+        $admissions = Student::with([
+            "batches" => function ($q) {
+                return $q->where("batch_status", 1);
+            }
+        ])
             ->limit(10)
             ->latest()
             ->get()
@@ -44,7 +48,7 @@ class MiscApiController extends Controller
             ->latest()
             ->where("batch_status", 2)
             ->with("batch", "student")
-            ->limit(10)
+            ->limit(20)
             ->get();
 
 
