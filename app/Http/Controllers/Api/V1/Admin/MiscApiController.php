@@ -7,6 +7,7 @@ use App\Http\Resources\Admin\StudentResource;
 use App\Http\Resources\BatchStudentResource;
 use App\Models\BatchStudent;
 use App\Models\Student;
+use Carbon\Carbon;
 
 class MiscApiController extends Controller
 {
@@ -45,15 +46,20 @@ class MiscApiController extends Controller
 //        });
 
         $alums = BatchStudent::latest()
-            ->latest()
             ->where("batch_status", 2)
             ->with("batch", "student")
             ->limit(20)
             ->get();
 
+        $sorted = $alums
+            ->sortBy(function ($item) {
+                return Carbon::parse($item->session_end_date);
+            })
+            ->reverse();
 
 
-        return new BatchStudentResource($alums);
+
+        return new BatchStudentResource($sorted);
 
     }
 }
