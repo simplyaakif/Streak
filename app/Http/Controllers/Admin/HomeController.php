@@ -134,7 +134,8 @@
                 'chart_color'=>'0,255,0',
                 'date_format'=>'M-Y',
 
-                'filter_field' => 'paid_on', // show only transactions for last 30 days
+                'filter_field' => 'paid_on',
+                'filter_days'=> 365 * 4, // show only transactions for last 30 days
                 'filter_period' => 'year', // show only transactions for this week
             ];
 
