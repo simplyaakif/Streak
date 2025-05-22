@@ -3,6 +3,7 @@
     namespace App\Models;
 
     use Carbon\Carbon;
+    use Illuminate\Database\Eloquent\Builder;
     use Illuminate\Database\Eloquent\Model;
     use Spatie\MediaLibrary\HasMedia;
     use Spatie\MediaLibrary\InteractsWithMedia;
@@ -10,6 +11,18 @@
     class Recovery extends Model implements HasMedia {
         use InteractsWithMedia;
         protected $guarded = [];
+
+        protected static function booted(): void
+        {
+            static::addGlobalScope('without_special', function (Builder $builder) {
+                $builder->whereRelation('batch_student','is_special',0);
+            });
+        }
+
+        public function scopeSpecial(Builder $query): void
+        {
+            $query->whereRelation('batch_student','is_special',1);
+        }
 
         public function student()
         {
