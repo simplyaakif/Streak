@@ -43,9 +43,9 @@ class RecoveryIndex extends Component implements HasForms, HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(Recovery::query()
+            ->query(Recovery::query()->withoutGlobalScopes()
                 ->join('batch_student', 'recoveries.batch_student_id', '=', 'batch_student.id')
-                ->select('recoveries.*', 'batch_student.batch_status')
+                ->select('recoveries.*', 'batch_student.batch_status','batch_student.is_special')
             )
             ->columns([
                 SpatieMediaLibraryImageColumn::make('student.dp')
@@ -109,56 +109,32 @@ class RecoveryIndex extends Component implements HasForms, HasTable
                     }),
                 TernaryFilter::make('is_paid')->label('Is Paid ?')->default(0),
 
-//
+
+                TernaryFilter::make('is_special')->label('Is Special ?')->default(0),
+
 //                TernaryFilter::make('special_students')
 //                    ->label('Special Students')
 //                    ->trueLabel('Include Special')
 //                    ->falseLabel('Without Special')
+//                    ->default(0)
 //                    ->query(function (Builder $query, $state) {
 //                        if ($state) {
 //                            // Remove the scope and directly handle the relationship query
-//                            return $query->withoutGlobalScopes()
-//                                ->whereHas('batch_student', function ($q) {
-//                                    $q->where('is_special', 1);
-//                                });
+//                            return $query->where('is_special', 1);
 //                        }
 //                        return $query;
 //                    }),
 
-//                Filter::make('with_special')
-//                    ->default(0)
-//                    ->form([
-//                        Select::make('is_special')
-//                            ->label('Include Special')
-//                            ->options([
-//                                'no' => 'No',
-//                                'yes' => 'Yes'
-//                            ])
-//                            ->default('no'),
-//                    ])
-//                    ->query(function (Builder $query, array $data): Builder {
-//                        if ($data['is_special'] === 'yes') {
-//                            return $query->withoutGlobalScopes()->whereHas('batch_student', function ($q) {
-//                                $q->where('is_special', 1);
-//                        dump($q);
-//                            });
-//                        } else {
-//                            return $query;
-//                        }
-//                    }),
 
-
+//
 //                TernaryFilter::make('Show All')
 //                    ->trueLabel('Include Special')
 //                    ->falseLabel('Without Special')
 //                    ->query(function (Builder $query, $state) {
 //                        if ($state) {
-//                                $query = $query->has('batch_student')->withoutGlobalScopes();
-//                            dump($query);
 //                            return $query;
-//
 //                        }
-//                        return $query; // uses global scope
+//                        return $query->where('batch_student.is_special','=',0); // uses global scope
 //                    }),
 
 

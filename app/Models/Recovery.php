@@ -19,9 +19,9 @@
             });
         }
 
-        public function scopeSpecial(Builder $query): void
+        public function scopeWithouts(Builder $query): void
         {
-            $query->whereRelation('batch_student','is_special',1);
+            $query->whereRelation('batch_student','is_special',0);
         }
 
         public function student()

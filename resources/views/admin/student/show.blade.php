@@ -110,7 +110,7 @@
 
                                     <div class="bg-gray-100 px-4 py-5 sm:px-6">
                                         @php
-                                        $recoveries = App\Models\Recovery::where('batch_student_id',$batch->pivot->id)
+                                        $recoveries = App\Models\Recovery::withoutGlobalScopes()->where('batch_student_id',$batch->pivot->id)
                                                       ->get()
                                         @endphp
                                         <h3 class="text-xl font-bold">Fee Schedule</h3>
