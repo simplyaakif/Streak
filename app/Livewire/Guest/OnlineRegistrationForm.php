@@ -42,7 +42,7 @@
                 TextInput::make('father_name')->label('Father Name')->required(),
 //
                 Select::make('courses')
-                    ->options(Course::pluck('title','id'))
+                    ->options(Course::orderBy('title','ASC')->pluck('title','id'))
                     ->helperText('Enter the course or courses you are applying for')
                     ->required(),
 //
@@ -81,6 +81,7 @@
 
                 TextInput::make('whatsapp_mobile')
                     ->label('Whatsapp Mobile Number')
+                    ->required()
                     ->helperText("Fill if you have Whatsapp number"),
                 TextInput::make('email')->email()->required(),
                 Textarea::make('address')->label('Current Address'),

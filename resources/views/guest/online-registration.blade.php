@@ -23,5 +23,9 @@
 
 <body class="antialiased">
 <livewire:guest.online-registration-form/>
+
+<!-- Fathom - beautiful, simple website analytics --> <script src="https://cdn.usefathom.com/script.js" data-spa="auto" data-site="XMRDWDRL" defer></script> <!-- / Fathom -->
 </body>
+
+<!-- Fathom - beautiful, simple website analytics --> <script src="https://cdn.usefathom.com/script.js" data-site="XMRDWDRL" defer></script> <!-- / Fathom -->
 </html>
