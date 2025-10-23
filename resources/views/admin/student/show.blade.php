@@ -166,7 +166,7 @@
             </x-tabs>
 
         </article>
-        <div class="card bg-blueGray-100">
+        <div class="card bg-slate-100">
         </div>
     </div>
 @endsection

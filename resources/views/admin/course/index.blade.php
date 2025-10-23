@@ -2,7 +2,7 @@
 @section('content')
 <div class="row ">
     <div class="card p-4 bg-white">
-        <div class="card-header border-b border-blueGray-200">
+        <div class="card-header border-b border-slate-200">
             <div class="card-header-container flex justify-between items-center mb-4">
                 <h6 class="card-title text-lg leading-6 font-medium text-gray-900">
                     {{ trans('cruds.course.title_singular') }}

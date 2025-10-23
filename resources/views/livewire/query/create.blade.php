@@ -1,10 +1,10 @@
 <div class="max-w-3xl mx-auto py-10 px-4 sm:px-6 lg:py-2 lg:px-8">
 
-    <form wire:submit="submit" class="mt-6 mb-6 space-y-8 divide-y divide-y-blue-gray-200">
+    <form wire:submit="submit" class="mt-6 mb-6 space-y-8 divide-y divide-slate-200">
         <div class=" grid grid-cols-1 gap-y-6 sm:grid-cols-6 sm:gap-x-6">
             <div class="sm:col-span-6">
-                <h2 class="text-xl font-medium text-blue-gray-900">Personal Information</h2>
-                <p class="mt-1 text-sm text-blue-gray-500">This information will be displayed publicly so be careful
+                <h2 class="text-xl font-medium text-slate-900">Personal Information</h2>
+                <p class="mt-1 text-sm text-slate-500">This information will be displayed publicly so be careful
                     what you share.</p>
             </div>
 
@@ -46,8 +46,8 @@
 
         <div class=" grid grid-cols-1 gap-y-6 sm:grid-cols-6 sm:gap-x-6 pt-6">
             <div class="sm:col-span-6">
-                <h2 class="text-xl font-medium text-blue-gray-900">Course Information</h2>
-                <p class="mt-1 text-sm text-blue-gray-500">The information relating to the course of query</p>
+                <h2 class="text-xl font-medium text-slate-900">Course Information</h2>
+                <p class="mt-1 text-sm text-slate-500">The information relating to the course of query</p>
             </div>
             <div class="sm:col-span-3">
                 <x-common.data-label class="form-label required" label="Course" for=""/>
@@ -149,8 +149,8 @@ error="qCourses.course_id"
 
         <div class=" grid grid-cols-1 gap-y-6 sm:grid-cols-6 sm:gap-x-6 pt-6">
             <div class="sm:col-span-6">
-                <h2 class="text-xl font-medium text-blue-gray-900">Timeline / Status</h2>
-                <p class="mt-1 text-sm text-blue-gray-500">This will define query timeline in the system.</p>
+                <h2 class="text-xl font-medium text-slate-900">Timeline / Status</h2>
+                <p class="mt-1 text-sm text-slate-500">This will define query timeline in the system.</p>
             </div>
 
             <div class="sm:col-span-3">

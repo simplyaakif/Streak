@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 @section('content')
 <div class="row">
-    <div class="card bg-blueGray-100 lg:w-6/12">
+    <div class="card bg-slate-100 lg:w-6/12">
         <div class="card-header">
             <div class="card-header-container">
                 <h6 class="card-title">
@@ -14,7 +14,7 @@
             <div class="pt-3">
                 @livewire('update-profile-information-form')
 
-                    <hr class="mt-6 border-b-1 border-blueGray-300">
+                    <hr class="mt-6 border-b-1 border-slate-300">
 
                     @livewire('update-password-form')
             </div>

@@ -1,11 +1,11 @@
 <div class="max-w-3xl mx-auto py-10 px-4 sm:px-6 lg:py-2 lg:px-8">
 
-    <form wire:submit="submit" class="mt-6 mb-6 space-y-8 divide-y divide-y-blue-gray-200">
+    <form wire:submit="submit" class="mt-6 mb-6 space-y-8 divide-y divide-slate-200">
 
         <div class="grid grid-cols-1 gap-y-6 sm:grid-cols-6 sm:gap-x-6">
             <div class="sm:col-span-6">
-                <h2 class="text-xl font-medium text-blue-gray-900">Account Information</h2>
-                <p class="mt-1 text-sm text-blue-gray-500">Finance account information</p>
+                <h2 class="text-xl font-medium text-slate-900">Account Information</h2>
+                <p class="mt-1 text-sm text-slate-500">Finance account information</p>
             </div>
             <div class=" sm:col-span-3  {{ $errors->has('account.title') ? 'text-red-500' : '' }}">
                 <label class="form-label required" for="mobile">Title</label>

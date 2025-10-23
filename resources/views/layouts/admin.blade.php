@@ -5,6 +5,8 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta name="theme-color" content="#000000"/>
+
+    <link rel="stylesheet" href="{{ asset('css/filament/filament/app.css') }}"/>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ asset('css/filament/filament/app.css') }}"/>
 
@@ -14,7 +16,9 @@
     <meta http-equiv="Expires" content="0"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+{{--    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />--}}
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;700&display=swap" rel="stylesheet">
 
     <script src="{{asset('js/components.js')}}"></script>
@@ -37,7 +41,7 @@
     @stack('styles')
 </head>
 
-<body class="text-blueGray-800 antialiased">
+<body class="text-slate-800 antialiased">
 
 <noscript>You need to enable JavaScript to run this app.</noscript>
 

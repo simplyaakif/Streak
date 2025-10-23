@@ -15,7 +15,7 @@
 }
 
 .card .card-title {
-    @apply text-blueGray-700 text-xl font-bold
+    @apply text-slate-700 text-xl font-bold
 }
 
 .card .card-body {
@@ -47,7 +47,7 @@
 }
 
 .btn.btn-secondary {
-    @apply text-blueGray-500 bg-white hover:bg-blueGray-50 active:bg-blueGray-100 focus:ring-indigo-500
+    @apply text-slate-500 bg-white hover:bg-slate-50 active:bg-slate-100 focus:ring-indigo-500
 }
 
 .btn.btn-success {
@@ -84,15 +84,15 @@
 }
 
 .sidebar-nav {
-    @apply text-xs uppercase py-3 font-bold block text-blueGray-800
+    @apply text-xs uppercase py-3 font-bold block text-slate-800
 }
 
 .sidebar-nav > i {
-    @apply mr-2 text-sm text-blueGray-400
+    @apply mr-2 text-sm text-slate-400
 }
 
 .sidebar-nav:hover {
-    @apply text-blueGray-600
+    @apply text-slate-600
 }
 
 .form-group {
@@ -111,15 +111,15 @@
 .form-group.invalid input,
 .form-group.invalid select,
 .form-group.invalid textarea {
-    @apply border-red-500 !important;
+    @apply !border-red-500;
 }
 
 .form-group.invalid .validation-message {
-    display: block !important;
+    @apply !block;
 }
 
 .form-label {
-    @apply block uppercase text-blueGray-600 text-xs font-bold mb-2
+    @apply block uppercase text-slate-600 text-xs font-bold mb-2
 }
 
 .form-control {
@@ -131,15 +131,15 @@ input[type=email].form-control,
 input[type=number].form-control,
 input[type=password].form-control,
 textarea.form-control {
-    @apply border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring;
+    @apply border-0 px-3 py-3 placeholder-slate-300 text-slate-600 bg-white rounded text-sm shadow focus:outline-none focus:ring;
 }
 
 .flatpickr input[type=text].form-control {
-    @apply border-0 px-3 py-3 pl-10 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring;
+    @apply border-0 px-3 py-3 pl-10 placeholder-slate-300 text-slate-600 bg-white rounded text-sm shadow focus:outline-none focus:ring;
 }
 
 .flatpickr input[type=text].form-control:required {
-    @apply border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring;
+    @apply border-0 px-3 py-3 placeholder-slate-300 text-slate-600 bg-white rounded text-sm shadow focus:outline-none focus:ring;
 }
 
 .table {
@@ -147,11 +147,11 @@ textarea.form-control {
 }
 
 .table th {
-    @apply align-middle border border-solid text-xs uppercase whitespace-nowrap font-semibold text-left bg-blueGray-50 text-blueGray-500
+    @apply align-middle border border-solid text-xs uppercase whitespace-nowrap font-semibold text-left bg-slate-50 text-slate-500
 }
 
 .table td {
-    @apply border-blueGray-200
+    @apply border-slate-200
 }
 
 
@@ -161,7 +161,7 @@ textarea.form-control {
 }
 
 .table.table-index th {
-    @apply px-6 py-3 border-l-0 border-r-0 border-blueGray-100
+    @apply px-6 py-3 border-l-0 border-r-0 border-slate-100
 }
 
 .table.table-index td {
@@ -169,11 +169,11 @@ textarea.form-control {
 }
 
 .table.table-index > tbody > tr:hover {
-    @apply bg-blueGray-50
+    @apply bg-slate-50
 }
 
 .table.table-messages th {
-    @apply px-6 py-3 border-l-0 border-r-0 border-blueGray-100
+    @apply px-6 py-3 border-l-0 border-r-0 border-slate-100
 }
 
 .table.table-messages td {
@@ -181,7 +181,7 @@ textarea.form-control {
 }
 
 .table.table-messages > tbody > tr:hover {
-    @apply bg-blueGray-50
+    @apply bg-slate-50
 }
 
 .form-group .required::after {
@@ -196,7 +196,7 @@ textarea.form-control {
 }
 
 .help-block {
-    @apply text-blueGray-600 pt-2 text-sm
+    @apply text-slate-600 pt-2 text-sm
 }
 
 .badge {
@@ -208,7 +208,7 @@ textarea.form-control {
 }
 
 .link-light-blue {
-    @apply text-lightBlue-500 flex items-center hover:underline last:mb-0 mb-1;
+    @apply text-slate-500 flex items-center hover:underline last:mb-0 mb-1;
 }
 
 .link-light-blue i {
