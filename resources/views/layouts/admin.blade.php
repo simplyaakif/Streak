@@ -5,10 +5,8 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta name="theme-color" content="#000000"/>
-{{--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">--}}
-{{--    <link rel="stylesheet" href="{{ asset('css/student.css') }}"/>--}}
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}"/>
-    <link rel="stylesheet" href="{{ asset('css/filament/support/support.css') }}"/>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="{{ asset('css/filament/filament/app.css') }}"/>
 
     <title>{{ config('app.name') }}</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
@@ -23,12 +21,20 @@
 
     <style>
         [x-cloak] { display: none !important; }
+
+        /* Fix Filament modal z-index issues - ensure modal appears above backdrop */
+        .fi-modal-close-overlay {
+            z-index: 40 !important;
+        }
+        .fi-modal-window-ctn {
+            z-index: 50 !important;
+            position: fixed !important;
+        }
     </style>
 
+    @livewireStyles
     @filamentStyles
     @stack('styles')
-    @filamentScripts
-    @livewire('notifications')
 </head>
 
 <body class="text-blueGray-800 antialiased">
@@ -66,11 +72,16 @@
 <form id="logoutform" action="{{ route('logout') }}" method="POST" style="display: none;">
     {{ csrf_field() }}
 </form>
-<script type="text/javascript" src="{{ asset('js/app.js') }}"></script>
 
 {{--@livewire('livewire-ui-spotlight')--}}
 @yield('scripts')
 @stack('scripts')
+
+@livewireScripts
+@filamentScripts
+<script src="{{ asset('js/filament/support/support.js') }}"></script>
+<script src="{{ asset('js/filament/filament/app.js') }}"></script>
+<script src="{{ asset('js/filament/tables/tables.js') }}"></script>
 
 {{--<script>--}}
 {{--    function closeAlert(event) {--}}

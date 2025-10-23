@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\CourseResource\Pages;
 
+use Filament\Actions\DeleteAction;
 use App\Filament\Resources\CourseResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,7 +14,7 @@ class EditCourse extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

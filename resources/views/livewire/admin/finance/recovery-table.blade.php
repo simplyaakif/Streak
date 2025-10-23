@@ -37,7 +37,7 @@
                 </div>
             </x-slot>
             <x-slot name="footer">
-                <x-button.secondary wire:click="$set('showModal',false)">Cancel</x-button.secondary>
+                <x-button.secondary wire:click="showModal = false">Cancel</x-button.secondary>
                 <x-button.primary type="submit">Submit</x-button.primary>
             </x-slot>
         </x-modal.dialog>
@@ -109,7 +109,7 @@
                 @endforeach
             </x-slot>
             <x-slot name="footer">
-                <x-button.secondary wire:click="$set('showEditModal',false)">Cancel</x-button.secondary>
+                <x-button.secondary wire:click="showEditModal = false">Cancel</x-button.secondary>
                 <x-button.primary type="submit">Submit</x-button.primary>
             </x-slot>
         </x-modal.dialog>

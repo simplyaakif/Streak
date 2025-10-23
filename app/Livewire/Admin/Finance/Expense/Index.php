@@ -2,6 +2,13 @@
 
     namespace App\Livewire\Admin\Finance\Expense;
 
+    use Filament\Actions\Contracts\HasActions;
+    use Filament\Actions\Concerns\InteractsWithActions;
+    use Filament\Tables\Enums\FiltersLayout;
+    use Filament\Actions\Action;
+    use Filament\Schemas\Schema;
+    use Filament\Schemas\Components\Grid;
+    use Filament\Actions\BulkAction;
     use App\Models\Account;
     use App\Models\Employee;
     use App\Models\Expense;
@@ -9,20 +16,18 @@
     use App\Models\User;
     use App\Models\Vendor;
     use Auth;
-    use Filament\Forms\ComponentContainer;
     use Filament\Forms\Components\DatePicker;
-    use Filament\Forms\Components\Grid;
     use Filament\Forms\Components\Select;
     use Filament\Forms\Components\TextInput;
     use Filament\Forms\Components\Toggle;
     use Filament\Forms\Concerns\InteractsWithForms;
     use Filament\Forms\Contracts\HasForms;
-    use Filament\Tables\Actions\Action;
-    use Filament\Tables\Actions\BulkAction;
     use Filament\Tables\Columns\BooleanColumn;
     use Filament\Tables\Columns\TextColumn;
     use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
     use Filament\Tables\Contracts\HasTable;
+use Filament\Schemas\Contracts\HasSchemas;
     use Filament\Tables\Filters\Filter;
     use Filament\Tables\Filters\Layout;
     use Filament\Tables\Filters\MultiSelectFilter;
@@ -33,8 +38,9 @@
     use Illuminate\Support\Collection;
     use Livewire\Component;
 
-    class Index extends Component implements HasTable, HasForms {
+    class Index extends Component implements HasTable, HasSchemas, HasForms, HasActions {
 
+        use InteractsWithActions;
         use InteractsWithTable, InteractsWithForms;
 
 //        use withPagination;
@@ -106,13 +112,13 @@
         {
             return [
 
-                Filter::make('due_date')->form([
+                Filter::make('due_date')->schema([
                                                    DatePicker::make('due_from'),
                                                    DatePicker::make('due_until'),
                                                ])->query(function (Builder $query, array $data): Builder {
                         return $query->when($data['due_from'], fn(Builder $query, $date): Builder => $query->whereDate('due_date', '>=', $date),)->when($data['due_until'], fn(Builder $query, $date): Builder => $query->whereDate('due_date', '<=', $date),);
                     }),
-                Filter::make('paid_on')->form([
+                Filter::make('paid_on')->schema([
                                                   DatePicker::make('paid_on_from'),
                                                   DatePicker::make('paid_on_until'),
                                               ])->query(function (Builder $query, array $data): Builder {
@@ -143,7 +149,7 @@
 
         protected function getTableFiltersLayout(): ?string
         {
-            return \Filament\Tables\Enums\FiltersLayout::AboveContent;
+            return FiltersLayout::AboveContent;
         }
 
         protected function getTableContentFooter(): ?View
@@ -158,7 +164,7 @@
                     ->requiresConfirmation(),
 
                 Action::make('edit')
-                    ->mountUsing(fn (ComponentContainer $form, Expense $record) => $form->fill([
+                    ->mountUsing(fn (Schema $schema, Expense $record) => $schema->fill([
                             'amount' => $record->amount,
                             'is_paid' => $record->is_paid,
                             'due_date' => $record->due_date,
@@ -166,7 +172,7 @@
                             'paid_to' => $record->paid_to,
                             'paid_by' => $record->paid_by,
                                                                                                 ]))
-                ->form([
+                ->schema([
                     Grid::make()
                     ->schema([
                         TextInput::make('amount')->required(),

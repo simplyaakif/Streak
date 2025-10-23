@@ -30,7 +30,7 @@
                 ></x-common.data-textarea>
             </x-slot>
             <x-slot name="footer">
-                <x-button.secondary type="button" wire:click="$set('showCreateModal',false)">Cancel</x-button.secondary>
+                <x-button.secondary type="button" wire:click="showCreateModal = false">Cancel</x-button.secondary>
                 <x-button.primary type="submit">Submit</x-button.primary>
             </x-slot>
         </x-modal.dialog>

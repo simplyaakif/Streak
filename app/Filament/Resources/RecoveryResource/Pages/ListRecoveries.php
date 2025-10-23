@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\RecoveryResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Resources\RecoveryResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -13,7 +14,7 @@ class ListRecoveries extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

@@ -2,6 +2,7 @@
 
     namespace App\Http\Controllers\Admin;
 
+    use Auth;
     use App\Models\Expense;
     use App\Models\Query;
     use App\Models\Recovery;
@@ -61,7 +62,7 @@
             $rExpenses= Expense::select()->with('vendor')->latest()->take(5)
                 ->get();
 
-            $user_tasks = Task::where('assigned_to_id',\Auth::id())
+            $user_tasks = Task::where('assigned_to_id',Auth::id())
                     ->where('status_id','!=',2)
                     ->get();
 

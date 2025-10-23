@@ -2,14 +2,17 @@
 
     namespace App\Livewire\Admin\Filament\Student;
 
+    use Filament\Actions\Contracts\HasActions;
+    use Filament\Actions\Concerns\InteractsWithActions;
+    use Filament\Actions\Action;
+    use Filament\Schemas\Schema;
+    use Filament\Schemas\Components\Section;
+    use Filament\Schemas\Components\Grid;
     use App\Models\Batch;
     use App\Models\BatchStudent;
     use App\Models\Recovery;
     use App\Models\Student;
-    use Filament\Forms\ComponentContainer;
-    use Filament\Forms\Components\Card;
     use Filament\Forms\Components\DatePicker;
-    use Filament\Forms\Components\Grid;
     use Filament\Forms\Components\Repeater;
     use Filament\Forms\Components\Select;
     use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -17,7 +20,6 @@
     use Filament\Forms\Concerns\InteractsWithForms;
     use Filament\Forms\Contracts\HasForms;
     use Filament\Notifications\Notification;
-    use Filament\Tables\Actions\Action;
     use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
     use Filament\Tables\Columns\TextColumn;
     use Filament\Tables\Concerns\InteractsWithTable;
@@ -26,7 +28,8 @@
     use Illuminate\Database\Eloquent\Relations\Relation;
     use Livewire\Component;
 
-    class StudentEdit extends Component implements HasForms, HasTable {
+    class StudentEdit extends Component implements HasForms, HasTable, HasActions {
+        use InteractsWithActions;
         use InteractsWithForms,InteractsWithTable;
 
         public $student_id;
@@ -57,7 +60,7 @@
         {
             return [
                 Action::make('edit')
-                    ->mountUsing(fn (ComponentContainer $form, Student $record) => $form->fill([
+                    ->mountUsing(fn (Schema $schema, Student $record) => $schema->fill([
                               'name' => $record->name,
                               'father_name' => $record->father_name,
                               'mobile' => $record->mobile,
@@ -66,8 +69,8 @@
                               'nationality' => $record->nationality,
                               'cnic_passport' => $record->cnic_passport,
                     ]))
-                    ->form([
-                        Card::make()
+                    ->schema([
+                        Section::make()
                     ->schema([
                         SpatieMediaLibraryFileUpload::make('dp')
                             ->collection('student_dp')
@@ -106,7 +109,7 @@
                         ->send();
                 }),
                 Action::make('add_batch')->label('Add Batch')
-                ->form([
+                ->schema([
                     Grid::make()
                     ->schema([
                         Select::make('batch_id')

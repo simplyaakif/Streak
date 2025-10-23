@@ -84,7 +84,7 @@
                 </div>
             </x-slot>
             <x-slot name="footer">
-                <x-button.secondary wire:click="$set('showEditModal', false)">Cancel</x-button.secondary>
+                <x-button.secondary wire:click="showEditModal = false">Cancel</x-button.secondary>
                 <x-button.primary wire:click="save">Save</x-button.primary>
             </x-slot>
         </x-modal.dialog>

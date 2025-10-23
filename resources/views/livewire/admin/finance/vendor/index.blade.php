@@ -42,14 +42,14 @@
                     </div>
                 </x-slot>
                 <x-slot name="footer">
-                    <x-button.secondary wire:click="$set('showModal',false)">Cancel</x-button.secondary>
+                    <x-button.secondary wire:click="showModal = false">Cancel</x-button.secondary>
                     <x-button.primary type="submit">Submit</x-button.primary>
                 </x-slot>
             </x-modal.dialog>
         </form>
     </div>
     <div>
-        <x-button.primary wire:click="$set('showModal',true)" class="mb-4">Add Vendor</x-button.primary>
+        <x-button.primary wire:click="showModal = true" class="mb-4">Add Vendor</x-button.primary>
         <x-common.table>
             <x-slot name="head">
                 <x-common.table.heading>Sr #</x-common.table.heading>

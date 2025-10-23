@@ -1,6 +1,6 @@
 <div>
     <div class="mb-4">
-        <x-button.primary wire:click="$set('showModal',true)">Add Home Work</x-button.primary>
+        <x-button.primary wire:click="showModal = true">Add Home Work</x-button.primary>
     </div>
     <div>
         <form wire:submit="submit">
@@ -12,7 +12,7 @@
                     </div>
                 </x-slot>
                 <x-slot name="footer">
-                    <x-button.secondary wire:click="$set('showModal',false)">Cancel</x-button.secondary>
+                    <x-button.secondary wire:click="showModal = false">Cancel</x-button.secondary>
                     <x-button.primary type="submit">Submit</x-button.primary>
                 </x-slot>
             </x-modal.dialog>

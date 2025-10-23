@@ -8,13 +8,15 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
     <meta http-equiv="Pragma" content="no-cache"/>
     <meta http-equiv="Expires" content="0"/>
-    <link rel="stylesheet" href="{{asset('css/student.css')}}">
+    @vite(['resources/css/student.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="{{ asset('css/filament/filament/app.css') }}"/>
+
     <title>{{ trans('panel.site_title') }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;700&display=swap" rel="stylesheet">
 
     {{--    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">--}}
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.2.4/dist/cdn.min.js"
-            integrity="sha256-w70uaH0T7oKUdZDY2JAQDIHJbgrF37i/Z9nr9B2e3Fs=" crossorigin="anonymous"></script>
+    {{-- Alpine.js is included with Livewire/Filament, no need to load separately --}}
+    @livewireStyles
     @filamentStyles
     @stack('styles')
 </head>
@@ -32,6 +34,7 @@
     {{ csrf_field() }}
 </form>
 <x-student.footer/>
+@livewireScripts
 @filamentScripts
 @yield('scripts')
 @stack('scripts')

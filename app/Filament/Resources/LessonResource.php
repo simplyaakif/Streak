@@ -2,13 +2,16 @@
 
     namespace App\Filament\Resources;
 
+    use Filament\Schemas\Schema;
+    use App\Filament\Resources\LessonResource\Pages\ListLessons;
+    use App\Filament\Resources\LessonResource\Pages\CreateLesson;
+    use App\Filament\Resources\LessonResource\Pages\EditLesson;
     use App\Filament\Resources\LessonResource\Pages;
     use App\Models\Lesson;
     use Filament\Forms\Components\DatePicker;
     use Filament\Forms\Components\Placeholder;
     use Filament\Forms\Components\Select;
     use Filament\Forms\Components\TextInput;
-    use Filament\Forms\Form;
     use Filament\Resources\Resource;
     use Filament\Tables\Table;
     use Filament\Tables\Columns\TextColumn;
@@ -23,9 +26,9 @@
 
         protected static ?string $recordTitleAttribute = 'title';
 
-        public static function form(Form $form): Form
+        public static function form(Schema $schema): Schema
         {
-            return $form->schema([
+            return $schema->components([
                                      TextInput::make('title')->required(),
 
                                      TextInput::make('short_description')->required(),
@@ -64,9 +67,9 @@
         public static function getPages(): array
         {
             return [
-                'index' => Pages\ListLessons::route('/'),
-                'create' => Pages\CreateLesson::route('/create'),
-                'edit' => Pages\EditLesson::route('/{record}/edit'),
+                'index' => ListLessons::route('/'),
+                'create' => CreateLesson::route('/create'),
+                'edit' => EditLesson::route('/{record}/edit'),
             ];
         }
 

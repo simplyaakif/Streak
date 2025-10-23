@@ -2,6 +2,8 @@
 
     namespace App\Livewire\Admin\Student;
 
+    use Filament\Actions\Contracts\HasActions;
+    use Filament\Actions\Concerns\InteractsWithActions;
     use App\Models\Batch;
     use App\Models\BatchStudent;
     use App\Models\Student;
@@ -15,8 +17,9 @@
     use Illuminate\Database\Eloquent\Builder;
     use Livewire\Component;
 
-    class UpdateOrCreate extends Component implements HasForms {
+    class UpdateOrCreate extends Component implements HasForms, HasActions {
 
+        use InteractsWithActions;
         use InteractsWithForms;
 
         public Student $student;

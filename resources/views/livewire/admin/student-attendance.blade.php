@@ -1,5 +1,5 @@
 <div class="block">
-    <x-button.primary wire:click="$set('showModal',true)">Take Attendance</x-button.primary>
+    <x-button.primary wire:click="showModal = true">Take Attendance</x-button.primary>
     <div class="mt-4">
         <x-common.table class="w-full">
             <x-slot name="head">
@@ -58,7 +58,7 @@
                     </x-common.table>
                 </x-slot>
                 <x-slot name="footer">
-                    <x-button.secondary wire:click="$set('showAttendanceModal',false)">Cancel</x-button.secondary>
+                    <x-button.secondary wire:click="showAttendanceModal = false">Cancel</x-button.secondary>
                 </x-slot>
             </x-modal.dialog>
         @endif
@@ -104,7 +104,7 @@
                 </x-common.table>
             </x-slot>
             <x-slot name="footer">
-                <x-button.secondary wire:click="$set('showModal',false)">Cancel</x-button.secondary>
+                <x-button.secondary wire:click="showModal = false">Cancel</x-button.secondary>
                 <x-button.primary type="submit">Submit Attendance</x-button.primary>
             </x-slot>
         </x-modal.dialog>

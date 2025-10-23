@@ -2,11 +2,21 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\BooleanColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\UserResource\Pages\ListUsers;
+use App\Filament\Resources\UserResource\Pages\CreateUser;
+use App\Filament\Resources\UserResource\Pages\EditUser;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Tables;
@@ -17,29 +27,29 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'Users Management';
-    public static function form(Form $form): Form
+    protected static string | \UnitEnum | null $navigationGroup = 'Users Management';
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Textarea::make('name')
+        return $schema
+            ->components([
+                Textarea::make('name')
                     ->maxLength(255),
-                Forms\Components\Textarea::make('email')
+                Textarea::make('email')
                     ->maxLength(255),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
-                Forms\Components\Textarea::make('password')
+                DateTimePicker::make('email_verified_at'),
+                Textarea::make('password')
                     ->maxLength(255),
-                Forms\Components\Textarea::make('is_staff')
+                Textarea::make('is_staff')
                     ->maxLength(255),
-                Forms\Components\Textarea::make('avatar')
+                Textarea::make('avatar')
                     ->maxLength(255),
-                Forms\Components\Textarea::make('messenger_color')
+                Textarea::make('messenger_color')
                     ->maxLength(255),
-                Forms\Components\Toggle::make('dark_mode'),
-                Forms\Components\Toggle::make('active_status'),
-                Forms\Components\Toggle::make('is_super')
+                Toggle::make('dark_mode'),
+                Toggle::make('active_status'),
+                Toggle::make('is_super')
                     ->required(),
             ]);
     }
@@ -48,31 +58,31 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('email'),
-                Tables\Columns\TextColumn::make('email_verified_at')
+                TextColumn::make('name'),
+                TextColumn::make('email'),
+                TextColumn::make('email_verified_at')
                     ->dateTime(),
-                Tables\Columns\TextColumn::make('is_staff'),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('is_staff'),
+                TextColumn::make('created_at')
                     ->dateTime(),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime(),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime(),
-                Tables\Columns\TextColumn::make('avatar'),
-                Tables\Columns\TextColumn::make('messenger_color'),
-                Tables\Columns\BooleanColumn::make('dark_mode'),
-                Tables\Columns\BooleanColumn::make('active_status'),
-                Tables\Columns\BooleanColumn::make('is_super'),
+                TextColumn::make('avatar'),
+                TextColumn::make('messenger_color'),
+                BooleanColumn::make('dark_mode'),
+                BooleanColumn::make('active_status'),
+                BooleanColumn::make('is_super'),
             ])
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                DeleteBulkAction::make(),
             ]);
     }
 
@@ -86,9 +96,9 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUsers::route('/'),
-            'create' => Pages\CreateUser::route('/create'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'index' => ListUsers::route('/'),
+            'create' => CreateUser::route('/create'),
+            'edit' => EditUser::route('/{record}/edit'),
         ];
     }
 }

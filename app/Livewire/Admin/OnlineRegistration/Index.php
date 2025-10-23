@@ -2,6 +2,8 @@
 
     namespace App\Livewire\Admin\OnlineRegistration;
 
+    use Filament\Actions\Contracts\HasActions;
+    use Filament\Actions\Concerns\InteractsWithActions;
     use App\Models\Campus;
     use App\Models\Course;
     use App\Models\OnlineRegistration;
@@ -13,7 +15,9 @@
     use Filament\Tables\Actions\Action;
     use Filament\Tables\Columns\TextColumn;
     use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
     use Filament\Tables\Contracts\HasTable;
+use Filament\Schemas\Contracts\HasSchemas;
     use Filament\Tables\Enums\FiltersLayout;
     use Filament\Tables\Filters\Layout;
     use Filament\Tables\Filters\SelectFilter;
@@ -22,7 +26,8 @@
     use Illuminate\Database\Eloquent\Relations\Relation;
     use Livewire\Component;
 
-    class Index extends Component implements HasTable,HasForms {
+    class Index extends Component implements HasTable, HasSchemas,HasForms, HasActions {
+        use InteractsWithActions;
         use InteractsWithTable,InteractsWithForms;
 
 
@@ -55,7 +60,7 @@
                         'Online'=>'Online'
                     ])
             ], layout: FiltersLayout::AboveContent)
-                ->actions([
+                ->recordActions([
 //                    Action::make('updateAuthor')
 //                        ->mountUsing(fn (ComponentContainer $form, User $record) => $form->fill([
 //                            'authorId' => $record->author->id,

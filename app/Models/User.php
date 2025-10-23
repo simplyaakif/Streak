@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Filament\Panel;
 use Chatify\Facades\ChatifyMessenger;
 use \DateTimeInterface;
 use App\Support\HasAdvancedFilter;
@@ -122,7 +123,7 @@ class User extends Authenticatable implements FilamentUser
     }
 
 
-    public function canAccessPanel(\Filament\Panel $panel): bool
+    public function canAccessPanel(Panel $panel): bool
     {
         return $this->is_super ? true:false;
     }

@@ -18,11 +18,11 @@ module.exports = {
       colors: {
         indigo: colors.indigo,
         rose: colors.rose,
-        blueGray: colors.blueGray,
+        blueGray: colors.slate,
         lightBlue: colors.sky,
         orange: colors.orange,
         red: colors.red,
-          primary:colors.cyan,
+        primary:colors.cyan,
       },
       minHeight: {
         'screen-75': '75vh'

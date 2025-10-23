@@ -2,12 +2,15 @@
 
 namespace App\Livewire\Admin\Filament\Student\Batch;
 
+use Filament\Actions\Contracts\HasActions;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Action;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
 use App\Models\Batch;
 use App\Models\BatchStudent;
 use App\Models\Recovery;
 use App\Models\Student;
-use Filament\Forms\ComponentContainer;
-use Filament\Forms\Components\Card;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -17,7 +20,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -25,8 +27,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Livewire\Component;
 
-class BatchIndex extends Component implements HasForms, HasTable
+class BatchIndex extends Component implements HasForms, HasTable, HasActions
 {
+    use InteractsWithActions;
     use InteractsWithForms, InteractsWithTable;
 
     public $student_id;
@@ -45,7 +48,7 @@ class BatchIndex extends Component implements HasForms, HasTable
     {
         return [
             Action::make('edit')
-                ->mountUsing(fn(ComponentContainer $form, BatchStudent $record) => $form->fill([
+                ->mountUsing(fn(Schema $schema, BatchStudent $record) => $schema->fill([
                     'session_start_date' => $record->session_start_date,
                     'session_end_date' => $record->session_end_date,
                     'batch_status' => $record->batch_status,
@@ -53,8 +56,8 @@ class BatchIndex extends Component implements HasForms, HasTable
                     'status_comments' => $record->status_comments,
                     'is_special' => $record->is_special,
                 ]))
-                ->form([
-                    Card::make()
+                ->schema([
+                    Section::make()
                         ->schema([
                             Select::make('batch_id')
                                 ->options(Batch::all()->pluck('title', 'id')),
@@ -88,12 +91,12 @@ Also mention your name & today Date so that we may know who updated the status')
                 }),
             Action::make('edit_recoveries')
                 ->label('Re-generate Unpaid Recoveries')
-                ->mountUsing(fn(ComponentContainer $form, BatchStudent $record) => $form->fill([
+                ->mountUsing(fn(Schema $schema, BatchStudent $record) => $schema->fill([
                     'recoveries' => Recovery::where('batch_student_id', $record->id)
                         ->where('is_paid', '=', 0)
                         ->get()->toArray()
                 ]))
-                ->form([
+                ->schema([
                     Repeater::make('recoveries')->schema([
                         TextInput::make('amount')->required(),
                         DatePicker::make('due_date')->required(),

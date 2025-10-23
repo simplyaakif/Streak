@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BatchStudentResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Resources\BatchStudentResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -13,7 +14,7 @@ class ListBatchStudents extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

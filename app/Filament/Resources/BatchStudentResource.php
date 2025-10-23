@@ -2,11 +2,21 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\BatchStudentResource\Pages\ListBatchStudents;
+use App\Filament\Resources\BatchStudentResource\Pages\CreateBatchStudent;
+use App\Filament\Resources\BatchStudentResource\Pages\EditBatchStudent;
 use App\Filament\Resources\BatchStudentResource\Pages;
 use App\Filament\Resources\BatchStudentResource\RelationManagers;
 use App\Models\BatchStudent;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Tables;
@@ -17,20 +27,20 @@ class BatchStudentResource extends Resource
 {
     protected static ?string $model = BatchStudent::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-academic-cap';
     protected static ?string $navigationLabel ='Admissions';
-    protected static ?string $navigationGroup ='Students Management';
+    protected static string | \UnitEnum | null $navigationGroup ='Students Management';
 
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('batch_id'),
-                Forms\Components\TextInput::make('student_id'),
-                Forms\Components\DatePicker::make('session_start_date'),
-                Forms\Components\DatePicker::make('session_end_date'),
-                Forms\Components\Toggle::make('batch_status'),
+        return $schema
+            ->components([
+                TextInput::make('batch_id'),
+                TextInput::make('student_id'),
+                DatePicker::make('session_start_date'),
+                DatePicker::make('session_end_date'),
+                Toggle::make('batch_status'),
             ]);
     }
 
@@ -38,25 +48,25 @@ class BatchStudentResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('student.name')->searchable(),
-                Tables\Columns\TextColumn::make('batch.title')->searchable(),
-                Tables\Columns\TextColumn::make('session_start_date')
+                TextColumn::make('student.name')->searchable(),
+                TextColumn::make('batch.title')->searchable(),
+                TextColumn::make('session_start_date')
                     ->date(),
-                Tables\Columns\TextColumn::make('session_end_date')
+                TextColumn::make('session_end_date')
                     ->date(),
-                Tables\Columns\BadgeColumn::make('batch_status'),
-                Tables\Columns\TextColumn::make('created_at')
+                BadgeColumn::make('batch_status'),
+                TextColumn::make('created_at')
                     ->sortable()
                     ->dateTime(),
             ])->defaultSort('created_at','desc')
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                DeleteBulkAction::make(),
             ]);
     }
 
@@ -70,9 +80,9 @@ class BatchStudentResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListBatchStudents::route('/'),
-            'create' => Pages\CreateBatchStudent::route('/create'),
-            'edit' => Pages\EditBatchStudent::route('/{record}/edit'),
+            'index' => ListBatchStudents::route('/'),
+            'create' => CreateBatchStudent::route('/create'),
+            'edit' => EditBatchStudent::route('/{record}/edit'),
         ];
     }
     protected function getRedirectUrl(): string

@@ -2,6 +2,8 @@
 
 namespace Netless\Token;
 
+use Closure;
+
 date_default_timezone_set("UTC");
 
 use Ramsey\Uuid\Uuid;
@@ -98,9 +100,9 @@ class Generate
     /**
      * 根据 prefix 生成相应的 generate
      * @param string $prefix 必须为: NETLESSSDK_ / NETLESSROOM_ / NETLESSTASK_
-     * @return \Closure
+     * @return Closure
      */
-    private function createToken(string $prefix): \Closure
+    private function createToken(string $prefix): Closure
     {
         return function (string $accessKey, string $secretAccessKey, int $lifespan, array $content) use ($prefix): string {
             $map = array_replace($content, array(

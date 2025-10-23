@@ -2,8 +2,8 @@
 
     namespace App\Filament\Resources\ExpenseResource\Pages;
 
+    use Filament\Actions\DeleteAction;
     use App\Filament\Resources\ExpenseResource;
-    use Filament\Pages\Actions\DeleteAction;
     use Filament\Resources\Pages\EditRecord;
 
     class EditExpense extends EditRecord {

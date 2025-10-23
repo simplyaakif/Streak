@@ -2,6 +2,8 @@
 
     namespace App\Livewire\Admin\Student;
 
+    use Filament\Actions\Contracts\HasActions;
+    use Filament\Actions\Concerns\InteractsWithActions;
     use App\Models\BatchStudent;
     use Filament\Forms\Components\Repeater;
     use Filament\Forms\Components\TextInput;
@@ -9,8 +11,9 @@
     use Filament\Forms\Contracts\HasForms;
     use Livewire\Component;
 
-    class UpdateOrCreateBatchStudentRecovery extends Component implements HasForms {
+    class UpdateOrCreateBatchStudentRecovery extends Component implements HasForms, HasActions {
 
+        use InteractsWithActions;
         use InteractsWithForms;
 
         public BatchStudent $batchStudent;

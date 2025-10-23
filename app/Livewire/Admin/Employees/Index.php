@@ -2,25 +2,30 @@
 
     namespace App\Livewire\Admin\Employees;
 
+    use Filament\Actions\Contracts\HasActions;
+    use Filament\Actions\Concerns\InteractsWithActions;
+    use Filament\Actions\Action;
+    use Filament\Actions\BulkAction;
     use App\Models\Employee;
     use App\Models\Role;
     use App\Models\User;
     use App\Notifications\EmployeeCreateNotification;
     use Filament\Forms\Concerns\InteractsWithForms;
     use Filament\Forms\Contracts\HasForms;
-    use Filament\Tables\Actions\Action;
-    use Filament\Tables\Actions\BulkAction;
     use Filament\Tables\Columns\TextColumn;
     use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
     use Filament\Tables\Contracts\HasTable;
+use Filament\Schemas\Contracts\HasSchemas;
     use Hash;
     use Illuminate\Database\Eloquent\Collection;
     use Livewire\Component;
     use Livewire\WithPagination;
     use Str;
 
-    class Index extends Component implements HasTable, HasForms {
+    class Index extends Component implements HasTable, HasSchemas, HasForms, HasActions {
 
+        use InteractsWithActions;
         use InteractsWithTable, InteractsWithForms;
 
         public Employee $employee;

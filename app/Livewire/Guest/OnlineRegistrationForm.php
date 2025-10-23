@@ -2,6 +2,8 @@
 
     namespace App\Livewire\Guest;
 
+    use Filament\Actions\Contracts\HasActions;
+    use Filament\Actions\Concerns\InteractsWithActions;
     use App\Channels\SmsChannel;
     use App\Models\Campus;
     use App\Models\Course;
@@ -13,8 +15,9 @@
     use Filament\Forms\Contracts\HasForms;
     use Livewire\Component;
 
-    class OnlineRegistrationForm extends Component implements HasForms {
+    class OnlineRegistrationForm extends Component implements HasForms, HasActions {
 
+        use InteractsWithActions;
         use InteractsWithForms;
 
         public $submitted = false ;

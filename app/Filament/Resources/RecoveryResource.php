@@ -2,13 +2,23 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\BooleanColumn;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\RecoveryResource\Pages\ListRecoveries;
+use App\Filament\Resources\RecoveryResource\Pages\CreateRecovery;
+use App\Filament\Resources\RecoveryResource\Pages\EditRecovery;
 use App\Filament\Resources\RecoveryResource\Pages;
 use App\Filament\Resources\RecoveryResource\RelationManagers;
 use App\Models\Batch;
 use App\Models\Recovery;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Tables;
@@ -20,33 +30,33 @@ class RecoveryResource extends Resource
 {
     protected static ?string $model = Recovery::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-banknotes';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-banknotes';
 
-    protected static ?string $navigationGroup = 'Finance Management';
+    protected static string | \UnitEnum | null $navigationGroup = 'Finance Management';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('batch_student_id')
+        return $schema
+            ->components([
+                TextInput::make('batch_student_id')
                     ->required(),
-                Forms\Components\TextInput::make('batch_id')
+                TextInput::make('batch_id')
                     ->required(),
-                Forms\Components\TextInput::make('student_id')
+                TextInput::make('student_id')
                     ->required(),
-                Forms\Components\TextInput::make('amount')
+                TextInput::make('amount')
                     ->required(),
-                Forms\Components\DatePicker::make('due_date')
+                DatePicker::make('due_date')
                     ->required(),
-                Forms\Components\Toggle::make('is_paid')
+                Toggle::make('is_paid')
                     ->required(),
-                Forms\Components\DatePicker::make('paid_on'),
-                Forms\Components\TextInput::make('account_id'),
-                Forms\Components\TextInput::make('slip_number')
+                DatePicker::make('paid_on'),
+                TextInput::make('account_id'),
+                TextInput::make('slip_number')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('course_id')
+                TextInput::make('course_id')
                     ->required(),
-                Forms\Components\TextInput::make('campus_id'),
+                TextInput::make('campus_id'),
             ]);
     }
 
@@ -54,25 +64,25 @@ class RecoveryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('batch.title')->searchable(),
-                Tables\Columns\TextColumn::make('student.name')->searchable(),
-                Tables\Columns\TextColumn::make('amount'),
-                Tables\Columns\TextColumn::make('due_date')
+                TextColumn::make('batch.title')->searchable(),
+                TextColumn::make('student.name')->searchable(),
+                TextColumn::make('amount'),
+                TextColumn::make('due_date')
                     ->date(),
-                Tables\Columns\BooleanColumn::make('is_paid'),
-                Tables\Columns\TextColumn::make('paid_on')
+                BooleanColumn::make('is_paid'),
+                TextColumn::make('paid_on')
                     ->searchable()
                     ->date(),
-                Tables\Columns\TextColumn::make('account.title'),
-                Tables\Columns\TextColumn::make('slip_number'),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('account.title'),
+                TextColumn::make('slip_number'),
+                TextColumn::make('created_at')
                     ->dateTime(),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime(),
             ])
             ->filters([
                           Filter::make('due_date')
-                              ->form([
+                              ->schema([
                                          DatePicker::make('due_from'),
                                          DatePicker::make('due_until'),
                                      ])
@@ -88,7 +98,7 @@ class RecoveryResource extends Resource
                                       );
                               }),
                           Filter::make('paid_on')
-                              ->form([
+                              ->schema([
                                          DatePicker::make('paid_from'),
                                          DatePicker::make('paid_until'),
                                      ])
@@ -103,19 +113,19 @@ class RecoveryResource extends Resource
                                           fn (Builder $query, $date): Builder => $query->whereDate('paid_on', '<=', $date),
                                       );
                               }),
-                Tables\Filters\SelectFilter::make('is_paid')
+                SelectFilter::make('is_paid')
                     ->options([
                         '0'=>'No',
                         '1'=>'Yes'
                               ]),
                 SelectFilter::make('batch_id')->label('Batch')
                     ->options(Batch::all()->pluck('title','id')),
-            ],\Filament\Tables\Enums\FiltersLayout::AboveContent)
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ],FiltersLayout::AboveContent)
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                DeleteBulkAction::make(),
             ]);
     }
 
@@ -129,9 +139,9 @@ class RecoveryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRecoveries::route('/'),
-            'create' => Pages\CreateRecovery::route('/create'),
-            'edit' => Pages\EditRecovery::route('/{record}/edit'),
+            'index' => ListRecoveries::route('/'),
+            'create' => CreateRecovery::route('/create'),
+            'edit' => EditRecovery::route('/{record}/edit'),
         ];
     }
 }

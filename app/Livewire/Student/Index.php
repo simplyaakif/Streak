@@ -2,19 +2,25 @@
 
 namespace App\Livewire\Student;
 
+use Filament\Actions\Contracts\HasActions;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Action;
 use App\Models\Student;
 use Filament\Forms\Components\TextInput;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Schemas\Contracts\HasSchemas;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 
-class Index extends Component implements HasTable
+class Index extends Component implements HasTable, HasSchemas, HasActions
 {
+    use InteractsWithActions;
     use InteractsWithTable;
+    use InteractsWithSchemas;
 
     protected function getTableQuery(): Builder
     {
@@ -37,7 +43,7 @@ class Index extends Component implements HasTable
         return[
             Action::make('edit')
             ->label('Edit')
-            ->form([
+            ->schema([
                     TextInput::make('name'),
                    ])
             ->action(function(){

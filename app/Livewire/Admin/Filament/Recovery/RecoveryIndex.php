@@ -2,18 +2,20 @@
 
 namespace App\Livewire\Admin\Filament\Recovery;
 
+use Filament\Actions\Contracts\HasActions;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Action;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Grid;
 use App\Models\Account;
 use App\Models\Batch;
 use App\Models\BatchStudent;
 use App\Models\Recovery;
-use Filament\Forms\ComponentContainer;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\BooleanColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
@@ -29,9 +31,10 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 
-class RecoveryIndex extends Component implements HasForms, HasTable
+class RecoveryIndex extends Component implements HasForms, HasTable, HasActions
 {
 
+    use InteractsWithActions;
     use InteractsWithTable;
     use InteractsWithForms;
 
@@ -76,7 +79,7 @@ class RecoveryIndex extends Component implements HasForms, HasTable
             ])->defaultSort('created_at', 'desc')
             ->filters([
                 Filter::make('due_date')
-                    ->form([
+                    ->schema([
                         DatePicker::make('due_from'),
                         DatePicker::make('due_until'),
                     ])
@@ -92,7 +95,7 @@ class RecoveryIndex extends Component implements HasForms, HasTable
                             );
                     }),
                 Filter::make('paid_on')
-                    ->form([
+                    ->schema([
                         DatePicker::make('paid_from'),
                         DatePicker::make('paid_until'),
                     ])
@@ -149,7 +152,7 @@ class RecoveryIndex extends Component implements HasForms, HasTable
 
                 Filter::make('Status')
                     ->default(1)
-                    ->form([
+                    ->schema([
                         Select::make('status')
                             ->options(BatchStudent::STATUS)
                             ->default(1),
@@ -167,17 +170,17 @@ class RecoveryIndex extends Component implements HasForms, HasTable
 //                                    ->where('id','=',$data['status']);
                     })
             ], FiltersLayout::AboveContent)
-            ->actions([
+            ->recordActions([
                 Action::make('Student')
                     ->url(fn(Recovery $record): string => route('admin.students.show', $record->student_id))
                     ->openUrlInNewTab(),
                 Action::make('Pay')
-                    ->mountUsing(fn(ComponentContainer $form, Recovery $record) => $form->fill([
+                    ->mountUsing(fn(Schema $schema, Recovery $record) => $schema->fill([
                         'amount' => $record->amount,
                         'name' => $record->student->name,
                         'batch' => $record->batch->title,
                     ]))
-                    ->form([
+                    ->schema([
                         Grid::make(3)
                             ->schema([
                                 TextInput::make('name')

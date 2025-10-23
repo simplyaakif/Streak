@@ -2,12 +2,13 @@
 
     namespace App\Models;
 
+    use Staudenmeir\EloquentHasManyDeep\HasRelationships;
     use Carbon\Carbon;
     use Illuminate\Database\Eloquent\Factories\HasFactory;
     use Illuminate\Database\Eloquent\Model;
 
     class Income extends Model {
-        use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
+        use HasRelationships;
 
         use HasFactory;
 

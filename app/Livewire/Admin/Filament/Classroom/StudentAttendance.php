@@ -2,6 +2,8 @@
 
     namespace App\Livewire\Admin\Filament\Classroom;
 
+    use Filament\Actions\Contracts\HasActions;
+    use Filament\Actions\Concerns\InteractsWithActions;
     use App\Models\StudentAttendance as SA;
     use Filament\Forms\Concerns\InteractsWithForms;
     use Filament\Forms\Contracts\HasForms;
@@ -10,8 +12,9 @@
     use Illuminate\Contracts\View\View;
     use Livewire\Component;
 
-    class StudentAttendance extends Component implements HasForms, HasTable {
+    class StudentAttendance extends Component implements HasForms, HasTable, HasActions {
 
+        use InteractsWithActions;
         use InteractsWithForms,InteractsWithTable;
 
         protected function getTableQuery()

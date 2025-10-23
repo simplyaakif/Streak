@@ -2,9 +2,11 @@
 
     namespace App\Livewire\Admin\Filament\Employee;
 
+    use Filament\Actions\Contracts\HasActions;
+    use Filament\Actions\Concerns\InteractsWithActions;
+    use Filament\Schemas\Components\Section;
     use App\Models\Employee;
     use Filament\Forms\Components\DatePicker;
-    use Filament\Forms\Components\Section;
     use Filament\Forms\Components\Select;
     use Filament\Forms\Components\TextInput;
     use Filament\Forms\Concerns\InteractsWithForms;
@@ -12,8 +14,9 @@
     use Livewire\Component;
     use Filament\Notifications\Notification;
 
-    class CreateOrUpdate extends Component implements HasForms {
+    class CreateOrUpdate extends Component implements HasForms, HasActions {
 
+        use InteractsWithActions;
         use InteractsWithForms;
 
         public Employee $employee;

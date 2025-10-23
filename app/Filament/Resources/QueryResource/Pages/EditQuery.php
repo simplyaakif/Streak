@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\QueryResource\Pages;
 
+use Filament\Actions\DeleteAction;
 use App\Filament\Resources\QueryResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,7 +14,7 @@ class EditQuery extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

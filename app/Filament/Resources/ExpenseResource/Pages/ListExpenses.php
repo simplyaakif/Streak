@@ -2,8 +2,8 @@
 
     namespace App\Filament\Resources\ExpenseResource\Pages;
 
+    use Filament\Actions\CreateAction;
     use App\Filament\Resources\ExpenseResource;
-    use Filament\Pages\Actions\CreateAction;
     use Filament\Resources\Pages\ListRecords;
 
     class ListExpenses extends ListRecords {

@@ -2,6 +2,9 @@
 
     namespace App\Livewire\Admin\Filament\StudentAttendance;
 
+    use Filament\Actions\Contracts\HasActions;
+    use Filament\Actions\Concerns\InteractsWithActions;
+    use Filament\Tables\Enums\FiltersLayout;
     use App\Models\Batch;
     use App\Models\Employee;
     use App\Models\StudentAttendance;
@@ -10,7 +13,9 @@
     use Filament\Forms\Contracts\HasForms;
     use Filament\Tables\Columns\TextColumn;
     use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
     use Filament\Tables\Contracts\HasTable;
+use Filament\Schemas\Contracts\HasSchemas;
     use Filament\Tables\Filters\Filter;
     use Filament\Tables\Filters\Layout;
     use Filament\Tables\Filters\MultiSelectFilter;
@@ -20,8 +25,9 @@
     use Livewire\Component;
     use Webbingbrasil\FilamentAdvancedFilter\Filters\DateFilter;
 
-    class Index extends Component implements HasTable, HasForms {
+    class Index extends Component implements HasTable, HasSchemas, HasForms, HasActions {
 
+        use InteractsWithActions;
         use InteractsWithTable, InteractsWithForms;
 
         protected function getTableQuery(): Builder|Relation
@@ -52,7 +58,7 @@
                                   ->pluck('name','id' ))
                         ->column('employee_id'),
                     Filter::make('Date')
-                        ->form([
+                        ->schema([
                                    DatePicker::make('created_from'),
                                    DatePicker::make('created_until'),
                                ])
@@ -81,7 +87,7 @@
         }
         protected function getTableFiltersLayout(): ?string
         {
-            return \Filament\Tables\Enums\FiltersLayout::AboveContent;
+            return FiltersLayout::AboveContent;
         }
         protected function getDefaultTableSortDirection(): ?string
         {

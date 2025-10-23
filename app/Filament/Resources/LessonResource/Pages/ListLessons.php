@@ -2,8 +2,8 @@
 
     namespace App\Filament\Resources\LessonResource\Pages;
 
+    use Filament\Actions\CreateAction;
     use App\Filament\Resources\LessonResource;
-    use Filament\Pages\Actions\CreateAction;
     use Filament\Resources\Pages\ListRecords;
 
     class ListLessons extends ListRecords {

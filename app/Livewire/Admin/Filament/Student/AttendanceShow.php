@@ -2,6 +2,8 @@
 
     namespace App\Livewire\Admin\Filament\Student;
 
+    use Filament\Actions\Contracts\HasActions;
+    use Filament\Actions\Concerns\InteractsWithActions;
     use App\Models\StudentAttendance;
     use Filament\Forms\Concerns\InteractsWithForms;
     use Filament\Forms\Contracts\HasForms;
@@ -12,8 +14,9 @@
     use Illuminate\Database\Eloquent\Relations\Relation;
     use Livewire\Component;
 
-    class AttendanceShow extends Component implements HasForms,HasTable {
+    class AttendanceShow extends Component implements HasForms,HasTable, HasActions {
 
+        use InteractsWithActions;
         use InteractsWithForms,InteractsWithTable;
         public $student_id;
 

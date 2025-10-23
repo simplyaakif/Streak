@@ -2,11 +2,19 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TagsColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\QueryResource\Pages\ListQueries;
+use App\Filament\Resources\QueryResource\Pages\CreateQuery;
+use App\Filament\Resources\QueryResource\Pages\EditQuery;
 use App\Filament\Resources\QueryResource\Pages;
 use App\Filament\Resources\QueryResource\RelationManagers;
 use App\Models\Query;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Tables;
@@ -16,24 +24,24 @@ class QueryResource extends Resource
 {
     protected static ?string $model = Query::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-user-plus';
-    protected static ?string $navigationGroup='Query Management';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user-plus';
+    protected static string | \UnitEnum | null $navigationGroup='Query Management';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Textarea::make('name'),
-                Forms\Components\Textarea::make('mobile'),
-                Forms\Components\Textarea::make('email'),
-                Forms\Components\Textarea::make('address'),
-                Forms\Components\TextInput::make('staff_user_id'),
-                Forms\Components\Textarea::make('remarks')
+        return $schema
+            ->components([
+                Textarea::make('name'),
+                Textarea::make('mobile'),
+                Textarea::make('email'),
+                Textarea::make('address'),
+                TextInput::make('staff_user_id'),
+                Textarea::make('remarks')
                     ->maxLength(65535),
-                Forms\Components\Textarea::make('telephone'),
-                Forms\Components\Textarea::make('p_timings'),
-                Forms\Components\Textarea::make('reference'),
-                Forms\Components\TextInput::make('contact_type'),
+                Textarea::make('telephone'),
+                Textarea::make('p_timings'),
+                Textarea::make('reference'),
+                TextInput::make('contact_type'),
             ]);
     }
 
@@ -45,7 +53,7 @@ class QueryResource extends Resource
                 TextColumn::make('mobile'),
                 TextColumn::make('mobile'),
                 TextColumn::make('entry_by'),
-                Tables\Columns\TagsColumn::make('course_tags'),
+                TagsColumn::make('course_tags'),
                 TextColumn::make('contact_type_label')
                 ->label('Contact Via'),
                 TextColumn::make('created_at')
@@ -54,11 +62,11 @@ class QueryResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                DeleteBulkAction::make(),
             ]);
     }
 
@@ -72,9 +80,9 @@ class QueryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListQueries::route('/'),
-            'create' => Pages\CreateQuery::route('/create'),
-            'edit' => Pages\EditQuery::route('/{record}/edit'),
+            'index' => ListQueries::route('/'),
+            'create' => CreateQuery::route('/create'),
+            'edit' => EditQuery::route('/{record}/edit'),
         ];
     }
     protected function getRedirectUrl(): string

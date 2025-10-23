@@ -2,20 +2,25 @@
 
     namespace App\Livewire\Admin\Filament\HomeTask;
 
+    use Filament\Actions\Contracts\HasActions;
+    use Filament\Actions\Concerns\InteractsWithActions;
+    use Filament\Actions\Action;
+    use Filament\Schemas\Schema;
+    use Filament\Schemas\Components\Grid;
+    use Filament\Tables\Enums\FiltersLayout;
     use App\Models\Batch;
     use App\Models\Employee;
     use App\Models\HomeTask;
     use App\Models\Lesson;
-    use Filament\Forms\ComponentContainer;
     use Filament\Forms\Components\DatePicker;
     use Filament\Forms\Components\DateTimePicker;
-    use Filament\Forms\Components\Grid;
     use Filament\Forms\Components\Textarea;
     use Filament\Forms\Components\TextInput;
-    use Filament\Tables\Actions\Action;
     use Filament\Tables\Columns\TextColumn;
     use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
     use Filament\Tables\Contracts\HasTable;
+use Filament\Schemas\Contracts\HasSchemas;
     use Filament\Tables\Filters\Filter;
     use Filament\Tables\Filters\Layout;
     use Filament\Tables\Filters\MultiSelectFilter;
@@ -23,9 +28,11 @@
     use Illuminate\Database\Eloquent\Relations\Relation;
     use Livewire\Component;
 
-    class Index extends Component implements HasTable {
+    class Index extends Component implements HasTable, HasSchemas, HasActions {
 
+        use InteractsWithActions;
         use InteractsWithTable;
+    use InteractsWithSchemas;
 
         public function mount()
         {
@@ -45,7 +52,7 @@
             return [
                 Action::make('edit')
                     ->label('View')
-                    ->mountUsing(fn (ComponentContainer $form, HomeTask $record) => $form->fill([
+                    ->mountUsing(fn (Schema $schema, HomeTask $record) => $schema->fill([
       'title' => $record->title,
       'due_date_time' => $record->due_date_time,
       'employee_id' => $record->empolyee_id,
@@ -55,7 +62,7 @@
                     ->action(function (HomeTask $record, array $data): void {
                         $record->save();
                     })
-                    ->form([
+                    ->schema([
                                Grid::make('2')
                                    ->schema([
 
@@ -73,7 +80,7 @@
         {
             return [
                 Filter::make('date')
-                    ->form([
+                    ->schema([
                                DatePicker::make('created_from'),
                                DatePicker::make('created_until'),
                            ])
@@ -100,7 +107,7 @@
 
         protected function getTableFiltersLayout(): ?string
         {
-            return \Filament\Tables\Enums\FiltersLayout::AboveContent;
+            return FiltersLayout::AboveContent;
         }
 
         protected function getDefaultTableSortColumn(): ?string

@@ -2,6 +2,10 @@
 
     namespace App\Filament\Resources;
 
+    use Filament\Schemas\Schema;
+    use App\Filament\Resources\ExpenseResource\Pages\ListExpenses;
+    use App\Filament\Resources\ExpenseResource\Pages\CreateExpense;
+    use App\Filament\Resources\ExpenseResource\Pages\EditExpense;
     use App\Filament\Resources\ExpenseResource\Pages;
     use App\Models\Expense;
     use Filament\Forms\Components\Checkbox;
@@ -9,7 +13,6 @@
     use Filament\Forms\Components\Placeholder;
     use Filament\Forms\Components\Select;
     use Filament\Forms\Components\TextInput;
-    use Filament\Forms\Form;
     use Filament\Resources\Resource;
     use Filament\Tables\Table;
     use Filament\Tables\Columns\TextColumn;
@@ -24,11 +27,11 @@
 
         protected static ?string $recordTitleAttribute = 'id';
 
-        protected static ?string $navigationGroup = 'Finance Management';
+        protected static string | \UnitEnum | null $navigationGroup = 'Finance Management';
 
-        public static function form(Form $form): Form
+        public static function form(Schema $schema): Schema
         {
-            return $form->schema([
+            return $schema->components([
                                      Select::make('types')
                                      ->options(Expense::types),
 
@@ -79,9 +82,9 @@
         public static function getPages(): array
         {
             return [
-                'index' => Pages\ListExpenses::route('/'),
-                'create' => Pages\CreateExpense::route('/create'),
-                'edit' => Pages\EditExpense::route('/{record}/edit'),
+                'index' => ListExpenses::route('/'),
+                'create' => CreateExpense::route('/create'),
+                'edit' => EditExpense::route('/{record}/edit'),
             ];
         }
 

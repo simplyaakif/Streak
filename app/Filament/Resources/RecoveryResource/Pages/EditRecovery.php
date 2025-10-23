@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\RecoveryResource\Pages;
 
+use Filament\Actions\DeleteAction;
 use App\Filament\Resources\RecoveryResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,7 +14,7 @@ class EditRecovery extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

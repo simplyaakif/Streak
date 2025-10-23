@@ -2,9 +2,11 @@
 
     namespace App\Livewire\Admin\Filament\Student;
 
+    use Filament\Actions\Contracts\HasActions;
+    use Filament\Actions\Concerns\InteractsWithActions;
+    use Filament\Schemas\Components\Section;
     use App\Models\Student;
     use App\Models\User;
-    use Filament\Forms\Components\Card;
     use Filament\Forms\Components\TextInput;
     use Filament\Forms\Concerns\InteractsWithForms;
     use Filament\Forms\Contracts\HasForms;
@@ -15,8 +17,9 @@
     use Illuminate\Database\Eloquent\Relations\Relation;
     use Livewire\Component;
 
-    class UserEdit extends Component implements HasForms {
+    class UserEdit extends Component implements HasForms, HasActions {
 
+        use InteractsWithActions;
         use InteractsWithForms;
 
         public $student_id;
@@ -38,7 +41,7 @@
         protected function getFormSchema(): array
         {
             return [
-                Card::make()
+                Section::make()
                 ->schema([
                 TextInput::make('email')->email(),
                 TextInput::make('password')->minLength(8),

@@ -2,11 +2,19 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\StudentResource\Pages\ListStudents;
+use App\Filament\Resources\StudentResource\Pages\CreateStudent;
+use App\Filament\Resources\StudentResource\Pages\EditStudent;
 use App\Filament\Resources\StudentResource\Pages;
 use App\Filament\Resources\StudentResource\RelationManagers;
 use App\Models\Student;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Tables;
@@ -15,22 +23,22 @@ class StudentResource extends Resource
 {
     protected static ?string $model = Student::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationGroup ='Students Management';
+    protected static string | \UnitEnum | null $navigationGroup ='Students Management';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Textarea::make('name'),
-                Forms\Components\Textarea::make('father_name'),
-                Forms\Components\Textarea::make('gender'),
-                Forms\Components\Textarea::make('nationality'),
-                Forms\Components\DatePicker::make('date_of_birth'),
-                Forms\Components\Textarea::make('cnic_passport'),
-                Forms\Components\Textarea::make('mobile'),
-                Forms\Components\Textarea::make('email'),
+        return $schema
+            ->components([
+                Textarea::make('name'),
+                Textarea::make('father_name'),
+                Textarea::make('gender'),
+                Textarea::make('nationality'),
+                DatePicker::make('date_of_birth'),
+                Textarea::make('cnic_passport'),
+                Textarea::make('mobile'),
+                Textarea::make('email'),
             ]);
     }
 
@@ -38,26 +46,26 @@ class StudentResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->searchable(),
-                Tables\Columns\TextColumn::make('mobile'),
-                Tables\Columns\TextColumn::make('father_name'),
-                Tables\Columns\TextColumn::make('gender')
+                TextColumn::make('name')->searchable(),
+                TextColumn::make('mobile'),
+                TextColumn::make('father_name'),
+                TextColumn::make('gender')
                 ->extraAttributes(['class'=>'capitalize']),
-                Tables\Columns\TextColumn::make('date_of_birth')
+                TextColumn::make('date_of_birth')
                     ->date(),
-                Tables\Columns\TextColumn::make('user.name'),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('user.name'),
+                TextColumn::make('created_at')
                     ->sortable()
                     ->dateTime(),
             ])->defaultSort('created_at','desc')
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                DeleteBulkAction::make(),
             ]);
     }
 
@@ -71,9 +79,9 @@ class StudentResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListStudents::route('/'),
-            'create' => Pages\CreateStudent::route('/create'),
-            'edit' => Pages\EditStudent::route('/{record}/edit'),
+            'index' => ListStudents::route('/'),
+            'create' => CreateStudent::route('/create'),
+            'edit' => EditStudent::route('/{record}/edit'),
         ];
     }
     protected function getRedirectUrl(): string
