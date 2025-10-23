@@ -3,6 +3,7 @@
 @import "./select.css";
 @import "dropzone/dist/dropzone.css";
 @import "flatpickr/dist/flatpickr.min.css";
+@plugin "@tailwindcss/forms";
 
 .btn-primary{
     @apply inline-flex items-center px-4 py-2 border
