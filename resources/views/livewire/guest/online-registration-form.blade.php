@@ -4,7 +4,7 @@
             <div class="mx-auto w-full max-w-sm lg:w-96">
                 <div>
                     <x-logo-ace class="w-24 h-24"/>
-                    <h2 class=" text-3xl font-extrabold text-indigo-600">Register Online</h2>
+                    <h2 class=" text-3xl font-extrabold text-cyan-600">Register Online</h2>
                 </div>
 
                 <div class="mt-8">
@@ -12,7 +12,7 @@
                         <form wire:submit="register">
                             {{ $this->form }}
 
-                            <button type="submit" class="bg-indigo-600 text-white rounded px-4 py-2 mt-4">
+                            <button type="submit" class="bg-cyan-600 text-white rounded px-4 py-2 mt-4">
                                 Submit
                             </button>
                         </form>
