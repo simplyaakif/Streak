@@ -1,7 +1,7 @@
 <div class="min-h-screen flex">
     @if(!$submitted)
         <div class="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
-            <div class="mx-auto w-full max-w-sm lg:w-96">
+            <div class="mx-auto w-full max-w-sm lg:w-[600px]">
                 <div>
                     <x-logo-ace class="w-24 h-24"/>
                     <h2 class=" text-3xl font-extrabold text-cyan-600">Register Online</h2>
@@ -37,8 +37,8 @@
         </div>
     @endif
     <div class="hidden lg:block relative w-0 flex-1 h-fixed">
-        <img class="absolute inset-0 h-full w-full object-cover" src="https://picsum.photos/1080/1080" alt="">
-        {{--        <img class="absolute inset-0 h-full w-full object-cover" src="{{asset('images/937-1080x1080.jpg')}}" alt="">--}}
+{{--        <img class="absolute inset-0 h-full w-full object-cover" src="https://picsum.photos/1080/1080" alt="">--}}
+                <img class="absolute inset-0 h-full w-full object-cover" src="{{asset('images/02.jpg')}}" alt="">
     </div>
 </div>
 

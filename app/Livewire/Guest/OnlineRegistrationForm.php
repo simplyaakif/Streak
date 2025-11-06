@@ -2,6 +2,7 @@
 
     namespace App\Livewire\Guest;
 
+    use Exception;
     use Filament\Actions\Contracts\HasActions;
     use Filament\Actions\Concerns\InteractsWithActions;
     use App\Channels\SmsChannel;
@@ -13,6 +14,8 @@
     use Filament\Forms\Components\TextInput;
     use Filament\Forms\Concerns\InteractsWithForms;
     use Filament\Forms\Contracts\HasForms;
+    use Illuminate\Support\Facades\Http;
+    use Illuminate\Support\Facades\Log;
     use Livewire\Component;
 
     class OnlineRegistrationForm extends Component implements HasForms, HasActions {
@@ -116,7 +119,64 @@
             $sms->singleSms($this->form->getState()['pakistan_mobile'],$text);
             }
 
+            if($this->form->getState()['whatsapp_mobile']){
+                $text = "Your registration has completed successfully online. We will be in touch
+            Ace American Center of English
+            03335335792";
+//                $sms->singleSms($this->form->getState()['pakistan_mobile'],$text);
+
+                // Get configuration
+                $apiKey = config('services.evo.api_key');
+                $instanceName = config('services.evo.instance_name');
+                $baseUrl = config('services.evo.base_url');
+
+                $number = $this->remove_leading_plus($this->form->getState()['whatsapp_mobile']);
+
+                try {
+                    // Send the notification via HTTP request
+                    sleep(3);
+                    $response = Http::timeout(30)
+                        ->withHeaders([
+                            'Content-Type' => 'application/json',
+                            'apikey' => $apiKey,
+                        ])
+                        ->post("{$baseUrl}/message/sendText/{$instanceName}", [
+                            'number' => $number,
+                            'text' => $text,
+                            'delay' => 3000,
+                        ]);
+
+                } catch (Exception $e) {
+                    Log::error('EvoChannel: Exception while sending notification', [
+                        'notifiable_id' => $notifiable->id ?? null,
+                        'number' => $number,
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+                }
+
+
+            }
+
             $this->submitted = true;
+
+
+
+
+
+        }
+
+
+
+        function remove_leading_plus(string $value): string
+        {
+            $value = str_replace('+', '', $value);
+            //        if variable starts with 03 then replace with 923
+            if (substr($value, 0, 2) == '03') {
+                $value = '923'.substr($value, 2);
+            }
+
+            return $value;
         }
 
         public function render()

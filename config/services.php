@@ -30,4 +30,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'evo'=>[
+        'api_key' => env('EVO_API_KEY'),
+        'instance_name'=>env('EVO_INSTANCE_NAME'),
+        'base_url'=>env('EVO_BASE_URL'),
+    ]
+
 ];
