@@ -30,9 +30,9 @@
             return $this->belongsTo(Batch::class);
         }
 
-        public function recoveries()
+        public function recoveries(): \Illuminate\Database\Eloquent\Relations\hasMany
         {
-            return $this->belongsToMany(Recovery::class);
+            return $this->hasMany(Recovery::class);
         }
 
 

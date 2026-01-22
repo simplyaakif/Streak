@@ -12,6 +12,13 @@
         use InteractsWithMedia;
         protected $guarded = [];
 
+        protected function casts(): array
+        {
+            return [
+                'meta' => 'json'
+            ];
+        }
+
         protected static function booted(): void
         {
             static::addGlobalScope('without_special', function (Builder $builder) {
