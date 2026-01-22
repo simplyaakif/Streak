@@ -42,9 +42,9 @@ sm:rounded-lg">
                     </div>
                 </div>
                 <div class="flex justify-end">
-                    <x-common.button.link wire:click="resetFilters" class="p-4">Reset
+                    <x-button.link wire:click="resetFilters" class="p-4">Reset
                         Filters
-                    </x-common.button.link>
+                    </x-button.link>
                 </div>
 
             </div>
