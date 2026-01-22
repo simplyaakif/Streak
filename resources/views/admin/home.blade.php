@@ -179,6 +179,30 @@
                             <x-icons.money-check class="w-6 h-6 text-gray-400"/>
                         </x-slot>
                     </x-common.stat-card>
+
+                    <x-common.stat-card can="view_daily_sale" label="Daily Admission Amount" :stat="$daily_admission_amount">
+                        <x-slot name="icon">
+                            <x-icons.money-check class="w-6 h-6 text-gray-400"/>
+                        </x-slot>
+                    </x-common.stat-card>
+                    <x-common.stat-card can="view_daily_sale" label="Daily Recovery Amount" :stat="$daily_recovery_amount">
+                        <x-slot name="icon">
+                            <x-icons.money-check class="w-6 h-6 text-gray-400"/>
+                        </x-slot>
+                    </x-common.stat-card>
+
+                    <x-common.stat-card can="view_monthly_sale" label="Monthly Admission Amount" :stat="$month_admission_amount">
+                        <x-slot name="icon">
+                            <x-icons.money-check class="w-6 h-6 text-gray-400"/>
+                        </x-slot>
+                    </x-common.stat-card>
+                    <x-common.stat-card can="view_monthly_sale" label="Monthly Recovery Amount" :stat="$month_recovery_amount">
+                        <x-slot name="icon">
+                            <x-icons.money-check class="w-6 h-6 text-gray-400"/>
+                        </x-slot>
+                    </x-common.stat-card>
+
+
                 </div>
             </div>
 

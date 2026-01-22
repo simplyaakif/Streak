@@ -15,7 +15,7 @@
         protected function casts(): array
         {
             return [
-                'meta' => 'json'
+                'meta' => 'array'
             ];
         }
 

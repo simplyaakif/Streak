@@ -22,6 +22,22 @@
                 ->whereDate('paid_on',now())
                 ->get()->sum('amount');
 
+            $recoveries = Recovery::where("is_paid", 1)
+                ->whereBetween("paid_on", [now()->startOfDay(), now()->endOfDay()])
+                ->get();
+
+            $daily_admission_amount = 0;
+            $daily_recovery_amount = 0;
+
+            foreach ($recoveries as $recovery) {
+                if ($recovery->meta["installment_number"] === 1) {
+                    $daily_admission_amount += $recovery->amount;
+                } else {
+                    $daily_recovery_amount += $recovery->amount;
+                }
+            }
+
+
 
             $mQuery = Query::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->get()
                 ->count();
@@ -53,6 +69,22 @@
                 ->whereMonth('paid_on', now()->month)
                 ->whereYear('paid_on', now()->year)
                 ->get()->sum('amount');
+
+
+            $recoveries = Recovery::where("is_paid", 1)
+                ->whereBetween("paid_on", [now()->startOfMonth(), now()->endOfMonth()])
+                ->get();
+
+            $month_admission_amount = 0;
+            $month_recovery_amount = 0;
+
+            foreach ($recoveries as $recovery) {
+                if ($recovery->meta["installment_number"] === 1) {
+                    $month_admission_amount += $recovery->amount;
+                } else {
+                    $month_recovery_amount += $recovery->amount;
+                }
+            }
 
 
 
@@ -155,7 +187,9 @@
                                                   'dSale','mSale',
                                                   'chart1','chart2','chart3','chart4','chart5',
                                                   'rAdmissions','rQueries','rExpenses',
-                                                  'user_tasks','mIndividualSale','mAceSale'
+                                                  'user_tasks','mIndividualSale','mAceSale',
+                'recoveries','month_admission_amount','month_recovery_amount',
+                'daily_admission_amount','daily_recovery_amount',
                                               ]));
 
         }
