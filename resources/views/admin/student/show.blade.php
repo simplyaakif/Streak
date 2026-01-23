@@ -129,7 +129,7 @@
                                                 @forelse($recoveries as $recovery)
                                                 <li>
                                                     <div class="grid gap-4 grid-cols-6">
-                                                    <div>{{$recovery->amount}} Rs</div>
+                                                    <div>{{$recovery->meta["installment_number"]}} -{{$recovery->amount}} Rs</div>
                                                     <div>{{$recovery->due_date}}</div>
                                                     <div>{{$recovery->is_paid ? "Paid":"Pending" }}</div>
                                                     <div>{{$recovery->paid_on}}</div>
