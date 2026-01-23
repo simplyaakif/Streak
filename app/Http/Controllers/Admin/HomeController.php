@@ -145,7 +145,39 @@
                 'aggregate_field' => 'amount',
                 'where_raw'=>'is_paid=1',
                 'chart_type' => 'line',
-                'chart_color'=>'0,0,0',
+                'chart_color'=>'0,255,0',
+                'date_format'=>'d-M-Y',
+
+                'filter_field'=>'paid_on',
+                'filter_period' => 'month', // show only transactions for last 30 days
+            ];
+            $sale_admission_chart_options = [
+                'chart_title' => 'Daily Sale',
+                'report_type' => 'group_by_date',
+                'model' => 'App\Models\Recovery',
+                'group_by_field' => 'carbon_paid_on',
+                'group_by_period' => 'day',
+                'aggregate_function' => 'sum',
+                'aggregate_field' => 'amount',
+                'where_raw'=>'is_paid=1 AND meta->>"$.installment_number"="1"',
+                'chart_type' => 'line',
+                'chart_color'=>'183,28,33',
+                'date_format'=>'d-M-Y',
+
+                'filter_field'=>'paid_on',
+                'filter_period' => 'month', // show only transactions for last 30 days
+            ];
+            $sale_recovery_chart_options = [
+                'chart_title' => 'Daily Sale',
+                'report_type' => 'group_by_date',
+                'model' => 'App\Models\Recovery',
+                'group_by_field' => 'carbon_paid_on',
+                'group_by_period' => 'day',
+                'aggregate_function' => 'sum',
+                'aggregate_field' => 'amount',
+                'where_raw'=>'is_paid=1 AND meta->>"$.installment_number"!="1"',
+                'chart_type' => 'line',
+                'chart_color'=>'39,36,114',
                 'date_format'=>'d-M-Y',
 
                 'filter_field'=>'paid_on',
@@ -171,12 +203,51 @@
                 'filter_days'=> 365 * 4, // show only transactions for last 30 days
                 'filter_period' => 'year', // show only transactions for this week
             ];
+            $year_admission_sale_chart_options = [
+                'chart_title' => 'Admission Sale',
+                'report_type' => 'group_by_date',
+                'model' => 'App\Models\Recovery',
+                'group_by_field' => 'carbon_paid_on',
+                'group_by_period' => 'month',
+
+                'aggregate_function' => 'sum',
+                'aggregate_field' => 'amount',
+                'where_raw'=>'is_paid=1 AND meta->>"$.installment_number"="1"',
+
+                'chart_type' => 'line',
+                'chart_color'=>'183,28,33',
+                'date_format'=>'M-Y',
+
+                'filter_field' => 'paid_on',
+                'filter_days'=> 365 * 4, // show only transactions for last 30 days
+                'filter_period' => 'year', // show only transactions for this week
+            ];
+            $year_recovery_sale_chart_options = [
+                'chart_title' => 'Recovery Sale',
+                'report_type' => 'group_by_date',
+                'model' => 'App\Models\Recovery',
+                'group_by_field' => 'carbon_paid_on',
+                'group_by_period' => 'month',
+
+                'aggregate_function' => 'sum',
+                'aggregate_field' => 'amount',
+                'where_raw'=>'is_paid=1 AND meta->>"$.installment_number"!="1"',
+
+                'chart_type' => 'line',
+                'chart_color'=>'39,36,114',
+                'date_format'=>'M-Y',
+
+                'filter_field' => 'paid_on',
+                'filter_days'=> 365 * 4, // show only transactions for last 30 days
+                'filter_period' => 'year', // show only transactions for this week
+            ];
 
             $chart1 = new LaravelChart($query_chart_options);
             $chart2 = new LaravelChart($admission_chart_options);
             $chart3 = new LaravelChart($expense_chart_options);
             $chart4 = new LaravelChart($sale_chart_options);
-            $chart5 = new LaravelChart($year_sale_chart_options);
+
+            $chart5 = new LaravelChart($year_sale_chart_options,$year_admission_sale_chart_options,$year_recovery_sale_chart_options);
 
 //            dd($chart4);
 
