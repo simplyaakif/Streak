@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.2.0",
         "ext-curl": "*",
+        "barryvdh/laravel-debugbar": "^3.6",
         "bugsnag/bugsnag-laravel": "^2.21",
         "calebporzio/awesome-helpers": "^2.5",
         "cknow/laravel-money": "^8.0",
@@ -29,11 +30,11 @@
         "pusher/pusher-php-server": "^7.0",
         "rappasoft/laravel-livewire-tables": "^3.0",
         "spatie/laravel-medialibrary": "^11.0",
+        "spatie/laravel-ray": "^1.43",
         "staudenmeir/eloquent-has-many-deep": "^1.7 || ^1.20",
         "symfony/http-client": "^6.1 || ^7.0",
         "symfony/mailgun-mailer": "^6.1 || ^7.0",
         "symfony/postmark-mailer": "^6.1 || ^7.0",
-        "barryvdh/laravel-debugbar": "^3.6",
         "wire-elements/spotlight": "^2.0"
     },
     "require-dev": {

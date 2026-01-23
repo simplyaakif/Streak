@@ -8,6 +8,7 @@ use App\Support\HasAdvancedFilter;
 use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Spatie\MediaLibrary\HasMedia;
@@ -111,8 +112,14 @@ class Student extends Model implements HasMedia
 
     public function batches()
     {
-        return $this->belongsToMany(Batch::class)->withPivot('id','session_start_date','session_end_date','batch_status')
+        return $this->belongsToMany(Batch::class)
+            ->withPivot('id','session_start_date','session_end_date','batch_status')
             ->withTimestamps();
+    }
+
+    public function admissions():HasMany
+    {
+        return $this->hasMany(BatchStudent::class);
     }
 
     public function recoveries()

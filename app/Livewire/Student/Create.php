@@ -192,6 +192,32 @@
 
             }
 
+            ray($student,$student->batches);
+//            dump($student,$student->batches);
+
+            foreach($student->admissions as $admission) {
+                ray($admission,$admission->recoveries, count($admission->recoveries));
+//                dump($admission,$admission->recoveries, count($admission->recoveries));
+
+                $iterator = 1;
+                $total_installments = count($admission->recoveries);
+                foreach ($admission->recoveries as $recovery) {
+//                    echo $admission->student_id . "-" . $iterator . "-" . $total_installments;
+
+                    $recovery->meta = [
+                        "installment_number" => $iterator
+                    ];
+                    $recovery->save();
+
+                    ray($recovery);
+//                    dump($recovery);
+
+                    $iterator++;
+                }
+            }
+
+
+
 //        Send Email to the Candidate
 
 
