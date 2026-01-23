@@ -126,6 +126,19 @@ Also mention your name & today Date so that we may know who updated the status')
                         ->title('Recoveries Added Successfully')
                         ->success()
                         ->send();
+
+                        $iterator = 1;
+                        $total_installments = count($record->recoveries);
+                        foreach ($record->recoveries as $recovery) {
+//                            echo $admission->student_id . "-" . $iterator . "-" . $total_installments;
+
+                            $recovery->meta = [
+                                "installment_number" => $iterator
+                            ];
+                            $recovery->save();
+
+                            $iterator++;
+                        }
                 }),
 
 
