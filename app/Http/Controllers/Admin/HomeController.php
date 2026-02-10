@@ -258,6 +258,14 @@
                 ->orderBy('due_date','desc')
                 ->get();
 
+            $pending_amount = Recovery::where('is_paid',0)
+                ->with(['student','batch',
+                    'batch_student'=>fn($query)=>$query->where('batch_status',2)])
+                ->whereBetween('due_date',[now()->startOfMonth(),now()->format('Y-m-d')])
+                ->orderBy('due_date','desc')
+                ->get()
+            ->sum('amount');
+
 //            dd($pending_recoveries);
 
             return view('admin.home', compact([
@@ -269,7 +277,7 @@
                                                   'rAdmissions','rQueries','rExpenses',
                                                   'user_tasks','mIndividualSale','mAceSale',
                 'recoveries','month_admission_amount','month_recovery_amount',
-                'daily_admission_amount','daily_recovery_amount','pending_recoveries'
+                'daily_admission_amount','daily_recovery_amount','pending_recoveries','pending_amount'
                                               ]));
 
         }

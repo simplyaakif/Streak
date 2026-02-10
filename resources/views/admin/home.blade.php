@@ -200,7 +200,8 @@
                         </x-slot>
                     </x-common.stat-card>
                     <x-common.stat-card can="view_monthly_sale" label="Monthly Recovery Amount"
-                                        :stat="$month_recovery_amount">
+                                        stat="{{$month_recovery_amount}}/
+                                        {{short_currency($pending_amount)}}">
                         <x-slot name="icon">
                             <x-icons.money-check class="w-6 h-6 text-gray-400"/>
                         </x-slot>
@@ -480,29 +481,29 @@
                             <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
                                 @forelse($pending_recoveries as $pending_recovery)
                                     <li>
-                                        <a href="#" class="block px-4 py-4
+                                        <a href="{{route('admin.students.show',$pending_recovery->student->id)}}" class="block px-4 py-4
                                     bg-white
                                     hover:bg-gray-50">
                     <span class="flex items-center space-x-4">
                       <span class="flex-1 flex space-x-2 truncate">
-                          <div class="w-12 rounded-full">
+                          <div class="xw-12 rounded-full">
                             @php $admission = App\Models\Student::findOrFail($pending_recovery->student->id)@endphp
                               @forelse($admission->dp as $key => $entry)
-                                  <a  href="{{ $entry['url'] }}">
-                                    <img class="h-10 w-10 rounded-full"
-                                         src="{{ $entry['url'] }}" alt="{{ $entry['name']
+                                  <img class="h-10 w-10 rounded-full"
+                                       src="{{ $entry['url'] }}" alt="{{ $entry['name']
                                      }}"
-                                         title="{{ $entry['name'] }}">
-                                </a>
+                                       title="{{ $entry['name'] }}">
                               @empty
                                   <img class="h-10 w-10 rounded-full" src="{{$admission->avatarUrl()}}" alt="">
                               @endforelse
+
                         </div>
 
                         <span class="flex flex-col text-gray-500 text-sm truncate">
                           <span class="truncate">{{$pending_recovery->student->name}}</span>
-                          <span><span class="text-gray-900 font-medium">{{$pending_recovery->amount}} Rs</span> </span>
-                          <span class="text-xs">{{Carbon\Carbon::parse($pending_recovery->due_date)->format('d-m-Y')}}</span>
+                          <span><span class="text-red-600 font-bold">{{$pending_recovery->amount}} Rs</span> </span>
+                          <span
+                              class="text-xs">{{Carbon\Carbon::parse($pending_recovery->due_date)->format('d-m-Y')}}</span>
                         </span>
                       </span>
                       <svg class="flex-shrink-0 h-5 w-5 text-gray-400"
@@ -548,33 +549,35 @@
                                             <tbody class="bg-white divide-y divide-gray-200">
                                             @forelse($pending_recoveries as $pending_recovery)
                                                 <tr class="bg-white">
-                                                                                                            <td class=" px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                                                                                <div class="w-12 rounded-full">
-                                                                                                                    @php $admission = App\Models\Student::findOrFail($pending_recovery->student->id)@endphp
-                                                                                                                    @forelse($admission->dp as $key => $entry)
-                                                                                                                        <a  href="{{ $entry['url'] }}">
-                                                                                                                            <img class="h-10 w-10 rounded-full"
-                                                                                                                                 src="{{ $entry['url'] }}" alt="{{ $entry['name']
+                                                    <td class=" px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        <div class="w-12 rounded-full">
+                                                            @php $admission = App\Models\Student::findOrFail($pending_recovery->student->id)@endphp
+                                                            @forelse($admission->dp as $key => $entry)
+                                                                <a href="{{ route('admin.students.show',$admission->id) }}">
+                                                                    <img class="h-10 w-10 rounded-full"
+                                                                         src="{{ $entry['url'] }}" alt="{{ $entry['name']
                                      }}"
-                                                                                                                                 title="{{ $entry['name'] }}">
-                                                                                                                        </a>
-                                                                                                                    @empty
-                                                                                                                        <img class="h-10 w-10 rounded-full" src="{{$admission->avatarUrl()}}" alt="">
-                                                                                                                    @endforelse
-                                                                                                                </div>
-                                                                                                            </td>
+                                                                         title="{{ $entry['name'] }}">
+                                                                </a>
+                                                            @empty
+                                                                <img class="h-10 w-10 rounded-full"
+                                                                     src="{{$admission->avatarUrl()}}" alt="">
+                                                            @endforelse
+                                                        </div>
+                                                    </td>
                                                     <td class=" w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                        <div class="flex flex-col">
+                                                        <a href="{{ route('admin.students.show',$pending_recovery->student->id) }}">
+                                                            <div class="flex flex-col">
                                                         <span>
                                                             {{$pending_recovery->student->name}}
                                                         </span>
-                                                            <span class="text-xs">
+                                                                <span class="text-xs">
                                                         {{$pending_recovery->batch->title}}
                                                         </span>
-                                                        </div>
-
+                                                            </div>
+                                                        </a>
                                                     </td>
-                                                    <td class=" px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-500 font-bold">
                                                         {{$pending_recovery->amount}} Rs
                                                     </td>
                                                     <td class=" px-6 py-4 whitespace-nowrap text-sm text-gray-500">
