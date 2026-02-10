@@ -101,18 +101,18 @@
                                     </div>
                                     <div>
                                         <div class="flex space-x-2">
-                                        {{$task->status->name}}
+                                            {{$task->status->name}}
                                             <span>
                                                 <a
-                                                onclick = "if (! confirm('Did you Actually Completed?')) { return false; }"
-                                                   href="{{route('admin.task_done',$task->id)}}">
+                                                    onclick="if (! confirm('Did you Actually Completed?')) { return false; }"
+                                                    href="{{route('admin.task_done',$task->id)}}">
                                                 <x-icons.add class="w-6 h-6"/>
                                                 </a>
                                             </span>
                                         </div>
                                         <div>
                                             @forelse($task->tag as $tag)
-                                            <span class="text-sm  text-yellow-600">{{$tag->name}}</span>
+                                                <span class="text-sm  text-yellow-600">{{$tag->name}}</span>
                                             @empty
                                             @endforelse
                                         </div>
@@ -180,23 +180,27 @@
                         </x-slot>
                     </x-common.stat-card>
 
-                    <x-common.stat-card can="view_daily_sale" label="Daily Admission Amount" :stat="$daily_admission_amount">
+                    <x-common.stat-card can="view_daily_sale" label="Daily Admission Amount"
+                                        :stat="$daily_admission_amount">
                         <x-slot name="icon">
                             <x-icons.money-check class="w-6 h-6 text-gray-400"/>
                         </x-slot>
                     </x-common.stat-card>
-                    <x-common.stat-card can="view_daily_sale" label="Daily Recovery Amount" :stat="$daily_recovery_amount">
+                    <x-common.stat-card can="view_daily_sale" label="Daily Recovery Amount"
+                                        :stat="$daily_recovery_amount">
                         <x-slot name="icon">
                             <x-icons.money-check class="w-6 h-6 text-gray-400"/>
                         </x-slot>
                     </x-common.stat-card>
 
-                    <x-common.stat-card can="view_monthly_sale" label="Monthly Admission Amount" :stat="$month_admission_amount">
+                    <x-common.stat-card can="view_monthly_sale" label="Monthly Admission Amount"
+                                        :stat="$month_admission_amount">
                         <x-slot name="icon">
                             <x-icons.money-check class="w-6 h-6 text-gray-400"/>
                         </x-slot>
                     </x-common.stat-card>
-                    <x-common.stat-card can="view_monthly_sale" label="Monthly Recovery Amount" :stat="$month_recovery_amount">
+                    <x-common.stat-card can="view_monthly_sale" label="Monthly Recovery Amount"
+                                        :stat="$month_recovery_amount">
                         <x-slot name="icon">
                             <x-icons.money-check class="w-6 h-6 text-gray-400"/>
                         </x-slot>
@@ -379,7 +383,7 @@
                           <span class="truncate">{{$admission->name}}</span>
                           <span>
                               @foreach($admission->batches as $bt)
-                              <span class="text-gray-900 font-medium">
+                                  <span class="text-gray-900 font-medium">
                                   {{$bt->title}}
                               </span>
                               @endforeach
@@ -440,12 +444,12 @@
                                                         </td>
                                                         <td class=" px-6 py-4 whitespace-nowrap text-sm text-gray-500 md:block space-x-2">
                                                             @foreach($admission->batches as $bt)
-                                                                <span >{{$bt->title}}</span>
+                                                                <span>{{$bt->title}}</span>
                                                             @endforeach
                                                         </td>
                                                         <td class="max-w-0 px-6 py-4 text-right whitespace-nowrap text-xs truncate
                                                 text-gray-500">
-{{--                                                            {{$query->entry_by}}--}}
+                                                            {{--                                                            {{$query->entry_by}}--}}
                                                         </td>
                                                     </tr>
                                                 @empty
@@ -467,7 +471,132 @@
                             </div>
                         </div>
                     @endcan
-                    @can('expense_show')
+                    <div class="col-span-2">
+                        <h2 class="  text-lg leading-6 font-medium text-gray-900">
+                            Pending Recovery
+                        </h2>
+                        <!-- Activity list (smallest breakpoint only) -->
+                        <div class="shadow sm:hidden">
+                            <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
+                                @forelse($pending_recoveries as $pending_recovery)
+                                    <li>
+                                        <a href="#" class="block px-4 py-4
+                                    bg-white
+                                    hover:bg-gray-50">
+                    <span class="flex items-center space-x-4">
+                      <span class="flex-1 flex space-x-2 truncate">
+                          <div class="w-12 rounded-full">
+                            @php $admission = App\Models\Student::findOrFail($pending_recovery->student->id)@endphp
+                              @forelse($admission->dp as $key => $entry)
+                                  <a  href="{{ $entry['url'] }}">
+                                    <img class="h-10 w-10 rounded-full"
+                                         src="{{ $entry['url'] }}" alt="{{ $entry['name']
+                                     }}"
+                                         title="{{ $entry['name'] }}">
+                                </a>
+                              @empty
+                                  <img class="h-10 w-10 rounded-full" src="{{$admission->avatarUrl()}}" alt="">
+                              @endforelse
+                        </div>
+
+                        <span class="flex flex-col text-gray-500 text-sm truncate">
+                          <span class="truncate">{{$pending_recovery->student->name}}</span>
+                          <span><span class="text-gray-900 font-medium">{{$pending_recovery->amount}} Rs</span> </span>
+                          <span class="text-xs">{{Carbon\Carbon::parse($pending_recovery->due_date)->format('d-m-Y')}}</span>
+                        </span>
+                      </span>
+                      <svg class="flex-shrink-0 h-5 w-5 text-gray-400"
+                           x-description="Heroicon name: solid/chevron-right" xmlns="http://www.w3.org/2000/svg"
+                           viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+  <path fill-rule="evenodd"
+        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+        clip-rule="evenodd"></path>
+</svg>
+                    </span>
+                                        </a>
+                                    </li>
+                                @empty
+                                    <li>
+                                        No Expense in System
+                                    </li>
+                                @endforelse
+                            </ul>
+                        </div>
+                        <!-- Activity table (small breakpoint and up) -->
+                        <div class="hidden sm:block">
+                            <div class="">
+                                <div class="flex flex-col mt-2">
+                                    <div
+                                        class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
+                                        <table class="min-w-full divide-y divide-gray-200">
+                                            <thead>
+                                            <tr>
+                                                <th class=" px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
+                                                    Dp
+                                                </th>
+                                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Student Name
+                                                </th>
+                                                <th class=" px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
+                                                    Amount
+                                                </th>
+                                                <th class="px-6 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Due Date
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody class="bg-white divide-y divide-gray-200">
+                                            @forelse($pending_recoveries as $pending_recovery)
+                                                <tr class="bg-white">
+                                                                                                            <td class=" px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                                                                <div class="w-12 rounded-full">
+                                                                                                                    @php $admission = App\Models\Student::findOrFail($pending_recovery->student->id)@endphp
+                                                                                                                    @forelse($admission->dp as $key => $entry)
+                                                                                                                        <a  href="{{ $entry['url'] }}">
+                                                                                                                            <img class="h-10 w-10 rounded-full"
+                                                                                                                                 src="{{ $entry['url'] }}" alt="{{ $entry['name']
+                                     }}"
+                                                                                                                                 title="{{ $entry['name'] }}">
+                                                                                                                        </a>
+                                                                                                                    @empty
+                                                                                                                        <img class="h-10 w-10 rounded-full" src="{{$admission->avatarUrl()}}" alt="">
+                                                                                                                    @endforelse
+                                                                                                                </div>
+                                                                                                            </td>
+                                                    <td class=" w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                        <div class="flex flex-col">
+                                                        <span>
+                                                            {{$pending_recovery->student->name}}
+                                                        </span>
+                                                            <span class="text-xs">
+                                                        {{$pending_recovery->batch->title}}
+                                                        </span>
+                                                        </div>
+
+                                                    </td>
+                                                    <td class=" px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        {{$pending_recovery->amount}} Rs
+                                                    </td>
+                                                    <td class=" px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        {{Carbon\Carbon::parse($pending_recovery->due_date)->format('d-m-Y')}}
+                                                    </td>
+
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td></td>
+                                                </tr>
+                                            @endforelse
+
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @can('expense_show2')
 
                         <div>
                             <h2 class="  text-lg leading-6 font-medium text-gray-900">
