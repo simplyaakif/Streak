@@ -261,7 +261,7 @@
             $pending_amount = Recovery::where('is_paid',0)
                 ->with(['student','batch',
                     'batch_student'=>fn($query)=>$query->where('batch_status',2)])
-                ->whereBetween('due_date',[now()->startOfMonth(),now()->format('Y-m-d')])
+                ->whereBetween('due_date',[now()->startOfMonth(),now()->endOfMonth()])
                 ->orderBy('due_date','desc')
                 ->get()
             ->sum('amount');
