@@ -1,289 +1,291 @@
 <?php
 
-    namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Admin;
 
-    use Auth;
-    use App\Models\Expense;
-    use App\Models\Query;
-    use App\Models\Recovery;
-    use App\Models\Student;
-    use App\Models\Task;
-    use LaravelDaily\LaravelCharts\Classes\LaravelChart;
+use Auth;
+use App\Models\Expense;
+use App\Models\Query;
+use App\Models\Recovery;
+use App\Models\Student;
+use App\Models\Task;
+use LaravelDaily\LaravelCharts\Classes\LaravelChart;
 
-    class HomeController {
+class HomeController
+{
 
-        public function index()
-        {
+    public function index()
+    {
 
-            $dQuery = Query::whereDate('created_at',date('Y-m-d'))->get()->count();
-            $dStudent = Student::whereDate('created_at', date('Y-m-d'))->get()->count();
+        $dQuery = Query::whereDate('created_at', date('Y-m-d'))->get()->count();
+        $dStudent = Student::whereDate('created_at', date('Y-m-d'))->get()->count();
 
-            $dSale = Recovery::where('is_paid',1)
-                ->whereDate('paid_on',now())
-                ->get()->sum('amount');
+        $dSale = Recovery::where('is_paid', 1)
+            ->whereDate('paid_on', now())
+            ->get()->sum('amount');
 
-            $recoveries = Recovery::where("is_paid", 1)
-                ->whereBetween("paid_on", [now()->startOfDay(), now()->endOfDay()])
-                ->get();
+        $recoveries = Recovery::where("is_paid", 1)
+            ->whereBetween("paid_on", [now()->startOfDay(), now()->endOfDay()])
+            ->get();
 
-            $daily_admission_amount = 0;
-            $daily_recovery_amount = 0;
+        $daily_admission_amount = 0;
+        $daily_recovery_amount = 0;
 
-            foreach ($recoveries as $recovery) {
-                if ($recovery->meta["installment_number"] === 1) {
-                    $daily_admission_amount += $recovery->amount;
-                } else {
-                    $daily_recovery_amount += $recovery->amount;
-                }
+        foreach ($recoveries as $recovery) {
+            if ($recovery->meta["installment_number"] === 1) {
+                $daily_admission_amount += $recovery->amount;
+            } else {
+                $daily_recovery_amount += $recovery->amount;
             }
+        }
 
 
-
-            $mQuery = Query::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->get()
-                ->count();
-            $mStudent = Student::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->get()
-                ->count();
-            $dExpense = Expense::whereDate('created_at', date('Y-m-d'))
-                ->get()
-                ->sum('amount');
-            $mExpense = Expense::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->get()
-                ->sum('amount');
-
+        $mQuery = Query::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->get()
+            ->count();
+        $mStudent = Student::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->get()
+            ->count();
+        $dExpense = Expense::whereDate('created_at', date('Y-m-d'))
+            ->get()
+            ->sum('amount');
+        $mExpense = Expense::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->get()
+            ->sum('amount');
 
 
-            $mSale = Recovery::where('is_paid',1)
-                ->whereMonth('paid_on', now()->month)->whereYear('paid_on', now()->year)
-                ->get()->sum('amount');
+        $mSale = Recovery::where('is_paid', 1)
+            ->whereMonth('paid_on', now()->month)->whereYear('paid_on', now()->year)
+            ->get()->sum('amount');
 
-            $mIndividualSale = Recovery::withWhereHas('batch',function ($query){
-                $query->where('is_sale_skip',1);
-            })->where('is_paid',1)
-                ->whereMonth('paid_on', now()->month)
-                ->whereYear('paid_on', now()->year)
-                ->get()->sum('amount');
-
-
-            $mAceSale = Recovery::withWhereHas('batch',function ($query){
-                $query->where('is_sale_skip',0);
-            })->where('is_paid',1)
-                ->whereMonth('paid_on', now()->month)
-                ->whereYear('paid_on', now()->year)
-                ->get()->sum('amount');
+        $mIndividualSale = Recovery::withWhereHas('batch', function ($query) {
+            $query->where('is_sale_skip', 1);
+        })->where('is_paid', 1)
+            ->whereMonth('paid_on', now()->month)
+            ->whereYear('paid_on', now()->year)
+            ->get()->sum('amount');
 
 
-            $recoveries = Recovery::where("is_paid", 1)
-                ->whereBetween("paid_on", [now()->startOfMonth(), now()->endOfMonth()])
-                ->get();
+        $mAceSale = Recovery::withWhereHas('batch', function ($query) {
+            $query->where('is_sale_skip', 0);
+        })->where('is_paid', 1)
+            ->whereMonth('paid_on', now()->month)
+            ->whereYear('paid_on', now()->year)
+            ->get()->sum('amount');
 
-            $month_admission_amount = 0;
-            $month_recovery_amount = 0;
 
-            foreach ($recoveries as $recovery) {
-                if ($recovery->meta["installment_number"] === 1) {
-                    $month_admission_amount += $recovery->amount;
-                } else {
-                    $month_recovery_amount += $recovery->amount;
-                }
+        $recoveries = Recovery::where("is_paid", 1)
+            ->whereBetween("paid_on", [now()->startOfMonth(), now()->endOfMonth()])
+            ->get();
+
+        $month_admission_amount = 0;
+        $month_recovery_amount = 0;
+
+        foreach ($recoveries as $recovery) {
+            if ($recovery->meta["installment_number"] === 1) {
+                $month_admission_amount += $recovery->amount;
+            } else {
+                $month_recovery_amount += $recovery->amount;
             }
+        }
 
 
+        $rQueries = Query::select()->latest()->with('courses')->take(5)->get();
+        $rAdmissions = Student::with('batches')->latest()->take(5)->get();
+        $rExpenses = Expense::select()->with('vendor')->latest()->take(5)
+            ->get();
+
+        $user_tasks = Task::where('assigned_to_id', Auth::id())
+            ->where('status_id', '!=', 2)
+            ->get();
 
 
-            $rQueries= Query::select()->latest()->with('courses')->take(5)->get();
-            $rAdmissions = Student::with('batches')->latest()->take(5)->get();
-            $rExpenses= Expense::select()->with('vendor')->latest()->take(5)
-                ->get();
+        $query_chart_options = [
+            'chart_title' => 'Daily Query',
+            'report_type' => 'group_by_date',
+            'model' => 'App\Models\Query',
+            'group_by_field' => 'created_at',
+            'group_by_period' => 'day',
+            'chart_type' => 'line',
+            'chart_color' => '0,200,200',
+            'filter_field' => 'created_at',
+            'filter_period' => 'month', // show only transactions for last 30 days
+        ];
 
-            $user_tasks = Task::where('assigned_to_id',Auth::id())
-                    ->where('status_id','!=',2)
-                    ->get();
+        $admission_chart_options = [
+            'chart_title' => 'Daily Admission',
+            'report_type' => 'group_by_date',
+            'model' => 'App\Models\Student',
+            'group_by_field' => 'created_at',
+            'group_by_period' => 'day',
+            'chart_type' => 'line',
+            'chart_color' => '0,200,0',
+            'filter_field' => 'created_at',
+            'filter_period' => 'month', // show only transactions for last 30 days
+        ];
 
+        $expense_chart_options = [
+            'chart_title' => 'Daily Expense',
+            'report_type' => 'group_by_date',
+            'model' => 'App\Models\Expense',
+            'group_by_field' => 'created_at',
+            'group_by_period' => 'day',
+            'chart_type' => 'line',
+            'chart_color' => '200,0,0',
+            'filter_field' => 'created_at',
+            'filter_period' => 'month', // show only transactions for last 30 days
+        ];
 
-            $query_chart_options = [
-                'chart_title' => 'Daily Query',
-                'report_type' => 'group_by_date',
-                'model' => 'App\Models\Query',
-                'group_by_field' => 'created_at',
-                'group_by_period' => 'day',
-                'chart_type' => 'line',
-                'chart_color'=>'0,200,200',
-                'filter_field'=>'created_at',
-                'filter_period' => 'month', // show only transactions for last 30 days
-            ];
+        $sale_chart_options = [
+            'chart_title' => 'Daily Sale',
+            'report_type' => 'group_by_date',
+            'model' => 'App\Models\Recovery',
+            'group_by_field' => 'carbon_paid_on',
+            'group_by_period' => 'day',
+            'aggregate_function' => 'sum',
+            'aggregate_field' => 'amount',
+            'where_raw' => 'is_paid=1',
+            'chart_type' => 'line',
+            'chart_color' => '0,255,0',
+            'date_format' => 'd-M-Y',
 
-            $admission_chart_options = [
-                'chart_title' => 'Daily Admission',
-                'report_type' => 'group_by_date',
-                'model' => 'App\Models\Student',
-                'group_by_field' => 'created_at',
-                'group_by_period' => 'day',
-                'chart_type' => 'line',
-                'chart_color'=>'0,200,0',
-                'filter_field'=>'created_at',
-                'filter_period' => 'month', // show only transactions for last 30 days
-            ];
+            'filter_field' => 'paid_on',
+            'filter_period' => 'month', // show only transactions for last 30 days
+        ];
+        $sale_admission_chart_options = [
+            'chart_title' => 'Daily Sale',
+            'report_type' => 'group_by_date',
+            'model' => 'App\Models\Recovery',
+            'group_by_field' => 'carbon_paid_on',
+            'group_by_period' => 'day',
+            'aggregate_function' => 'sum',
+            'aggregate_field' => 'amount',
+            'where_raw' => 'is_paid=1 AND meta->>"$.installment_number"="1"',
+            'chart_type' => 'line',
+            'chart_color' => '183,28,33',
+            'date_format' => 'd-M-Y',
 
-            $expense_chart_options = [
-                'chart_title' => 'Daily Expense',
-                'report_type' => 'group_by_date',
-                'model' => 'App\Models\Expense',
-                'group_by_field' => 'created_at',
-                'group_by_period' => 'day',
-                'chart_type' => 'line',
-                'chart_color'=>'200,0,0',
-                'filter_field'=>'created_at',
-                'filter_period' => 'month', // show only transactions for last 30 days
-            ];
+            'filter_field' => 'paid_on',
+            'filter_period' => 'month', // show only transactions for last 30 days
+        ];
+        $sale_recovery_chart_options = [
+            'chart_title' => 'Daily Sale',
+            'report_type' => 'group_by_date',
+            'model' => 'App\Models\Recovery',
+            'group_by_field' => 'carbon_paid_on',
+            'group_by_period' => 'day',
+            'aggregate_function' => 'sum',
+            'aggregate_field' => 'amount',
+            'where_raw' => 'is_paid=1 AND meta->>"$.installment_number"!="1"',
+            'chart_type' => 'line',
+            'chart_color' => '39,36,114',
+            'date_format' => 'd-M-Y',
 
-            $sale_chart_options = [
-                'chart_title' => 'Daily Sale',
-                'report_type' => 'group_by_date',
-                'model' => 'App\Models\Recovery',
-                'group_by_field' => 'carbon_paid_on',
-                'group_by_period' => 'day',
-                'aggregate_function' => 'sum',
-                'aggregate_field' => 'amount',
-                'where_raw'=>'is_paid=1',
-                'chart_type' => 'line',
-                'chart_color'=>'0,255,0',
-                'date_format'=>'d-M-Y',
+            'filter_field' => 'paid_on',
+            'filter_period' => 'month', // show only transactions for last 30 days
+        ];
 
-                'filter_field'=>'paid_on',
-                'filter_period' => 'month', // show only transactions for last 30 days
-            ];
-            $sale_admission_chart_options = [
-                'chart_title' => 'Daily Sale',
-                'report_type' => 'group_by_date',
-                'model' => 'App\Models\Recovery',
-                'group_by_field' => 'carbon_paid_on',
-                'group_by_period' => 'day',
-                'aggregate_function' => 'sum',
-                'aggregate_field' => 'amount',
-                'where_raw'=>'is_paid=1 AND meta->>"$.installment_number"="1"',
-                'chart_type' => 'line',
-                'chart_color'=>'183,28,33',
-                'date_format'=>'d-M-Y',
+        $year_sale_chart_options = [
+            'chart_title' => 'Monthly Sale',
+            'report_type' => 'group_by_date',
+            'model' => 'App\Models\Recovery',
+            'group_by_field' => 'carbon_paid_on',
+            'group_by_period' => 'month',
 
-                'filter_field'=>'paid_on',
-                'filter_period' => 'month', // show only transactions for last 30 days
-            ];
-            $sale_recovery_chart_options = [
-                'chart_title' => 'Daily Sale',
-                'report_type' => 'group_by_date',
-                'model' => 'App\Models\Recovery',
-                'group_by_field' => 'carbon_paid_on',
-                'group_by_period' => 'day',
-                'aggregate_function' => 'sum',
-                'aggregate_field' => 'amount',
-                'where_raw'=>'is_paid=1 AND meta->>"$.installment_number"!="1"',
-                'chart_type' => 'line',
-                'chart_color'=>'39,36,114',
-                'date_format'=>'d-M-Y',
+            'aggregate_function' => 'sum',
+            'aggregate_field' => 'amount',
+            'where_raw' => 'is_paid=1',
 
-                'filter_field'=>'paid_on',
-                'filter_period' => 'month', // show only transactions for last 30 days
-            ];
+            'chart_type' => 'line',
+            'chart_color' => '0,255,0',
+            'date_format' => 'M-Y',
 
-            $year_sale_chart_options = [
-                'chart_title' => 'Monthly Sale',
-                'report_type' => 'group_by_date',
-                'model' => 'App\Models\Recovery',
-                'group_by_field' => 'carbon_paid_on',
-                'group_by_period' => 'month',
+            'filter_field' => 'paid_on',
+            'filter_days' => 365 * 4, // show only transactions for last 30 days
+            'filter_period' => 'year', // show only transactions for this week
+        ];
+        $year_admission_sale_chart_options = [
+            'chart_title' => 'Admission Sale',
+            'report_type' => 'group_by_date',
+            'model' => 'App\Models\Recovery',
+            'group_by_field' => 'carbon_paid_on',
+            'group_by_period' => 'month',
 
-                'aggregate_function' => 'sum',
-                'aggregate_field' => 'amount',
-                'where_raw'=>'is_paid=1',
+            'aggregate_function' => 'sum',
+            'aggregate_field' => 'amount',
+            'where_raw' => 'is_paid=1 AND meta->>"$.installment_number"="1"',
 
-                'chart_type' => 'line',
-                'chart_color'=>'0,255,0',
-                'date_format'=>'M-Y',
+            'chart_type' => 'line',
+            'chart_color' => '183,28,33',
+            'date_format' => 'M-Y',
 
-                'filter_field' => 'paid_on',
-                'filter_days'=> 365 * 4, // show only transactions for last 30 days
-                'filter_period' => 'year', // show only transactions for this week
-            ];
-            $year_admission_sale_chart_options = [
-                'chart_title' => 'Admission Sale',
-                'report_type' => 'group_by_date',
-                'model' => 'App\Models\Recovery',
-                'group_by_field' => 'carbon_paid_on',
-                'group_by_period' => 'month',
+            'filter_field' => 'paid_on',
+            'filter_days' => 365 * 4, // show only transactions for last 30 days
+            'filter_period' => 'year', // show only transactions for this week
+        ];
+        $year_recovery_sale_chart_options = [
+            'chart_title' => 'Recovery Sale',
+            'report_type' => 'group_by_date',
+            'model' => 'App\Models\Recovery',
+            'group_by_field' => 'carbon_paid_on',
+            'group_by_period' => 'month',
 
-                'aggregate_function' => 'sum',
-                'aggregate_field' => 'amount',
-                'where_raw'=>'is_paid=1 AND meta->>"$.installment_number"="1"',
+            'aggregate_function' => 'sum',
+            'aggregate_field' => 'amount',
+            'where_raw' => 'is_paid=1 AND meta->>"$.installment_number"!="1"',
 
-                'chart_type' => 'line',
-                'chart_color'=>'183,28,33',
-                'date_format'=>'M-Y',
+            'chart_type' => 'line',
+            'chart_color' => '39,36,114',
+            'date_format' => 'M-Y',
 
-                'filter_field' => 'paid_on',
-                'filter_days'=> 365 * 4, // show only transactions for last 30 days
-                'filter_period' => 'year', // show only transactions for this week
-            ];
-            $year_recovery_sale_chart_options = [
-                'chart_title' => 'Recovery Sale',
-                'report_type' => 'group_by_date',
-                'model' => 'App\Models\Recovery',
-                'group_by_field' => 'carbon_paid_on',
-                'group_by_period' => 'month',
+            'filter_field' => 'paid_on',
+            'filter_days' => 365 * 4, // show only transactions for last 30 days
+            'filter_period' => 'year', // show only transactions for this week
+        ];
 
-                'aggregate_function' => 'sum',
-                'aggregate_field' => 'amount',
-                'where_raw'=>'is_paid=1 AND meta->>"$.installment_number"!="1"',
+        $chart1 = new LaravelChart($query_chart_options);
+        $chart2 = new LaravelChart($admission_chart_options);
+        $chart3 = new LaravelChart($expense_chart_options);
+        $chart4 = new LaravelChart($sale_chart_options);
 
-                'chart_type' => 'line',
-                'chart_color'=>'39,36,114',
-                'date_format'=>'M-Y',
-
-                'filter_field' => 'paid_on',
-                'filter_days'=> 365 * 4, // show only transactions for last 30 days
-                'filter_period' => 'year', // show only transactions for this week
-            ];
-
-            $chart1 = new LaravelChart($query_chart_options);
-            $chart2 = new LaravelChart($admission_chart_options);
-            $chart3 = new LaravelChart($expense_chart_options);
-            $chart4 = new LaravelChart($sale_chart_options);
-
-            $chart5 = new LaravelChart($year_sale_chart_options,$year_admission_sale_chart_options,$year_recovery_sale_chart_options);
+        $chart5 = new LaravelChart($year_sale_chart_options, $year_admission_sale_chart_options, $year_recovery_sale_chart_options);
 
 //            dd($chart4);
 
-            $pending_recoveries = Recovery::where('is_paid',0)
-                ->with(['student','batch',
-                    'batch_student'=>fn($query)=>$query->where('batch_status',2)])
-                ->whereBetween('due_date',[now()->subMonths(2),now()->format('Y-m-d')])
-                ->orderBy('due_date','desc')
-                ->get();
+        $pending_recoveries = Recovery::where("is_paid", 0)
+            ->whereBetween("due_date", [now()->subMonths(2), now()->endOfDay()])
+            ->withWhereHas("batch_student", function ($q) {
+                $q->where("batch_status", 1);
+            })
+            ->orderBy('due_date', 'desc')
+            ->with(["student", "batch"])
+            ->get();
 
-            $pending_amount = Recovery::where('is_paid',0)
-                ->with(['student','batch',
-                    'batch_student'=>fn($query)=>$query->where('batch_status',2)])
-                ->whereBetween('due_date',[now()->startOfMonth(),now()->endOfMonth()])
-                ->orderBy('due_date','desc')
-                ->get()
+
+        $pending_amount = Recovery::where("is_paid", 0)
+            ->whereBetween("due_date", [now()->startOfMonth(), now()->endOfMonth()])
+            ->withWhereHas("batch_student", function ($q) {
+                $q->where("batch_status", 1);
+            })
+            ->orderBy('due_date', 'desc')
+            ->with(["student", "batch"])
+            ->get()
             ->sum('amount');
 
 //            dd($pending_recoveries);
 
-            return view('admin.home', compact([
-                                                  'dQuery','dStudent',
-                                                  'mQuery','mStudent',
-                                                  'dExpense','mExpense',
-                                                  'dSale','mSale',
-                                                  'chart1','chart2','chart3','chart4','chart5',
-                                                  'rAdmissions','rQueries','rExpenses',
-                                                  'user_tasks','mIndividualSale','mAceSale',
-                'recoveries','month_admission_amount','month_recovery_amount',
-                'daily_admission_amount','daily_recovery_amount','pending_recoveries','pending_amount'
-                                              ]));
+        return view('admin.home', compact([
+            'dQuery', 'dStudent',
+            'mQuery', 'mStudent',
+            'dExpense', 'mExpense',
+            'dSale', 'mSale',
+            'chart1', 'chart2', 'chart3', 'chart4', 'chart5',
+            'rAdmissions', 'rQueries', 'rExpenses',
+            'user_tasks', 'mIndividualSale', 'mAceSale',
+            'recoveries', 'month_admission_amount', 'month_recovery_amount',
+            'daily_admission_amount', 'daily_recovery_amount', 'pending_recoveries', 'pending_amount'
+        ]));
 
-        }
-
-        public function wip()
-        {
-            return view('wip');
-        }
     }
+
+    public function wip()
+    {
+        return view('wip');
+    }
+}
