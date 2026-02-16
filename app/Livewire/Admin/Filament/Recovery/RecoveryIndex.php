@@ -57,8 +57,12 @@ class RecoveryIndex extends Component implements HasForms, HasTable, HasActions
                 TextColumn::make('student.name')->searchable()->sortable(),
                 TextColumn::make('student.mobile')->label('Contact')->toggleable(),
                 TextColumn::make('student.father_name')->label('Father Name')->toggleable(),
-                TextColumn::make('batch.title')->label('Batch'),
-                TextColumn::make('batch_student.status')->label('Status'),
+                TextColumn::make('batch.title')
+                    ->toggleable()
+                    ->label('Batch'),
+                TextColumn::make('batch_student.status')
+                    ->toggleable()
+                    ->label('Status'),
                 TextColumn::make('due_date')->date('d-M-Y')->sortable(),
                 TextColumn::make('amount')
                     ->sortable()
@@ -70,7 +74,9 @@ class RecoveryIndex extends Component implements HasForms, HasTable, HasActions
                     ),
                 BooleanColumn::make('is_paid'),
                 TextColumn::make('paid_on')->date('d-M-Y')->sortable(),
-                TextColumn::make('account.title')->sortable(),
+                TextColumn::make('account.title')
+                    ->toggleable()
+                    ->sortable(),
                 TextColumn::make('slip_number')->toggleable(),
                 TextColumn::make('created_at')->toggledHiddenByDefault()
                     ->date('d-M-Y')
