@@ -129,7 +129,7 @@
             <h2 class="font-bold text-xl border-b border-gray-200 mt-4">Invoice</h2>
             <ul>
                 <li>
-                    <a href="http://invoice.ace.org.pk/">Invoice</a>
+                    <a href="https://red-hummingbird-617899.hostingersite.com/invoice/">Invoice</a>
                 </li>
             </ul>
         </div>
@@ -138,7 +138,7 @@
             <h2 class="font-bold text-xl border-b border-gray-200 mt-4">Certificate</h2>
             <ul>
                 <li>
-                    <a href="http://certificate.ace.org.pk/">Certificate</a>
+                    <a href="https://red-hummingbird-617899.hostingersite.com/certificate/">Certificate</a>
                 </li>
             </ul>
         </div>
