@@ -30,7 +30,7 @@
                         <h4 class="text-indigo-600 text-2xl font-bold">
                             Submitted Successfully
                         </h4>
-                        We will be in touch.
+                        Your registration has completed successfully online. Our staff will contact you in next 24 working hours.
                     </div>
                 </div>
             </div>

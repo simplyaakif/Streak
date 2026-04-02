@@ -113,14 +113,14 @@
 
             if($this->form->getState()['pakistan_mobile']){
             $sms = new SmsChannel();
-            $text = "Your registration has completed successfully online. We will be in touch
+            $text = "Your registration has completed successfully online. Our staff will contact you in next 24 working hours.
             Ace American Center of English
             03335335792";
             $sms->singleSms($this->form->getState()['pakistan_mobile'],$text);
             }
 
             if($this->form->getState()['whatsapp_mobile']){
-                $text = "Your registration has completed successfully online. We will be in touch
+                $text = "Your registration has completed successfully online. Our staff will contact you in next 24 working hours.
             Ace American Center of English
             03335335792";
 //                $sms->singleSms($this->form->getState()['pakistan_mobile'],$text);
@@ -134,7 +134,7 @@
 
                 try {
                     // Send the notification via HTTP request
-                    sleep(3);
+                    sleep(1);
                     $response = Http::timeout(30)
                         ->withHeaders([
                             'Content-Type' => 'application/json',
