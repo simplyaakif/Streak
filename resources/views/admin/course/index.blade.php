@@ -16,7 +16,7 @@
                 @endcan
             </div>
         </div>
-        @livewire('course.index')
+        @livewire('admin.filament.course.course-index')
 
     </div>
 </div>

@@ -12,7 +12,7 @@
         </div>
 
         <div class="card-body">
-            @livewire('course.create')
+            @livewire('admin.filament.course.course-create')
         </div>
     </div>
 </div>

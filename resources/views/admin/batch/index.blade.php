@@ -16,7 +16,7 @@
                 @endcan
             </div>
         </div>
-        @livewire('batch.index')
+        @livewire('admin.filament.batch.batch-index')
 
     </div>
 </div>

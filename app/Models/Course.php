@@ -7,6 +7,7 @@ use App\Support\HasAdvancedFilter;
 use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -57,6 +58,15 @@ class Course extends Model implements HasMedia
     public function onlineRegistrations()
     {
         return $this->belongsToMany(OnlineRegistration::class);
+    }
+
+    public function whatsappResponses(): MorphToMany
+    {
+        return $this->morphToMany(
+            WhatsappResponse::class,
+            'responseable',
+            'whatsapp_responseables'
+        );
     }
 
 

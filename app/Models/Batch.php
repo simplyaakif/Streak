@@ -8,6 +8,7 @@ use App\Traits\Auditable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\StudentT;
 use Spatie\MediaLibrary\HasMedia;
@@ -142,5 +143,14 @@ class Batch extends Model implements HasMedia
     public function batchStudent()
     {
         return $this->belongsToOne(BatchStudent::class);
+    }
+
+    public function whatsappResponses(): MorphToMany
+    {
+        return $this->morphToMany(
+            WhatsappResponse::class,
+            'responseable',
+            'whatsapp_responseables'
+        );
     }
 }

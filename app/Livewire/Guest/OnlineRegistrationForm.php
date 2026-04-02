@@ -120,9 +120,50 @@
             }
 
             if($this->form->getState()['whatsapp_mobile']){
-                $text = "Your registration has completed successfully online. Our staff will contact you in next 24 working hours.
-            Ace American Center of English
-            03335335792";
+                $text = "Hi! 👋
+
+Thank you for submitting your registration form. We have successfully received your details. You are currently in the queue, and our Front Desk Manager will contact you within the next 24 hours.
+
+Important Note:
+An Assessment Test is compulsory before admission for the following courses:
+
+
+Our most Popular Courses ⭐
+
+Spoken English
+(https://ace.org.pk/courses/spoken-english/)
+
+IELTS
+(https://ace.org.pk/courses/ielts/)
+
+Digital Marketing
+(https://ace.org.pk/courses/digital-marketing-islamabad-rawalpindi/)
+
+Web Design & Development
+(https://ace.org.pk/courses/wordpress-web-development-course/)
+
+Graphic Design
+(https://ace.org.pk/courses/graphics-designing-course/)
+
+Assessment Test Link:
+(https://assessment.ace.org.pk/)
+
+Please follow these steps to attempt the test:
+
+Click on Login
+Sign in with Google
+Enter your details (Name, WhatsApp Number, etc.)
+Select your course
+Start your assessment test
+
+Tip:
+Please do not take help from anywhere while attempting the test. This will help us place you in the most suitable class according to your level.
+
+For any assistance, feel free to contact us:
+📞 0333-5335792
+📞 0333-5335892
+
+Thank you! 😊";
 //                $sms->singleSms($this->form->getState()['pakistan_mobile'],$text);
 
                 // Get configuration

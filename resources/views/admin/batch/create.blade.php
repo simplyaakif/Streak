@@ -12,7 +12,7 @@
         </div>
 
         <div class="card-body">
-            @livewire('batch.create')
+            @livewire('admin.filament.batch.batch-create')
         </div>
     </div>
 </div>

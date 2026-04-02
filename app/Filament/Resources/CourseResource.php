@@ -5,6 +5,9 @@ namespace App\Filament\Resources;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
 use App\Filament\Resources\CourseResource\Pages\ListCourses;
@@ -44,15 +47,39 @@ class CourseResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('title')->searchable(),
-                TextColumn::make('price'),
-                TextColumn::make('duration'),
+                TextColumn::make('title')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('description')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('price')
+                    ->prefix('PKR ')
+                    ->sortable(),
+                TextColumn::make('duration')
+                    ->badge()
+                    ->color('gray')
+                    ->sortable(),
                 TextColumn::make('created_at')
-                    ->dateTime(),
+                    ->dateTime()
+                    ->sortable(),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
-                //
+                TrashedFilter::make(),
+                SelectFilter::make('duration')
+                    ->options(fn (): array => Course::query()->distinct()->pluck('duration', 'duration')->toArray()),
+                Filter::make('created_at')
+                    ->form([
+                        Forms\Components\DatePicker::make('created_from'),
+                        Forms\Components\DatePicker::make('created_until'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when($data['created_from'], fn (Builder $q, string $v): Builder => $q->whereDate('created_at', '>=', $v))
+                            ->when($data['created_until'], fn (Builder $q, string $v): Builder => $q->whereDate('created_at', '<=', $v));
+                    }),
             ])
+            ->filtersFormColumns(3)
             ->recordActions([
                 EditAction::make(),
             ])
