@@ -143,9 +143,9 @@
                             if ($block['type'] === 'text') {
                                 $this->sendWhatsappText($number, $block['data']['message'], $delay);
                             } elseif ($block['type'] === 'media') {
-                                $mediaUrl = $whatsappResponse->getFirstMediaUrl('whatsapp_response_media');
-                                if ($mediaUrl) {
-                                    $this->sendWhatsappMedia($number, $mediaUrl, $block['data']['caption'] ?? '', $delay);
+                                $media = $whatsappResponse->getFirstMedia('whatsapp_response_media');
+                                if ($media) {
+                                    $this->sendWhatsappMedia($number, $media->getUrl(), $media->mime_type, $media->file_name, $block['data']['caption'] ?? '', $delay);
                                 }
                             }
                         }
@@ -188,8 +188,14 @@
                 ]);
         }
 
-        private function sendWhatsappMedia(string $number, string $mediaUrl, string $caption = '', int $delayMs = 1000): void
+        private function sendWhatsappMedia(string $number, string $mediaUrl, string $mimeType, string $fileName, string $caption = '', int $delayMs = 1000): void
         {
+            $mediatype = match (true) {
+                str_starts_with($mimeType, 'image/') => 'image',
+                str_starts_with($mimeType, 'video/') => 'video',
+                default                              => 'document',
+            };
+
             Http::timeout(30)
                 ->withHeaders([
                     'Content-Type' => 'application/json',
@@ -197,8 +203,10 @@
                 ])
                 ->post(config('services.evo.base_url') . '/message/sendMedia/' . config('services.evo.instance_name'), [
                     'number'    => $number,
-                    'mediatype' => 'image',
+                    'mediatype' => $mediatype,
+                    'mimetype'  => $mimeType,
                     'media'     => $mediaUrl,
+                    'fileName'  => $fileName,
                     'caption'   => $caption,
                     'delay'     => $delayMs,
                 ]);
