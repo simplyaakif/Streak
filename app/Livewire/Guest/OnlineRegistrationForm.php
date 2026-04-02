@@ -206,7 +206,8 @@
                     'mediatype' => $mediatype,
                     'mimetype'  => $mimeType,
                     'media'     => $mediaUrl,
-                    'fileName'  => $fileName,
+//                    'fileName'  => $fileName,
+                    'fileName'  => $caption,
                     'caption'   => $caption,
                     'delay'     => $delayMs,
                 ]);
