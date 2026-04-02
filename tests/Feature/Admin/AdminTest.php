@@ -10,7 +10,7 @@
 
     class AdminTest extends TestCase {
 
-        use DatabaseMigrations, RefreshDatabase;
+        use RefreshDatabase;
 
         /** @test */
         public function admin_can_login()
