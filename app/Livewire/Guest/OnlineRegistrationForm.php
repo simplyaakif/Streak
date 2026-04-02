@@ -9,6 +9,7 @@
     use App\Models\Campus;
     use App\Models\Course;
     use App\Models\OnlineRegistration;
+    use App\Models\WhatsappResponse;
     use Filament\Forms\Components\Select;
     use Filament\Forms\Components\Textarea;
     use Filament\Forms\Components\TextInput;
@@ -105,7 +106,7 @@
 
         public function register():void
         {
-            $courses = $this->form->getState()['courses'];
+            $courses = (array) $this->form->getState()['courses'];
             $onlineRegistration = $this->form->getState();
             unset($onlineRegistration['courses']);
             $registration = OnlineRegistration::create($onlineRegistration);
@@ -119,8 +120,93 @@
             $sms->singleSms($this->form->getState()['pakistan_mobile'],$text);
             }
 
-            if($this->form->getState()['whatsapp_mobile']){
-                $text = "Hi! 👋
+            if ($this->form->getState()['whatsapp_mobile']) {
+                $number = $this->remove_leading_plus($this->form->getState()['whatsapp_mobile']);
+                $courseSpecificMessageSent = false;
+
+                try {
+                    foreach ($courses as $courseId) {
+                        $whatsappResponse = WhatsappResponse::whereHas(
+                            'courses', fn ($q) => $q->where('courses.id', $courseId)
+                        )->first();
+
+                        if (!$whatsappResponse) {
+                            continue;
+                        }
+
+                        $courseSpecificMessageSent = true;
+
+                        foreach ($whatsappResponse->content as $block) {
+                            sleep(1);
+                            $delay = !empty($block['data']['delay']) ? (int) $block['data']['delay'] : 1000;
+
+                            if ($block['type'] === 'text') {
+                                $this->sendWhatsappText($number, $block['data']['message'], $delay);
+                            } elseif ($block['type'] === 'media') {
+                                $mediaUrl = $whatsappResponse->getFirstMediaUrl('whatsapp_response_media');
+                                if ($mediaUrl) {
+                                    $this->sendWhatsappMedia($number, $mediaUrl, $block['data']['caption'] ?? '', $delay);
+                                }
+                            }
+                        }
+                    }
+
+                    if (!$courseSpecificMessageSent) {
+                        sleep(1);
+                        $this->sendWhatsappText($number, $this->hardcodedRegistrationMessage(), 3000);
+                    }
+                } catch (Exception $e) {
+                    Log::error('WhatsApp send failed on registration', [
+                        'number' => $number,
+                        'error'  => $e->getMessage(),
+                        'trace'  => $e->getTraceAsString(),
+                    ]);
+                }
+            }
+
+            $this->submitted = true;
+
+
+
+
+
+        }
+
+
+
+        private function sendWhatsappText(string $number, string $text, int $delayMs = 1000): void
+        {
+            Http::timeout(30)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'apikey'       => config('services.evo.api_key'),
+                ])
+                ->post(config('services.evo.base_url') . '/message/sendText/' . config('services.evo.instance_name'), [
+                    'number' => $number,
+                    'text'   => $text,
+                    'delay'  => $delayMs,
+                ]);
+        }
+
+        private function sendWhatsappMedia(string $number, string $mediaUrl, string $caption = '', int $delayMs = 1000): void
+        {
+            Http::timeout(30)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'apikey'       => config('services.evo.api_key'),
+                ])
+                ->post(config('services.evo.base_url') . '/message/sendMedia/' . config('services.evo.instance_name'), [
+                    'number'    => $number,
+                    'mediatype' => 'image',
+                    'media'     => $mediaUrl,
+                    'caption'   => $caption,
+                    'delay'     => $delayMs,
+                ]);
+        }
+
+        private function hardcodedRegistrationMessage(): string
+        {
+            return "Hi! 👋
 
 Thank you for submitting your registration form. We have successfully received your details. You are currently in the queue, and our Front Desk Manager will contact you within the next 24 hours.
 
@@ -164,50 +250,7 @@ For any assistance, feel free to contact us:
 📞 0333-5335892
 
 Thank you! 😊";
-//                $sms->singleSms($this->form->getState()['pakistan_mobile'],$text);
-
-                // Get configuration
-                $apiKey = config('services.evo.api_key');
-                $instanceName = config('services.evo.instance_name');
-                $baseUrl = config('services.evo.base_url');
-
-                $number = $this->remove_leading_plus($this->form->getState()['whatsapp_mobile']);
-
-                try {
-                    // Send the notification via HTTP request
-                    sleep(1);
-                    $response = Http::timeout(30)
-                        ->withHeaders([
-                            'Content-Type' => 'application/json',
-                            'apikey' => $apiKey,
-                        ])
-                        ->post("{$baseUrl}/message/sendText/{$instanceName}", [
-                            'number' => $number,
-                            'text' => $text,
-                            'delay' => 3000,
-                        ]);
-
-                } catch (Exception $e) {
-                    Log::error('EvoChannel: Exception while sending notification', [
-                        'notifiable_id' => $notifiable->id ?? null,
-                        'number' => $number,
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString(),
-                    ]);
-                }
-
-
-            }
-
-            $this->submitted = true;
-
-
-
-
-
         }
-
-
 
         function remove_leading_plus(string $value): string
         {
