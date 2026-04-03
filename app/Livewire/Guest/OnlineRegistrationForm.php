@@ -109,6 +109,10 @@
             $courses = (array) $this->form->getState()['courses'];
             $onlineRegistration = $this->form->getState();
             unset($onlineRegistration['courses']);
+            $onlineRegistration['status'] = [[
+                'status' => 'Pending',
+                'date'   => now()->toDateTimeString(),
+            ]];
             $registration = OnlineRegistration::create($onlineRegistration);
             $registration->courses()->attach($courses);
 

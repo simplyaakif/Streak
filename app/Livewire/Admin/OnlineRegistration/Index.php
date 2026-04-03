@@ -1,45 +1,57 @@
 <?php
 
-    namespace App\Livewire\Admin\OnlineRegistration;
+namespace App\Livewire\Admin\OnlineRegistration;
 
-    use Filament\Actions\Contracts\HasActions;
-    use Filament\Actions\Concerns\InteractsWithActions;
-    use App\Models\Campus;
-    use App\Models\Course;
-    use App\Models\OnlineRegistration;
-    use App\Models\User;
-    use Filament\Forms\ComponentContainer;
-    use Filament\Forms\Components\Select;
-    use Filament\Forms\Concerns\InteractsWithForms;
-    use Filament\Forms\Contracts\HasForms;
-    use Filament\Tables\Actions\Action;
-    use Filament\Tables\Columns\TextColumn;
-    use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Schemas\Concerns\InteractsWithSchemas;
-    use Filament\Tables\Contracts\HasTable;
-use Filament\Schemas\Contracts\HasSchemas;
-    use Filament\Tables\Enums\FiltersLayout;
-    use Filament\Tables\Filters\Layout;
-    use Filament\Tables\Filters\SelectFilter;
-    use Filament\Tables\Table;
-    use Illuminate\Database\Eloquent\Builder;
-    use Illuminate\Database\Eloquent\Relations\Relation;
-    use Livewire\Component;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\Contracts\HasActions;
+use Filament\Actions\Concerns\InteractsWithActions;
+use App\Models\Campus;
+use App\Models\Course;
+use App\Models\OnlineRegistration;
+use Filament\Actions\DeleteAction;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Notifications\Notification;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
+use Illuminate\Support\Collection;
+use Livewire\Component;
 
-    class Index extends Component implements HasTable, HasSchemas,HasForms, HasActions {
-        use InteractsWithActions;
-        use InteractsWithTable,InteractsWithForms;
+class Index extends Component implements HasTable, HasForms, HasActions
+{
+    use InteractsWithActions;
+    use InteractsWithTable, InteractsWithForms;
 
-
-        public function table(Table $table): Table
-        {
-            return $table
-                ->query(OnlineRegistration::query()->with('courses')->latest())
-                ->columns([
+    public function table(Table $table): Table
+    {
+        return $table
+            ->query(OnlineRegistration::query()->with('courses')->latest())
+            ->columns([
                 TextColumn::make('name')->searchable()->toggleable(),
                 TextColumn::make('father_name')->label('Father Name')->searchable()->toggleable(),
                 TextColumn::make('pakistan_mobile')->label('Mobile Number')->toggleable(),
                 TextColumn::make('whatsapp_mobile')->label('Whatsapp Number')->toggleable(),
+                TextColumn::make('status')->label('Status')->toggleable()
+                    ->view('admin.filament.tables.columns.registration-status')
+                    ->action(
+                        Action::make('viewStatusHistory')
+                            ->label('Status History')
+                            ->modalContent(fn(OnlineRegistration $record) => view(
+                                'admin.filament.modals.registration-status-history',
+                                ['record' => $record]
+                            ))
+                            ->modalSubmitAction(false)
+                            ->modalCancelActionLabel('Close')
+                    ),
                 TextColumn::make('email')->label('Email')->searchable()->toggleable(),
                 TextColumn::make('pak_cnic')->label('CNIC')->searchable()->toggleable(),
                 TextColumn::make('passport_number')->label('Passport Number')->toggleable(),
@@ -48,42 +60,70 @@ use Filament\Schemas\Contracts\HasSchemas;
                 TextColumn::make('campus.name')->label('Campus')->toggleable(),
                 TextColumn::make('ace_reference')->label('Reference')->toggleable(),
                 TextColumn::make('mode_of_learning')->label('Learning Type')->toggleable(),
+
                 TextColumn::make('created_at')->since()->toggleable(),
             ])->filters([
                 SelectFilter::make('campus_id')
                     ->label('Campus')
-                    ->options(Campus::all()->pluck('name','id')),
+                    ->options(Campus::all()->pluck('name', 'id')),
                 SelectFilter::make('course')
                     ->label('Course')
-                    ->relationship('courses','title')
-                    ->options(Course::all()->pluck('title','id')),
+                    ->relationship('courses', 'title')
+                    ->options(Course::all()->pluck('title', 'id')),
                 SelectFilter::make('mode_of_learning')
                     ->label('Mode')
                     ->options([
-                        'In Campus'=>'On-Campus',
-                        'Online'=>'Online'
+                        'In Campus' => 'On-Campus',
+                        'Online' => 'Online'
                     ])
             ], layout: FiltersLayout::AboveContent)
-                ->recordActions([
-//                    Action::make('updateAuthor')
-//                        ->mountUsing(fn (ComponentContainer $form, User $record) => $form->fill([
-//                            'authorId' => $record->author->id,
-//                        ]))
-//                        ->action(function (User $record, array $data): void {
-//                            $record->author()->associate($data['authorId']);
-//                            $record->save();
-//                        })
-//                        ->form([
-//                            Select::make('authorId')
-//                                ->label('Author')
-//                                ->options(User::query()->pluck('name', 'id'))
-//                                ->required(),
-//                        ]),
-                ]);
-        }
+            ->recordActions([
+                Action::make('updateStatus')
+                    ->label('Update Status')
+                    ->mountUsing(fn(Schema $schema, OnlineRegistration $record) => $schema->fill([
+                        'status' => $record->latestStatus()['status'] ?? null,
+                        'date' => now()->toDateTimeString(),
+                        'message' => null,
+                    ]))
+                    ->schema([
+                        Select::make('status')
+                            ->label('Status')
+                            ->options(OnlineRegistration::STATUS)
+                            ->required(),
+                        DateTimePicker::make('date')
+                            ->label('Date & Time')
+                            ->required(),
+                        Textarea::make('message')
+                            ->label('Message/Reason/Notes'),
+                    ])
+                    ->action(function (OnlineRegistration $record, array $data): void {
+                        $existing = empty($record->status) ? [] : (isset($record->status[0]) ? $record->status : [$record->status]);
+                        $record->status = array_merge($existing, [[
+                            'status' => $data['status'],
+                            'date' => $data['date'],
+                            'message' => $data['message'] ?? null,
+                            'updated_by' => auth()->id(),
+                        ]]);
+                        $record->save();
 
-        public function render()
-        {
-            return view('livewire.admin.online-registration.index');
-        }
+                        Notification::make()
+                            ->title('Status updated successfully')
+                            ->success()
+                            ->send();
+                    }),
+                DeleteAction::make('delete')
+                    ->visible(fn($record) => auth()->user()->is_admin)
+            ])
+            ->toolbarActions([
+                BulkAction::make('delete')
+                    ->requiresConfirmation()
+                    ->visible(fn($record) => auth()->user()->is_admin)
+                    ->action(fn (Collection $records) => $records->each->delete())
+            ]);
     }
+
+    public function render(): \Illuminate\View\View
+    {
+        return view('livewire.admin.online-registration.index');
+    }
+}
