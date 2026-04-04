@@ -37,7 +37,7 @@ class Index extends Component implements HasTable, HasForms, HasActions
             ->query(OnlineRegistration::query()->with('courses')->latest())
             ->columns([
                 TextColumn::make('name')->searchable()->toggleable(),
-                TextColumn::make('father_name')->label('Father Name')->searchable()->toggleable(),
+                TextColumn::make('father_name')->label('Father Name')->searchable()->toggleable()->toggledHiddenByDefault(),
                 TextColumn::make('pakistan_mobile')->label('Mobile Number')->toggleable(),
                 TextColumn::make('whatsapp_mobile')->label('Whatsapp Number')->toggleable(),
                 TextColumn::make('status')->label('Status')->toggleable()
@@ -52,16 +52,16 @@ class Index extends Component implements HasTable, HasForms, HasActions
                             ->modalSubmitAction(false)
                             ->modalCancelActionLabel('Close')
                     ),
-                TextColumn::make('email')->label('Email')->searchable()->toggleable(),
-                TextColumn::make('pak_cnic')->label('CNIC')->searchable()->toggleable(),
-                TextColumn::make('passport_number')->label('Passport Number')->toggleable(),
-                TextColumn::make('address')->label('Address')->toggleable(),
+                TextColumn::make('email')->label('Email')->searchable()->toggleable()->toggledHiddenByDefault(),
+                TextColumn::make('pak_cnic')->label('CNIC')->searchable()->toggleable()->toggledHiddenByDefault(),
+                TextColumn::make('passport_number')->label('Passport Number')->toggleable()->toggledHiddenByDefault(),
+                TextColumn::make('address')->label('Address')->toggleable()->toggledHiddenByDefault(),
                 TextColumn::make('courses')->view('admin.filament.tables.columns.courses')->toggleable(),
                 TextColumn::make('campus.name')->label('Campus')->toggleable(),
-                TextColumn::make('ace_reference')->label('Reference')->toggleable(),
+                TextColumn::make('ace_reference')->label('Reference')->toggleable()->toggledHiddenByDefault(),
                 TextColumn::make('mode_of_learning')->label('Learning Type')->toggleable(),
 
-                TextColumn::make('created_at')->since()->toggleable(),
+                TextColumn::make('created_at')->since()->toggleable()->toggledHiddenByDefault(),
             ])->filters([
                 SelectFilter::make('campus_id')
                     ->label('Campus')
