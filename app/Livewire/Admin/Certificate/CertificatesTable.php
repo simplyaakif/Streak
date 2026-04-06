@@ -18,6 +18,7 @@ use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -44,9 +45,10 @@ class CertificatesTable extends Component implements HasActions, HasSchemas, Has
                     ->with(['student', 'batch', 'batch.course', 'certificate', 'certificate.deliveredBy'])
             )
             ->columns([
-                ImageColumn::make('student.dp')
+                SpatieMediaLibraryImageColumn::make('student.dp')
                     ->label('Photo')
-                    ->state(fn (BatchStudent $record): string => $record->student->dp->first()['thumbnail'] ?? $record->student->avatar_url)
+                    ->collection('student_dp')
+//                    ->state(fn (BatchStudent $record): string => $record->student->dp->first()['thumbnail'] ?? $record->student->avatar_url)
                     ->circular(),
                 TextColumn::make('student.name')
                     ->label('Student')
