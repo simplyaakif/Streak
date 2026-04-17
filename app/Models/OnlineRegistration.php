@@ -11,6 +11,7 @@
         const STATUS = [
             'Pending'   => 'Pending',
             'Contacted' => 'Contacted / Called / Responded',
+            'Silent' => 'Silent / Not Responding / Not Picking',
             'Enrolled'  => 'Enrolled / Admission Done',
             'Cancelled' => 'Cancelled / Not Interested',
             'Rejected'  => 'Rejected / Fee Issue | Disciplinary Issue',
