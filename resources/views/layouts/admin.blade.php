@@ -11,6 +11,12 @@
     <link rel="stylesheet" href="{{ asset('css/filament/filament/app.css') }}"/>
 
     <title>{{ config('app.name') }}</title>
+    @if(request()->getHost() === 'rwp.portal.ace.org.pk')
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon-rwp.svg') }}">
+    @else
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    @endif
+    <link rel="alternate icon" href="{{ asset('favicon.ico') }}">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
     <meta http-equiv="Pragma" content="no-cache"/>
     <meta http-equiv="Expires" content="0"/>

@@ -12,6 +12,12 @@
     <link rel="stylesheet" href="{{ asset('css/filament/filament/app.css') }}"/>
 
     <title>{{ trans('panel.site_title') }}</title>
+    @if(request()->getHost() === 'rwp.portal.ace.org.pk')
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon-rwp.svg') }}">
+    @else
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    @endif
+    <link rel="alternate icon" href="{{ asset('favicon.ico') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;700&display=swap" rel="stylesheet">
 
     {{--    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">--}}
