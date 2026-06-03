@@ -268,6 +268,12 @@ class HomeController
             ->get()
             ->sum('amount');
 
+        $recent_received_recoveries = Recovery::where('is_paid', 1)
+            ->orderBy('paid_on', 'desc')
+            ->with(['student', 'batch', 'account'])
+            ->limit(10)
+            ->get();
+
 //            dd($pending_recoveries);
 
         return view('admin.home', compact([
@@ -279,7 +285,8 @@ class HomeController
             'rAdmissions', 'rQueries', 'rExpenses',
             'user_tasks', 'mIndividualSale', 'mAceSale',
             'recoveries', 'month_admission_amount', 'month_recovery_amount',
-            'daily_admission_amount', 'daily_recovery_amount', 'pending_recoveries', 'pending_amount'
+            'daily_admission_amount', 'daily_recovery_amount', 'pending_recoveries', 'pending_amount',
+            'recent_received_recoveries'
         ]));
 
     }

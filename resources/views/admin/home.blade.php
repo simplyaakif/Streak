@@ -599,6 +599,116 @@
                             </div>
                         </div>
                     </div>
+                    @can('recovery_show')
+                    <div class="col-span-2">
+                        <h2 class="text-lg leading-6 font-medium text-gray-900">
+                            Last 10 Received Recoveries
+                        </h2>
+                        <!-- Activity list (smallest breakpoint only) -->
+                        <div class="shadow sm:hidden">
+                            <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
+                                @forelse($recent_received_recoveries as $recovery)
+                                    <li>
+                                        <a href="{{route('admin.students.show',$recovery->student->id)}}" class="block px-4 py-4 bg-white hover:bg-gray-50">
+                                            <span class="flex items-center space-x-4">
+                                                <span class="flex-1 flex space-x-2 truncate">
+                                                    <div class="w-12 rounded-full">
+                                                        @php $rStudent = App\Models\Student::findOrFail($recovery->student->id) @endphp
+                                                        @forelse($rStudent->dp as $key => $entry)
+                                                            <img class="h-10 w-10 rounded-full" src="{{ $entry['url'] }}" alt="{{ $entry['name'] }}" title="{{ $entry['name'] }}">
+                                                        @empty
+                                                            <img class="h-10 w-10 rounded-full" src="{{$rStudent->avatarUrl()}}" alt="">
+                                                        @endforelse
+                                                    </div>
+                                                    <span class="flex flex-col text-gray-500 text-sm truncate">
+                                                        <span class="truncate">{{$recovery->student->name}}</span>
+                                                        <span><span class="text-green-600 font-bold">{{$recovery->amount}} Rs</span></span>
+                                                        <span class="text-xs">{{Carbon\Carbon::parse($recovery->paid_on)->format('d-m-Y')}}</span>
+                                                    </span>
+                                                </span>
+                                                <svg class="flex-shrink-0 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </span>
+                                        </a>
+                                    </li>
+                                @empty
+                                    <li>No received recoveries found</li>
+                                @endforelse
+                            </ul>
+                        </div>
+                        <!-- Activity table (small breakpoint and up) -->
+                        <div class="hidden sm:block">
+                            <div class="flex flex-col mt-2">
+                                <div class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead>
+                                        <tr>
+                                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                DP
+                                            </th>
+                                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Student Name
+                                            </th>
+                                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Amount
+                                            </th>
+                                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Paid On
+                                            </th>
+                                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Account
+                                            </th>
+                                        </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200">
+                                        @forelse($recent_received_recoveries as $recovery)
+                                            @php $rStudent = App\Models\Student::findOrFail($recovery->student->id) @endphp
+                                            <tr class="bg-white">
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    <div class="w-12 rounded-full">
+                                                        @forelse($rStudent->dp as $key => $entry)
+                                                            <a href="{{ route('admin.students.show', $rStudent->id) }}">
+                                                                <img class="h-10 w-10 rounded-full" src="{{ $entry['url'] }}" alt="{{ $entry['name'] }}" title="{{ $entry['name'] }}">
+                                                            </a>
+                                                        @empty
+                                                            <img class="h-10 w-10 rounded-full" src="{{$rStudent->avatarUrl()}}" alt="">
+                                                        @endforelse
+                                                    </div>
+                                                </td>
+                                                <td class="w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                    <a href="{{ route('admin.students.show', $recovery->student->id) }}">
+                                                        <div class="flex flex-col">
+                                                            <span>{{$recovery->student->name}}</span>
+                                                            <span class="text-xs">{{$recovery->batch->title}}</span>
+                                                        </div>
+                                                    </a>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-bold">
+                                                    {{$recovery->amount}} Rs
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {{$recovery->paid_on ? Carbon\Carbon::parse($recovery->paid_on)->format('d-m-Y') : '—'}}
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {{$recovery->account->title ?? '—'}}
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="5">
+                                                    <div class="p-2 text-gray-500 text-center">No received recoveries found</div>
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endcan
+
                     @can('expense_show2')
 
                         <div>
