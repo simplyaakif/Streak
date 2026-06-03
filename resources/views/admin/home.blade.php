@@ -28,9 +28,11 @@
                             @endforelse
                             <div>
                                 <div class="flex items-center">
-                                    <img class="h-16 w-16 rounded-full sm:hidden"
-                                         src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2.6&amp;w=256&amp;h=256&amp;q=80"
-                                         alt="">
+                                    @forelse(Auth::user()->employee->dp as $key => $entry)
+                                        <img class="h-16 w-16 rounded-full sm:hidden" src="{{ $entry['url'] }}" alt="{{ $entry['name'] }}" title="{{ $entry['name'] }}">
+                                    @empty
+                                        <img class="h-16 w-16 rounded-full sm:hidden" src="{{ Auth::user()->employee->avatarUrl() }}" alt="">
+                                    @endforelse
                                     <h1 class="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
                                         Good morning, {{Auth::user()->name}}
                                     </h1>
@@ -64,7 +66,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mt-6 flex space-x-3 md:mt-0 md:ml-4">
+                    <div class="mt-6 flex flex-wrap gap-2 space-x-0 md:mt-0 md:ml-4">
                         @can('query_create')
                             <a href="{{route('admin.queries.create')}}" type="button" class="inline-flex items-center px-4 py-2
                         border
@@ -100,7 +102,7 @@
                                         <p class="text-sm">{{$task->description}}</p>
                                     </div>
                                     <div>
-                                        <div class="flex space-x-2">
+                                        <div class="flex flex-wrap gap-1">
                                             {{$task->status->name}}
                                             <span>
                                                 <a
@@ -266,13 +268,13 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     @can('query_show')
 
-                        <div>
+                        <div class="col-span-2">
                             <h2 class="text-lg leading-6 font-medium text-gray-900 ">
                                 Recent Queries
                             </h2>
                             <!-- Activity list (smallest breakpoint only) -->
-                            <div class="shadow sm:hidden">
-                                <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
+                            <div class="shadow md:hidden">
+                                <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow md:hidden">
                                     @forelse($rQueries as $query)
                                         <li>
                                             <a href="{{route('admin.queries.show',$query->id)}}" class="block px-4 py-4
@@ -305,12 +307,12 @@
                                     @endforelse
                                 </ul>
                             </div>
-                            <!-- Activity table (small breakpoint and up) -->
-                            <div class="hidden sm:block">
+                            <!-- Activity table (medium breakpoint and up) -->
+                            <div class="hidden md:block">
                                 <div class="">
                                     <div class="flex flex-col mt-2">
                                         <div
-                                            class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
+                                            class="align-middle min-w-full overflow-x-auto shadow overflow-hidden md:rounded-lg">
                                             <table class="min-w-full divide-y divide-gray-200">
                                                 <thead>
                                                 <tr>
@@ -364,13 +366,13 @@
                     @endcan
                     @can('student_show')
 
-                        <div>
+                        <div class="col-span-2">
                             <h2 class="  text-lg leading-6 font-medium text-gray-900">
                                 Recent Admissions
                             </h2>
                             <!-- Activity list (smallest breakpoint only) -->
-                            <div class="shadow sm:hidden">
-                                <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
+                            <div class="shadow md:hidden">
+                                <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow md:hidden">
                                     @forelse($rAdmissions as $admission)
                                         <li>
                                             <a href="{{route('admin.students.show',$admission->id)}}" class="block px-4 py-4
@@ -409,12 +411,12 @@
                                     @endforelse
                                 </ul>
                             </div>
-                            <!-- Activity table (small breakpoint and up) -->
-                            <div class="hidden sm:block">
+                            <!-- Activity table (medium breakpoint and up) -->
+                            <div class="hidden md:block">
                                 <div class="">
                                     <div class="flex flex-col mt-2">
                                         <div
-                                            class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
+                                            class="align-middle min-w-full overflow-x-auto shadow overflow-hidden md:rounded-lg">
                                             <table class="min-w-full divide-y divide-gray-200">
                                                 <thead>
                                                 <tr>
@@ -486,7 +488,7 @@
                                     hover:bg-gray-50">
                     <span class="flex items-center space-x-4">
                       <span class="flex-1 flex space-x-2 truncate">
-                          <div class="xw-12 rounded-full">
+                          <div class="w-12 rounded-full">
                             @php $admission = App\Models\Student::findOrFail($pending_recovery->student->id)@endphp
                               @forelse($admission->dp as $key => $entry)
                                   <img class="h-10 w-10 rounded-full"
