@@ -16,21 +16,21 @@ class HomeController
     public function index()
     {
 
-        $dQuery = Query::whereDate('created_at', date('Y-m-d'))->get()->count();
-        $dStudent = Student::whereDate('created_at', date('Y-m-d'))->get()->count();
+        $dQuery = Query::whereDate('created_at', now()->toDateString())->count();
+        $dStudent = Student::whereDate('created_at', now()->toDateString())->count();
 
         $dSale = Recovery::where('is_paid', 1)
             ->whereDate('paid_on', now())
-            ->get()->sum('amount');
+            ->sum('amount');
 
-        $recoveries = Recovery::where("is_paid", 1)
+        $dailyRecoveries = Recovery::where("is_paid", 1)
             ->whereBetween("paid_on", [now()->startOfDay(), now()->endOfDay()])
             ->get();
 
         $daily_admission_amount = 0;
         $daily_recovery_amount = 0;
 
-        foreach ($recoveries as $recovery) {
+        foreach ($dailyRecoveries as $recovery) {
             if ($recovery->meta["installment_number"] === 1) {
                 $daily_admission_amount += $recovery->amount;
             } else {
@@ -38,46 +38,37 @@ class HomeController
             }
         }
 
-
-        $mQuery = Query::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->get()
-            ->count();
-        $mStudent = Student::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->get()
-            ->count();
-        $dExpense = Expense::whereDate('created_at', date('Y-m-d'))
-            ->get()
-            ->sum('amount');
-        $mExpense = Expense::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->get()
-            ->sum('amount');
-
+        $mQuery = Query::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count();
+        $mStudent = Student::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count();
+        $dExpense = Expense::whereDate('created_at', now()->toDateString())->sum('amount');
+        $mExpense = Expense::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('amount');
 
         $mSale = Recovery::where('is_paid', 1)
             ->whereMonth('paid_on', now()->month)->whereYear('paid_on', now()->year)
-            ->get()->sum('amount');
+            ->sum('amount');
 
         $mIndividualSale = Recovery::withWhereHas('batch', function ($query) {
             $query->where('is_sale_skip', 1);
         })->where('is_paid', 1)
             ->whereMonth('paid_on', now()->month)
             ->whereYear('paid_on', now()->year)
-            ->get()->sum('amount');
-
+            ->sum('amount');
 
         $mAceSale = Recovery::withWhereHas('batch', function ($query) {
             $query->where('is_sale_skip', 0);
         })->where('is_paid', 1)
             ->whereMonth('paid_on', now()->month)
             ->whereYear('paid_on', now()->year)
-            ->get()->sum('amount');
+            ->sum('amount');
 
-
-        $recoveries = Recovery::where("is_paid", 1)
+        $monthlyRecoveries = Recovery::where("is_paid", 1)
             ->whereBetween("paid_on", [now()->startOfMonth(), now()->endOfMonth()])
             ->get();
 
         $month_admission_amount = 0;
         $month_recovery_amount = 0;
 
-        foreach ($recoveries as $recovery) {
+        foreach ($monthlyRecoveries as $recovery) {
             if ($recovery->meta["installment_number"] === 1) {
                 $month_admission_amount += $recovery->amount;
             } else {
@@ -85,11 +76,9 @@ class HomeController
             }
         }
 
-
-        $rQueries = Query::select()->latest()->with('courses')->take(5)->get();
+        $rQueries = Query::latest()->with('courses')->take(5)->get();
         $rAdmissions = Student::with('batches')->latest()->take(5)->get();
-        $rExpenses = Expense::select()->with('vendor')->latest()->take(5)
-            ->get();
+        $rExpenses = Expense::with('vendor')->latest()->take(5)->get();
 
         $user_tasks = Task::where('assigned_to_id', Auth::id())
             ->where('status_id', '!=', 2)
@@ -246,8 +235,6 @@ class HomeController
 
         $chart5 = new LaravelChart($year_sale_chart_options, $year_admission_sale_chart_options, $year_recovery_sale_chart_options);
 
-//            dd($chart4);
-
         $pending_recoveries = Recovery::where("is_paid", 0)
             ->whereBetween("due_date", [now()->subMonths(2), now()->endOfDay()])
             ->withWhereHas("batch_student", function ($q) {
@@ -263,9 +250,6 @@ class HomeController
             ->withWhereHas("batch_student", function ($q) {
                 $q->where("batch_status", 1);
             })
-            ->orderBy('due_date', 'desc')
-            ->with(["student", "batch"])
-            ->get()
             ->sum('amount');
 
         $recent_received_recoveries = Recovery::where('is_paid', 1)
@@ -273,8 +257,6 @@ class HomeController
             ->with(['student', 'batch', 'account'])
             ->limit(10)
             ->get();
-
-//            dd($pending_recoveries);
 
         return view('admin.home', compact([
             'dQuery', 'dStudent',
@@ -284,7 +266,7 @@ class HomeController
             'chart1', 'chart2', 'chart3', 'chart4', 'chart5',
             'rAdmissions', 'rQueries', 'rExpenses',
             'user_tasks', 'mIndividualSale', 'mAceSale',
-            'recoveries', 'month_admission_amount', 'month_recovery_amount',
+            'month_admission_amount', 'month_recovery_amount',
             'daily_admission_amount', 'daily_recovery_amount', 'pending_recoveries', 'pending_amount',
             'recent_received_recoveries'
         ]));
