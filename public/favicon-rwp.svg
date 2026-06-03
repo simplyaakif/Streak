@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Rawalpindi Clock Tower">
+
+  <!-- Night-sky background -->
+  <rect width="100" height="100" fill="#1a2e4a"/>
+
+  <!-- Ground -->
+  <rect x="0" y="86" width="100" height="14" fill="#243a55"/>
+  <!-- Platform -->
+  <rect x="18" y="82" width="64" height="4" fill="#c8b48a" rx="1"/>
+
+  <!-- ── LOWER BASE WINGS ── -->
+  <rect x="28" y="70" width="44" height="12" fill="#c8b48a" rx="1"/>
+  <!-- Left wing arched window -->
+  <rect x="31" y="73" width="10" height="9" fill="#1a2e4a"/>
+  <path d="M31,73 Q36,68 41,73" fill="#1a2e4a"/>
+  <!-- Right wing arched window -->
+  <rect x="59" y="73" width="10" height="9" fill="#1a2e4a"/>
+  <path d="M59,73 Q64,68 69,73" fill="#1a2e4a"/>
+
+  <!-- ── MAIN TOWER BODY ── -->
+  <rect x="39" y="18" width="22" height="64" fill="#d4c0a0" rx="1"/>
+
+  <!-- Horizontal string course (decorative band) -->
+  <rect x="39" y="56" width="22" height="2" fill="#b8a07a"/>
+
+  <!-- ── CLOCK FACE ── -->
+  <!-- Dark surround ring -->
+  <circle cx="50" cy="40" r="13" fill="#1a2e4a"/>
+  <!-- Clock dial -->
+  <circle cx="50" cy="40" r="11" fill="#f5edd5"/>
+  <!-- Thin bezel ring -->
+  <circle cx="50" cy="40" r="11" fill="none" stroke="#c8a870" stroke-width="0.8"/>
+  <!-- Hour markers at 12, 3, 6, 9 -->
+  <rect x="49" y="30.5" width="2" height="3"  fill="#1a2e4a"/>
+  <rect x="49" y="46.5" width="2" height="3"  fill="#1a2e4a"/>
+  <rect x="58"   y="39" width="3" height="2"  fill="#1a2e4a"/>
+  <rect x="39"   y="39" width="3" height="2"  fill="#1a2e4a"/>
+  <!-- Hour hand (~10 o'clock) -->
+  <line x1="50" y1="40" x2="44.5" y2="33.5" stroke="#1a2e4a" stroke-width="2"   stroke-linecap="round"/>
+  <!-- Minute hand (~2 o'clock) -->
+  <line x1="50" y1="40" x2="56"   y2="33.5" stroke="#1a2e4a" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Center pin -->
+  <circle cx="50" cy="40" r="1.5" fill="#1a2e4a"/>
+
+  <!-- ── ARCHED WINDOW below clock ── -->
+  <rect x="44" y="59" width="12" height="11" fill="#1a2e4a"/>
+  <path d="M44,59 Q50,53 56,59" fill="#1a2e4a"/>
+
+  <!-- ── MAIN ARCHED ENTRANCE ── -->
+  <rect x="43" y="70" width="14" height="12" fill="#1a2e4a"/>
+  <path d="M43,70 Q50,63 57,70" fill="#1a2e4a"/>
+
+  <!-- ── CROWN / PARAPET ── -->
+  <!-- Parapet base band -->
+  <rect x="35" y="12" width="30" height="7" fill="#d4c0a0"/>
+  <!-- Crenellations (5 merlons) -->
+  <rect x="35" y="5"  width="5" height="8" fill="#d4c0a0" rx="0.5"/>
+  <rect x="43" y="5"  width="5" height="8" fill="#d4c0a0" rx="0.5"/>
+  <rect x="51" y="5"  width="5" height="8" fill="#d4c0a0" rx="0.5"/>
+  <rect x="59" y="5"  width="5" height="8" fill="#d4c0a0" rx="0.5"/>
+  <!-- Central flag-pole spire -->
+  <line x1="50" y1="2" x2="50" y2="12" stroke="#d4c0a0" stroke-width="1.5"/>
+  <!-- Pennant flag -->
+  <polygon points="50,2 58,5 50,8" fill="#c0392b"/>
+
+</svg>
