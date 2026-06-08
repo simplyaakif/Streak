@@ -17,4 +17,14 @@ class EditRecovery extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        if (array_key_exists('installment_number', $data)) {
+            $data['meta'] = ['installment_number' => $data['installment_number']];
+            unset($data['installment_number']);
+        }
+
+        return $data;
+    }
 }

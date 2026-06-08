@@ -50,6 +50,12 @@ class RecoveryResource extends Resource
                     ->required(),
                 Toggle::make('is_paid')
                     ->required(),
+                TextInput::make('installment_number')
+                    ->label('Installment Number')
+                    ->numeric()
+                    ->minValue(1)
+                    ->helperText('1 = original admission fee, 2+ = subsequent recovery installment')
+                    ->afterStateHydrated(fn (TextInput $component, ?Recovery $record) => $component->state($record?->meta['installment_number'] ?? null)),
                 DatePicker::make('paid_on'),
                 TextInput::make('account_id'),
                 TextInput::make('slip_number')
@@ -70,6 +76,16 @@ class RecoveryResource extends Resource
                 TextColumn::make('due_date')
                     ->date(),
                 BooleanColumn::make('is_paid'),
+                TextColumn::make('meta.installment_number')
+                    ->label('Installment')
+                    ->state(fn (Recovery $record): ?int => $record->meta['installment_number'] ?? null)
+                    ->formatStateUsing(fn (?int $state): string => match (true) {
+                        $state === null => '—',
+                        $state === 1 => 'Admission Fee',
+                        default => "Installment #{$state}",
+                    })
+                    ->badge()
+                    ->color(fn (?int $state): string => $state === 1 ? 'success' : 'gray'),
                 TextColumn::make('paid_on')
                     ->searchable()
                     ->date(),

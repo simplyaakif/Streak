@@ -153,6 +153,18 @@
                             'course_id' => $batch_student->batch->course_id,
                                          ]);
                     }
+
+                    $iterator = 1;
+                    $total_installments = count($batch_student->recoveries);
+                    foreach ($batch_student->recoveries as $recovery) {
+                        $recovery->meta = [
+                            "installment_number" => $iterator
+                        ];
+                        $recovery->save();
+
+                        $iterator++;
+                    }
+
                     Notification::make()
                         ->title('Batch Added Successfully')
                         ->success()
