@@ -626,6 +626,13 @@
                                                         <span class="truncate">{{$recovery->student->name}}</span>
                                                         <span><span class="text-green-600 font-bold">{{$recovery->amount}} Rs</span></span>
                                                         <span class="text-xs">{{Carbon\Carbon::parse($recovery->paid_on)->format('d-m-Y')}}</span>
+                                                        <span class="text-xs">{{$recovery->account->title ?? '—'}}</span>
+                                                        @php $installmentNumber = $recovery->meta['installment_number'] ?? null; @endphp
+                                                        @if($installmentNumber === 1)
+                                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 w-fit mt-1">Admission</span>
+                                                        @else
+                                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 w-fit mt-1">Recovery</span>
+                                                        @endif
                                                     </span>
                                                 </span>
                                                 <svg class="flex-shrink-0 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -661,11 +668,18 @@
                                             <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                 Account
                                             </th>
+                                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Type
+                                            </th>
                                         </tr>
                                         </thead>
                                         <tbody class="bg-white divide-y divide-gray-200">
                                         @forelse($recent_received_recoveries as $recovery)
-                                            @php $rStudent = App\Models\Student::findOrFail($recovery->student->id) @endphp
+                                            @php
+                                                $rStudent = App\Models\Student::findOrFail($recovery->student->id);
+                                                $installmentNumber = $recovery->meta['installment_number'] ?? null;
+                                                $isAdmission = $installmentNumber === 1;
+                                            @endphp
                                             <tr class="bg-white">
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                     <div class="w-12 rounded-full">
@@ -695,10 +709,21 @@
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                     {{$recovery->account->title ?? '—'}}
                                                 </td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                    @if($isAdmission)
+                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                            Admission
+                                                        </span>
+                                                    @else
+                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                            Recovery
+                                                        </span>
+                                                    @endif
+                                                </td>
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="5">
+                                                <td colspan="6">
                                                     <div class="p-2 text-gray-500 text-center">No received recoveries found</div>
                                                 </td>
                                             </tr>
