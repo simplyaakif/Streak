@@ -6,6 +6,7 @@ use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\MultiSelect;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
 use App\Filament\Resources\RoleResource\Pages\ListRoles;
@@ -35,8 +36,8 @@ class RoleResource extends Resource
                 TextInput::make('title')
                     ->maxLength(255),
                 MultiSelect::make('permissions')
-                ->relationship('permissions','title')
-                ->columnSpan(2),
+                    ->relationship('permissions', 'title')
+                    ->columnSpan(2),
             ]);
     }
 
@@ -44,16 +45,17 @@ class RoleResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('title'),
+                TextColumn::make('title')->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime(),
                 TextColumn::make('updated_at')
                     ->dateTime(),
                 TextColumn::make('deleted_at')
-                    ->dateTime(),
+                    ->dateTime()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                TrashedFilter::make(),
             ])
             ->recordActions([
                 EditAction::make(),

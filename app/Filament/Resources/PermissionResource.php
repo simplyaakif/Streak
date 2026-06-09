@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
 use App\Filament\Resources\PermissionResource\Pages\ListPermissions;
@@ -27,7 +28,6 @@ class PermissionResource extends Resource
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static string | \UnitEnum | null $navigationGroup = 'Users Management';
 
-
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -42,16 +42,17 @@ class PermissionResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('title'),
+                TextColumn::make('title')->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime(),
                 TextColumn::make('updated_at')
                     ->dateTime(),
                 TextColumn::make('deleted_at')
-                    ->dateTime(),
+                    ->dateTime()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                TrashedFilter::make(),
             ])
             ->recordActions([
                 EditAction::make(),

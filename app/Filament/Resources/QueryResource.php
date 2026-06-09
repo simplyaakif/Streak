@@ -6,6 +6,8 @@ use Filament\Schemas\Schema;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TagsColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
 use App\Filament\Resources\QueryResource\Pages\ListQueries;
@@ -18,14 +20,13 @@ use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
 
 class QueryResource extends Resource
 {
     protected static ?string $model = Query::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user-plus';
-    protected static string | \UnitEnum | null $navigationGroup='Query Management';
+    protected static string | \UnitEnum | null $navigationGroup = 'Query Management';
 
     public static function form(Schema $schema): Schema
     {
@@ -51,16 +52,15 @@ class QueryResource extends Resource
             ->columns([
                 TextColumn::make('name')->searchable(),
                 TextColumn::make('mobile'),
-                TextColumn::make('mobile'),
                 TextColumn::make('entry_by'),
                 TagsColumn::make('course_tags'),
                 TextColumn::make('contact_type_label')
-                ->label('Contact Via'),
+                    ->label('Contact Via'),
                 TextColumn::make('created_at')
                     ->dateTime('h:m d-M-Y')->sortable(),
-            ])->defaultSort('created_at','desc')
+            ])->defaultSort('created_at', 'desc')
             ->filters([
-                //
+                TrashedFilter::make(),
             ])
             ->recordActions([
                 EditAction::make(),
@@ -85,6 +85,7 @@ class QueryResource extends Resource
             'edit' => EditQuery::route('/{record}/edit'),
         ];
     }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

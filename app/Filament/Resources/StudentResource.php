@@ -3,9 +3,11 @@
 namespace App\Filament\Resources;
 
 use Filament\Schemas\Schema;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
 use App\Filament\Resources\StudentResource\Pages\ListStudents;
@@ -25,20 +27,22 @@ class StudentResource extends Resource
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
 
-    protected static string | \UnitEnum | null $navigationGroup ='Students Management';
+    protected static string | \UnitEnum | null $navigationGroup = 'Students Management';
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Textarea::make('name'),
-                Textarea::make('father_name'),
-                Textarea::make('gender'),
-                Textarea::make('nationality'),
+                TextInput::make('name'),
+                TextInput::make('father_name'),
+                Select::make('gender')
+                    ->options(Student::GENDER_SELECT),
+                TextInput::make('nationality'),
                 DatePicker::make('date_of_birth'),
-                Textarea::make('cnic_passport'),
-                Textarea::make('mobile'),
-                Textarea::make('email'),
+                TextInput::make('cnic_passport'),
+                TextInput::make('mobile'),
+                TextInput::make('email')
+                    ->email(),
             ]);
     }
 
@@ -47,19 +51,25 @@ class StudentResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')->searchable(),
-                TextColumn::make('mobile'),
+                TextColumn::make('mobile')->searchable(),
+                TextColumn::make('email')->searchable(),
                 TextColumn::make('father_name'),
                 TextColumn::make('gender')
-                ->extraAttributes(['class'=>'capitalize']),
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'male' => 'info',
+                        'female' => 'success',
+                        default => 'gray',
+                    }),
                 TextColumn::make('date_of_birth')
                     ->date(),
                 TextColumn::make('user.name'),
                 TextColumn::make('created_at')
                     ->sortable()
                     ->dateTime(),
-            ])->defaultSort('created_at','desc')
+            ])->defaultSort('created_at', 'desc')
             ->filters([
-                //
+                TrashedFilter::make(),
             ])
             ->recordActions([
                 EditAction::make(),
@@ -84,6 +94,7 @@ class StudentResource extends Resource
             'edit' => EditStudent::route('/{record}/edit'),
         ];
     }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

@@ -3,11 +3,14 @@
 namespace App\Filament\Resources;
 
 use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Components\Toggle;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
 use App\Filament\Resources\BatchResource\Pages\ListBatches;
@@ -28,7 +31,7 @@ class BatchResource extends Resource
     protected static ?string $model = Batch::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-inbox';
-    protected static ?int $navigationSort =5;
+    protected static ?int $navigationSort = 5;
 
     protected static string | \UnitEnum | null $navigationGroup = 'Academic Management';
 
@@ -39,10 +42,11 @@ class BatchResource extends Resource
                 TextInput::make('title'),
                 TextInput::make('limit')->numeric(),
                 TextInput::make('session_duration'),
-                TextInput::make('description'),
+                Textarea::make('description'),
                 Select::make('course_id')
-                ->relationship('course','title'),
+                    ->relationship('course', 'title'),
                 TimePicker::make('time')->withoutSeconds(),
+                Toggle::make('is_sale_skip'),
             ]);
     }
 
@@ -50,17 +54,18 @@ class BatchResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('title')->searchable(),
+                TextColumn::make('title')->searchable()->sortable(),
                 ToggleColumn::make('is_sale_skip'),
-                TextColumn::make('course.title'),
+                TextColumn::make('course.title')->searchable()->sortable(),
                 TextColumn::make('limit'),
                 TextColumn::make('time'),
                 TextColumn::make('session_duration'),
                 TextColumn::make('created_at')
-                    ->dateTime(),
+                    ->dateTime()
+                    ->sortable(),
             ])
             ->filters([
-                //
+                TrashedFilter::make(),
             ])
             ->recordActions([
                 EditAction::make(),
@@ -85,6 +90,7 @@ class BatchResource extends Resource
             'edit' => EditBatch::route('/{record}/edit'),
         ];
     }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
