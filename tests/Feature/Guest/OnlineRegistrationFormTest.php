@@ -16,7 +16,7 @@ class OnlineRegistrationFormTest extends TestCase
     use RefreshDatabase;
 
     #[Test]
-    public function fallback_whatsapp_registration_message_includes_selected_course_and_campus(): void
+    public function fallback_whatsapp_registration_message_includes_selected_name_course_and_campus(): void
     {
         config([
             'services.evo.base_url' => 'https://evo.test',
@@ -55,6 +55,7 @@ class OnlineRegistrationFormTest extends TestCase
         Http::assertSent(function ($request) use ($campus, $course): bool {
             return $request->url() === 'https://evo.test/message/sendText/ace'
                 && $request['number'] === '923001234567'
+                && str_contains($request['text'], 'Name: Test Student')
                 && str_contains($request['text'], 'Selected Course(s): '.$course->title)
                 && str_contains($request['text'], 'Selected Campus: '.$campus->name);
         });

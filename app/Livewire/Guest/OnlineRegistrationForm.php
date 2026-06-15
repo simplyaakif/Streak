@@ -119,6 +119,7 @@
 
             $courseNames = $registration->courses->pluck('title')->implode(', ');
             $campusName = $registration->campus?->name ?? '';
+            $studentName = $registration->name;
 
             if($this->form->getState()['pakistan_mobile']){
             $sms = new SmsChannel();
@@ -161,7 +162,7 @@
 
                     if (!$courseSpecificMessageSent) {
                         sleep(1);
-                        $this->sendWhatsappText($number, $this->hardcodedRegistrationMessage($courseNames, $campusName), 3000);
+                        $this->sendWhatsappText($number, $this->hardcodedRegistrationMessage($studentName, $courseNames, $campusName), 3000);
                     }
                 } catch (Exception $e) {
                     Log::error('WhatsApp send failed on registration', [
@@ -221,12 +222,13 @@
                 ]);
         }
 
-        private function hardcodedRegistrationMessage(string $course, string $campus): string
+        private function hardcodedRegistrationMessage(string $name, string $course, string $campus): string
         {
             return "Hi! 👋
 
-Thank you for submitting your registration form. We have successfully received your details. You are currently in the queue, and our Front Desk Manager will contact you within the next 24 hours.
+Thank you for submitting your registration form. We have successfully received {$name}'s {$course} course and {$campus} campus request with your details. You are currently in the queue, and our Front Desk Manager will contact you within the next 24 hours.
 
+Name: {$name}
 Selected Course(s): {$course}
 Selected Campus: {$campus}
 
