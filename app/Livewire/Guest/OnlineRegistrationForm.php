@@ -224,9 +224,9 @@
 
         private function hardcodedRegistrationMessage(string $name, string $course, string $campus): string
         {
-            return "Hi! 👋
+            return "Hi! {$name} 👋
 
-Thank you for submitting your registration form. We have successfully received {$name}'s {$course} course and {$campus} campus request with your details. You are currently in the queue, and our Front Desk Manager will contact you within the next 24 hours.
+Thank you for submitting your registration form. We have successfully received your registration with your details. You are currently in the queue, and our Front Desk Manager will contact you within the next 24 hours.
 
 Name: {$name}
 Selected Course(s): {$course}
