@@ -61,7 +61,7 @@ Route::get('/online-information',function (){
 Auth::routes(['register' => false]);
 
 
-Route::group(['prefix' => 'student','middleware' => ['auth','student_guardian']],function(){
+Route::group(['prefix' => 'st','middleware' => ['auth','student_guardian']],function(){
     Route::get('/',[SC::class,'index'])->name('student.dashboard');
     Route::get('/courses',[SC::class,'courses'])->name('student.courses');
     Route::get('/course/{id}',[SC::class,'course'])->name('student.course');

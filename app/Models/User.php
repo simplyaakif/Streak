@@ -68,6 +68,7 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->roles()->where('title', 'Admin')->exists();
     }
+
     public function getIsStudentAttribute()
     {
         return $this->roles()->where('title', 'Student')->exists();
@@ -84,7 +85,7 @@ class User extends Authenticatable implements FilamentUser
 
     public function scopeAdmins()
     {
-        return $this->whereHas('roles', fn ($q) => $q->where('title', 'Admin'));
+        return $this->whereHas('roles', fn($q) => $q->where('title', 'Admin'));
     }
 
     public function getEmailVerifiedAtAttribute($value)
@@ -109,22 +110,29 @@ class User extends Authenticatable implements FilamentUser
         return $date->format('Y-m-d H:i:s');
     }
 
-    public function student(){
+    public function student()
+    {
         return $this->hasOne(Student::class);
     }
 
-    public function employee(){
+    public function employee()
+    {
         return $this->hasOne(Employee::class);
     }
 
-    public function chat_message(){
-        return DB::table('ch_messages')->where('to_id',$this->id)
-            ->where('seen',0)->get();
+    public function chat_message()
+    {
+        return DB::table('ch_messages')->where('to_id', $this->id)
+            ->where('seen', 0)->get();
     }
 
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->is_super ? true:false;
+        if ($panel->getId() === 'streak') {
+            return $this->is_super ? true : false;
+        } elseif ($panel->getId() === 'student') {
+            return $this->student()->exists();
+        }
     }
 }

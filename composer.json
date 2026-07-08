@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.4.0",
         "ext-curl": "*",
+        "afatmustafa/blade-hugeicons": "*",
         "barryvdh/laravel-debugbar": "^3.6",
         "bugsnag/bugsnag-laravel": "^2.21",
         "calebporzio/awesome-helpers": "^2.5",

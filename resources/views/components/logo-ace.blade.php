@@ -1,4 +1,4 @@
-<svg {{$attributes}} viewBox="0 0 409 185" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg {{$attributes ?? "null"}} viewBox="0 0 409 185" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g clip-path="url(#clip0_301:76)">
         <path d="M39.2 143.1H113.6L126.8 179.6H152.8L89.6 5.20001H89.2H63.6H63.2L0 179.5H26L39.2 143.1ZM76.4 40.5L104.2 117.1H48.6L76.4 40.5Z" fill="url(#paint0_linear_301:76)"/>
         <path d="M307.4 5.20001C307.4 63.3 307.4 121.4 307.4 179.5H333.4H408.1V153.5H333.4V105.3H392.5L403.7 79.3H333.3V31.2H408V5.20001H333.3H307.4Z" fill="url(#paint1_linear_301:76)"/>
