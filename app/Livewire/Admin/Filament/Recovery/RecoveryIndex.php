@@ -17,6 +17,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Columns\BooleanColumn;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\Summarizers\Sum;
@@ -30,6 +31,8 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
+use pxlrbt\FilamentExcel\Actions\ExportBulkAction;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 
 class RecoveryIndex extends Component implements HasForms, HasTable, HasActions
 {
@@ -73,6 +76,11 @@ class RecoveryIndex extends Component implements HasForms, HasTable, HasActions
                             ->money('PKR')
                     ),
                 BooleanColumn::make('is_paid'),
+                IconColumn::make('is_special')
+                    ->label('Special Batch')
+                    ->toggleable()
+                    ->toggledHiddenByDefault()
+                ->boolean(),
                 TextColumn::make('paid_on')->date('d-M-Y')->sortable(),
                 TextColumn::make('account.title')
                     ->toggleable()
@@ -214,6 +222,18 @@ class RecoveryIndex extends Component implements HasForms, HasTable, HasActions
                         $record->save();
                     })
                     ->visible(fn(Recovery $record): bool => !$record->is_paid),
+            ])
+            ->toolbarActions([
+                ExportBulkAction::make()
+                    ->exports([
+                        ExcelExport::make()
+                            ->except([
+                                'created_at', 'updated_at', 'deleted_at','student.dp'
+                            ])
+                            ->fromTable()
+                            ->askForFilename()
+                            ->askForWriterType()
+                    ]),
             ]);
     }
 
