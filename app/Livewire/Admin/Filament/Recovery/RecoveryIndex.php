@@ -5,8 +5,10 @@ namespace App\Livewire\Admin\Filament\Recovery;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Action;
+use Filament\Actions\ExportBulkAction;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Grid;
+use App\Filament\Exports\RecoveryExporter;
 use App\Models\Account;
 use App\Models\Batch;
 use App\Models\BatchStudent;
@@ -214,6 +216,10 @@ class RecoveryIndex extends Component implements HasForms, HasTable, HasActions
                         $record->save();
                     })
                     ->visible(fn(Recovery $record): bool => !$record->is_paid),
+            ])
+            ->bulkActions([
+                ExportBulkAction::make()
+                    ->exporter(RecoveryExporter::class),
             ]);
     }
 
