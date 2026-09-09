@@ -129,10 +129,12 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        if ($panel->getId() === 'streak') {
-            return $this->is_super ? true : false;
+        if ($panel->getId() === 'app') {
+            return (bool) $this->is_super;
         } elseif ($panel->getId() === 'student') {
             return $this->student()->exists();
         }
+
+        return false;
     }
 }
